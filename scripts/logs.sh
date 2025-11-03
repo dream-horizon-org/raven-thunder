@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# View Thunder Docker logs
+
+set -e
+
+# Check if Docker is running
+if ! docker info > /dev/null 2>&1; then
+    echo "❌ Error: Docker is not running"
+    exit 1
+fi
+
+# Follow logs
+docker-compose logs -f thunder
+
