@@ -6,6 +6,7 @@ import com.dream11.thunder.client.AerospikeClientHolder;
 import com.dream11.thunder.config.AerospikeConfig;
 import com.dream11.thunder.config.Config;
 import com.dream11.thunder.util.SharedDataUtils;
+import com.google.inject.Inject;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import jakarta.ws.rs.Consumes;
@@ -13,22 +14,17 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.CompletionStage;
 
 @Slf4j
-@NoArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__({@Inject}))
 @Path("/healthcheck")
 public class HealthCheckController {
 
-    private Vertx vertx;
-
-    @jakarta.inject.Inject
-    public void setVertx(Vertx vertx) {
-        this.vertx = vertx;
-    }
+    private final Vertx vertx;
 
     @GET
     @Consumes(MediaType.WILDCARD)

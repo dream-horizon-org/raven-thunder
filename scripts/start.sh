@@ -4,6 +4,9 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR/.." || exit 1
+
 echo "⚡ Starting Thunder in Docker..."
 echo ""
 
@@ -31,8 +34,7 @@ echo "🔗 Application: http://localhost:8080"
 echo "🏥 Health check: http://localhost:8080/healthcheck"
 echo "🏥 Ping:          http://localhost:8080/healthcheck/ping"
 echo ""
-echo "📋 View logs:    docker-compose logs -f"
-echo "📋 View logs:    docker-compose logs -f thunder"
-echo "🛑 Stop:         docker-compose down"
-echo "🔄 Restart:       docker-compose restart"
+echo "📋 View logs:    ./scripts/logs.sh"
+echo "🛑 Stop:         ./scripts/stop.sh"
+echo "🔄 Restart:      ./scripts/restart.sh"
 
