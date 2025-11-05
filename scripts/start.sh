@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Build and run Thunder in Docker container
+# Build and run Thunder in Docker containers
 
 set -e
 
@@ -17,22 +17,26 @@ if ! docker info > /dev/null 2>&1; then
     exit 1
 fi
 
-# Stop and remove existing container if running
-if docker ps -a --format '{{.Names}}' | grep -q '^thunder-api$'; then
-    echo "Stopping existing container..."
+# Stop and remove existing containers if running
+if docker ps -a --format '{{.Names}}' | grep -q '^thunder-api$\|^thunder-admin$'; then
+    echo "Stopping existing containers..."
     docker-compose down
 fi
 
-# Build and start container
-echo "Building and starting container..."
+# Build and start containers
+echo "Building and starting containers..."
 docker-compose up -d --build
 
 echo ""
 echo "✅ Thunder is running in Docker!"
 echo ""
-echo "🔗 Application: http://localhost:8080"
-echo "🏥 Health check: http://localhost:8080/healthcheck"
-echo "🏥 Ping:          http://localhost:8080/healthcheck/ping"
+echo "🔗 Thunder API:      http://localhost:8080"
+echo "🏥 API Health check: http://localhost:8080/healthcheck"
+echo "🏥 API Ping:         http://localhost:8080/healthcheck/ping"
+echo ""
+echo "🔗 Thunder Admin:    http://localhost:8081"
+echo "🏥 Admin Health check: http://localhost:8081/healthcheck"
+echo "🏥 Admin Ping:        http://localhost:8081/healthcheck/ping"
 echo ""
 echo "📋 View logs:    ./scripts/logs.sh"
 echo "🛑 Stop:         ./scripts/stop.sh"

@@ -11,13 +11,20 @@ if ! docker info > /dev/null 2>&1; then
     exit 1
 fi
 
-# Check if container exists
-if ! docker ps -a --format '{{.Names}}' | grep -q '^thunder-api$'; then
-    echo "❌ Error: Thunder container not found"
-    echo "Start it first with: ./scripts/start.sh"
+# Check if containers exist
+if ! docker ps -a --format '{{.Names}}' | grep -q '^thunder-api$\|^thunder-admin$'; then
+    echo "❌ Error: Thunder containers not found"
+    echo "Start them first with: ./scripts/start.sh"
     exit 1
 fi
 
-# Follow logs (removed set -e to allow Ctrl+C to exit gracefully)
-docker-compose logs -f thunder
+# Show logs for both services
+if [ "$1" = "api" ]; then
+    docker-compose logs -f thunder-api
+elif [ "$1" = "admin" ]; then
+    docker-compose logs -f thunder-admin
+else
+    echo "Following logs for both services (use 'api' or 'admin' to filter)..."
+    docker-compose logs -f thunder-api thunder-admin
+fi
 

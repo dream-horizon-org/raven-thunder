@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Stop Thunder Docker container
+# Stop Thunder Docker containers
 
 set -e
 
@@ -16,12 +16,12 @@ if ! docker info > /dev/null 2>&1; then
     exit 1
 fi
 
-# Check if container is running
-if ! docker ps --format '{{.Names}}' | grep -q '^thunder-api$'; then
-    echo "⚠️  Thunder container is not running"
+# Check if containers are running
+if ! docker ps --format '{{.Names}}' | grep -q '^thunder-api$\|^thunder-admin$'; then
+    echo "⚠️  Thunder containers are not running"
     echo ""
     # Try to clean up any stopped containers
-    if docker ps -a --format '{{.Names}}' | grep -q '^thunder-api$'; then
+    if docker ps -a --format '{{.Names}}' | grep -q '^thunder-api$\|^thunder-admin$'; then
         echo "Removing stopped containers..."
         docker-compose down
     fi
@@ -29,7 +29,7 @@ if ! docker ps --format '{{.Names}}' | grep -q '^thunder-api$'; then
     exit 0
 fi
 
-# Stop and remove container
+# Stop and remove containers
 docker-compose down
 
 echo ""
