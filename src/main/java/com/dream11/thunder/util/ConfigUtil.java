@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ConfigUtil {
 
     private static final String DEFAULT_CONFIG_FILE = "thunder-default.conf";
+    private static final String LOCAL_OVERRIDE_CONFIG_FILE = "thunder.conf";
 
     public static ConfigRetriever getConfigRetriever(Vertx vertx) {
         ConfigStoreOptions defaultStore = new ConfigStoreOptions()
@@ -18,8 +19,14 @@ public class ConfigUtil {
                 .setFormat("hocon")
                 .setConfig(new JsonObject().put("path", DEFAULT_CONFIG_FILE));
 
+        ConfigStoreOptions localOverrideStore = new ConfigStoreOptions()
+                .setType("file")
+                .setFormat("hocon")
+                .setConfig(new JsonObject().put("path", LOCAL_OVERRIDE_CONFIG_FILE));
+
         ConfigRetrieverOptions options = new ConfigRetrieverOptions()
-                .addStore(defaultStore);
+                .addStore(defaultStore)
+                .addStore(localOverrideStore);
 
         return ConfigRetriever.create(vertx, options);
     }

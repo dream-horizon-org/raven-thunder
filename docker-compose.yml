@@ -9,6 +9,11 @@ services:
     volumes:
       - ./logs:/app/logs
     restart: unless-stopped
+    depends_on:
+      aerospike:
+        condition: service_healthy
+    environment:
+      - AEROSPIKE_HOSTS=aerospike:3000
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/healthcheck/ping"]
       interval: 30s
@@ -18,7 +23,30 @@ services:
     networks:
       - thunder-network
 
+  aerospike:
+    image: aerospike/aerospike-server:latest
+    container_name: thunder-aerospike
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+      - "3002:3002"
+    environment:
+      - NAMESPACE=thunder
+    volumes:
+      - aerospike-data:/opt/aerospike/data
+    healthcheck:
+      test: ["CMD-SHELL", "asinfo -v status | grep -q '^ok$'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - thunder-network
+
 networks:
   thunder-network:
     driver: bridge
+
+volumes:
+  aerospike-data:
 

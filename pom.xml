@@ -34,6 +34,9 @@
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <maven-shade-plugin.version>3.5.1</maven-shade-plugin.version>
         <maven-surefire-plugin.version>3.2.3</maven-surefire-plugin.version>
+        
+        <!-- Dependency Versions -->
+        <aerospike-client.version>6.3.0</aerospike-client.version>
     </properties>
 
     <dependencies>
@@ -119,6 +122,13 @@
             <groupId>jakarta.ws.rs</groupId>
             <artifactId>jakarta.ws.rs-api</artifactId>
             <version>3.1.0</version>
+        </dependency>
+
+        <!-- Aerospike Client -->
+        <dependency>
+            <groupId>com.aerospike</groupId>
+            <artifactId>aerospike-client</artifactId>
+            <version>${aerospike-client.version}</version>
         </dependency>
 
         <!-- Test Dependencies -->
