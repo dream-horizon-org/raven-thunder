@@ -24,7 +24,7 @@ public class AerospikeClientImpl implements AerospikeClient {
                 policy.timeout = config.getTotalTimeout();
                 policy.maxConnsPerNode = config.getMaxConnections();
 
-                String[] hostPorts = config.getHosts().split(",");
+                String[] hostPorts = config.getHost().split(",");
                 com.aerospike.client.Host[] hosts = Arrays.stream(hostPorts)
                         .map(hp -> {
                             String[] parts = hp.trim().split(":");
@@ -37,7 +37,7 @@ public class AerospikeClientImpl implements AerospikeClient {
                         .toArray(com.aerospike.client.Host[]::new);
 
                 this.client = new com.aerospike.client.AerospikeClient(policy, hosts);
-                log.info("Aerospike client connected successfully to hosts: {}", config.getHosts());
+                log.info("Aerospike client connected successfully to host: {}", config.getHost());
             } catch (Exception e) {
                 log.error("Failed to connect to Aerospike", e);
                 throw new RuntimeException("Failed to connect to Aerospike", e);

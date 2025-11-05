@@ -14,11 +14,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AerospikeConfig {
     
-    @JsonProperty("hosts")
-    private String hosts;
+    @JsonProperty("host")
+    private String host;
     
-    @JsonProperty("namespace")
-    private String namespace;
+    @JsonProperty("user-data-namespace")
+    private String userDataNamespace;
+    
+    @JsonProperty("admin-data-namespace")
+    private String adminDataNamespace;
     
     @JsonProperty("port")
     private Integer port;

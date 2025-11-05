@@ -13,7 +13,8 @@ services:
       aerospike:
         condition: service_healthy
     environment:
-      - AEROSPIKE_HOSTS=aerospike:3000
+      # Override Aerospike host for Docker networking (service name)
+      - AEROSPIKE_HOST=aerospike
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/healthcheck/ping"]
       interval: 30s
@@ -30,10 +31,12 @@ services:
       - "3000:3000"
       - "3001:3001"
       - "3002:3002"
-    environment:
-      - NAMESPACE=thunder
+      - "3003:3003"
     volumes:
       - aerospike-data:/opt/aerospike/data
+      - ./aerospike.conf:/etc/aerospike/aerospike.conf:ro
+    entrypoint: ["/usr/bin/as-tini-static", "-r", "SIGUSR1", "-t", "SIGTERM", "--"]
+    command: ["/usr/bin/asd", "--config-file", "/etc/aerospike/aerospike.conf"]
     healthcheck:
       test: ["CMD-SHELL", "asinfo -v status | grep -q '^ok$'"]
       interval: 10s

@@ -31,7 +31,7 @@ public final class ConfigUtil {
 
     /**
      * Loads the application configuration using ConfigRetriever and returns it as a type-safe Config object.
-     * This method loads configuration from HOCON files only (no environment variable overrides).
+     * Loads from HOCON files and environment variables (env vars override file values).
      *
      * @param vertx the Vert.x instance
      * @return a Single that emits the parsed Config object
@@ -41,6 +41,18 @@ public final class ConfigUtil {
                 .rxGetConfig()
                 .map(jsonConfig -> {
                     try {
+                        // Override aerospike.host from environment variable if present (for Docker)
+                        String aerospikeHost = System.getenv("AEROSPIKE_HOST");
+                        if (aerospikeHost != null && !aerospikeHost.isEmpty()) {
+                            JsonObject aerospike = jsonConfig.getJsonObject("aerospike");
+                            if (aerospike == null) {
+                                aerospike = new JsonObject();
+                                jsonConfig.put("aerospike", aerospike);
+                            }
+                            aerospike.put("host", aerospikeHost);
+                            log.info("Overriding aerospike.host with environment variable: {}", aerospikeHost);
+                        }
+                        
                         return objectMapper.readValue(jsonConfig.encode(), Config.class);
                     } catch (Exception e) {
                         log.error("Failed to parse configuration", e);
@@ -52,8 +64,9 @@ public final class ConfigUtil {
     }
 
     /**
-     * Returns a ConfigRetriever that loads configuration from HOCON files.
+     * Returns a ConfigRetriever that loads configuration from HOCON files and environment variables.
      * Loads thunder-default.conf first, then overlays thunder.conf if it exists.
+     * Environment variables override file values (using Vert.x's env variable substitution).
      *
      * @param vertx the Vert.x instance
      * @return a ConfigRetriever instance
@@ -67,11 +80,17 @@ public final class ConfigUtil {
         ConfigStoreOptions localOverrideStore = new ConfigStoreOptions()
                 .setType("file")
                 .setFormat("hocon")
-                .setConfig(new JsonObject().put("path", LOCAL_OVERRIDE_CONFIG_FILE));
+                .setConfig(new JsonObject().put("path", LOCAL_OVERRIDE_CONFIG_FILE))
+                .setOptional(true);
+
+        // Environment variables store (takes precedence)
+        ConfigStoreOptions envStore = new ConfigStoreOptions()
+                .setType("env");
 
         ConfigRetrieverOptions options = new ConfigRetrieverOptions()
                 .addStore(defaultStore)
-                .addStore(localOverrideStore);
+                .addStore(localOverrideStore)
+                .addStore(envStore);
 
         return ConfigRetriever.create(vertx, options);
     }

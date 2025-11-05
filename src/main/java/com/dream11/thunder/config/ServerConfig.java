@@ -23,10 +23,10 @@ public class ServerConfig {
     @JsonProperty("instances")
     private Integer instances;
     
-    @JsonProperty("compressionSupported")
+    @JsonProperty("compression-supported")
     private Boolean compressionSupported;
     
-    @JsonProperty("idleTimeout")
+    @JsonProperty("idle-timeout")
     private Integer idleTimeout;
 }
 

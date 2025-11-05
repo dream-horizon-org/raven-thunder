@@ -61,9 +61,12 @@ public class MainVerticle extends AbstractVerticle {
                     .doOnComplete(() -> {
                         AerospikeClientHolder.set(aerospikeClient);
                         log.info("Aerospike client initialized successfully");
+                    })
+                    .doOnError(error -> {
+                        log.error("Failed to connect to Aerospike, service startup will fail", error);
                     });
         } catch (Exception e) {
-            log.error("Failed to initialize Aerospike client", e);
+            log.error("Failed to initialize Aerospike client, service startup will fail", e);
             return Completable.error(e);
         }
     }

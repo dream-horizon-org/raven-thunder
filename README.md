@@ -43,6 +43,11 @@ Or using docker-compose directly:
 docker-compose up -d --build
 ```
 
+Docker setup includes:
+- Thunder application container
+- Aerospike database container with namespaces: `thunder` and `thunder-admin`
+- Configuration via environment variables (AEROSPIKE_HOST) and `aerospike.conf` (Aerospike server)
+
 ### Running Locally
 
 To run the application locally:
@@ -57,13 +62,25 @@ Or using Maven:
 mvn exec:java -Dexec.mainClass="com.dream11.thunder.Main"
 ```
 
+**Note:** For local development, you need to:
+1. Run Aerospike locally or configure connection to a remote instance
+2. Configure Aerospike namespaces (`thunder` and `thunder-admin`) if needed
+3. Update `thunder.conf` to override any settings from `thunder-default.conf`
+
 ## Configuration
 
-The application configuration is loaded from `src/main/resources/thunder-default.conf`.
+### Local Development
+- **`src/main/resources/thunder-default.conf`** - Default configuration for local development
+- **`src/main/resources/thunder.conf`** - Optional local overrides (empty by default)
 
-Default configuration:
-- Port: 8080
-- Instances: 1
+### Docker Environment
+- **`aerospike.conf`** - Aerospike server configuration for Docker containers
+- Environment variable `AEROSPIKE_HOST` overrides `aerospike.host` (defaults to `localhost`, set to `aerospike` in Docker)
+
+Configuration:
+- Local development: Uses `thunder-default.conf` → connects to `localhost`
+- Docker: Uses `thunder-default.conf` + `AEROSPIKE_HOST` env var → connects to `aerospike` service name
+- Aerospike server config (`aerospike.conf`) is Docker-only
 
 ## Health Check
 
@@ -72,6 +89,26 @@ The application provides a health check endpoint:
 ```bash
 curl http://localhost:8080/healthcheck
 curl http://localhost:8080/healthcheck/ping
+```
+
+The healthcheck endpoint includes:
+- Overall service status
+- Aerospike connection status
+- Individual namespace statuses (`thunder` and `thunder-admin`)
+
+Example response:
+```json
+{
+  "status": "UP",
+  "service": "thunder",
+  "aerospike": {
+    "status": "UP",
+    "namespaces": {
+      "thunder": "UP",
+      "thunder-admin": "UP"
+    }
+  }
+}
 ```
 
 ## Docker
@@ -108,6 +145,7 @@ Convenience scripts are available in the `scripts/` directory:
 
 ```
 thunder-oss/
+├── aerospike.conf           # Aerospike server config (Docker only)
 ├── scripts/
 │   ├── start.sh
 │   ├── stop.sh
@@ -123,7 +161,8 @@ thunder-oss/
 │   │   │       ├── util/
 │   │   │       └── verticle/
 │   │   └── resources/
-│   │       ├── thunder-default.conf
+│   │       ├── thunder-default.conf  # Default config (local dev)
+│   │       ├── thunder.conf          # Local overrides (optional)
 │   │       └── logback.xml
 │   └── test/
 ├── Dockerfile
