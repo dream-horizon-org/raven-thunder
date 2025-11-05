@@ -2,32 +2,34 @@ package com.dream11.thunder.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
+/**
+ * Aerospike configuration class.
+ * Contains all Aerospike connection settings.
+ */
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class AerospikeConfig {
-
+    
     @JsonProperty("hosts")
     private String hosts;
-
+    
     @JsonProperty("namespace")
     private String namespace;
-
+    
     @JsonProperty("port")
-    private int port = 3000;
-
+    private Integer port;
+    
     @JsonProperty("socket-timeout")
-    private int socketTimeout = 5000;
-
+    private Integer socketTimeout;
+    
     @JsonProperty("total-timeout")
-    private int totalTimeout = 10000;
-
+    private Integer totalTimeout;
+    
     @JsonProperty("max-connections")
-    private int maxConnections = 100;
+    private Integer maxConnections;
 }
 

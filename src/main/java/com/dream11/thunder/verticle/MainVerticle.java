@@ -4,21 +4,21 @@ import com.dream11.thunder.client.AerospikeClient;
 import com.dream11.thunder.client.AerospikeClientHolder;
 import com.dream11.thunder.client.AerospikeClientImpl;
 import com.dream11.thunder.config.AerospikeConfig;
+import com.dream11.thunder.config.Config;
+import com.dream11.thunder.config.ServerConfig;
 import com.dream11.thunder.util.ConfigUtil;
 import com.dream11.thunder.util.SharedDataUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.reactivex.rxjava3.core.Completable;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.impl.cpu.CpuCoreSensor;
-import io.vertx.core.json.JsonObject;
 import io.vertx.rxjava3.core.AbstractVerticle;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class MainVerticle extends AbstractVerticle {
 
-    private JsonObject config;
+    private Config config;
     private AerospikeClient aerospikeClient;
 
     @Override
@@ -26,7 +26,7 @@ public class MainVerticle extends AbstractVerticle {
         return ConfigUtil.getConfig(vertx)
                 .map(config -> {
                     this.config = config;
-                    SharedDataUtils.put(vertx.getDelegate(), config, "applicationConfig");
+                    SharedDataUtils.put(vertx.getDelegate(), config);
                     log.info("Configuration loaded successfully");
                     return config;
                 })
@@ -45,19 +45,17 @@ public class MainVerticle extends AbstractVerticle {
         return Completable.complete();
     }
 
-    private Completable initializeClients(JsonObject config) {
+    private Completable initializeClients(Config config) {
         return initializeAerospikeClient(config);
     }
 
-    private Completable initializeAerospikeClient(JsonObject cfg) {
-        JsonObject aerospikeJson = cfg.getJsonObject("aerospike");
-        if (aerospikeJson == null) {
+    private Completable initializeAerospikeClient(Config cfg) {
+        AerospikeConfig aerospikeConfig = cfg.getAerospike();
+        if (aerospikeConfig == null) {
             log.warn("Aerospike configuration not found, skipping Aerospike client initialization");
             return Completable.complete();
         }
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            AerospikeConfig aerospikeConfig = mapper.readValue(aerospikeJson.encode(), AerospikeConfig.class);
             this.aerospikeClient = new AerospikeClientImpl(aerospikeConfig);
             return aerospikeClient.rxConnect()
                     .doOnComplete(() -> {
@@ -70,13 +68,18 @@ public class MainVerticle extends AbstractVerticle {
         }
     }
 
-    private Completable deployRestVerticle(JsonObject cfg) {
-        JsonObject server = cfg.getJsonObject("server", new JsonObject());
-        String host = server.getString("host", "0.0.0.0");
-        int port = server.getInteger("port", 8080);
-        int instances = server.getInteger("instances", 1);
-        boolean compressionSupported = server.getBoolean("compressionSupported", true);
-        int idleTimeout = server.getInteger("idleTimeout", 60);
+    private Completable deployRestVerticle(Config cfg) {
+        ServerConfig server = cfg.getServer();
+        if (server == null) {
+            log.error("Server configuration not found!");
+            return Completable.error(new IllegalStateException("Server configuration is required"));
+        }
+
+        String host = server.getHost() != null ? server.getHost() : "0.0.0.0";
+        int port = server.getPort() != null ? server.getPort() : 8080;
+        int instances = server.getInstances() != null ? server.getInstances() : 1;
+        boolean compressionSupported = server.getCompressionSupported() != null ? server.getCompressionSupported() : true;
+        int idleTimeout = server.getIdleTimeout() != null ? server.getIdleTimeout() : 60;
 
         log.info("Starting Thunder application on {}:{} with {} instance(s)", host, port, instances);
 

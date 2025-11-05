@@ -1,13 +1,15 @@
 package com.dream11.thunder.injection;
 
 import com.dream11.thunder.config.AerospikeConfig;
+import com.dream11.thunder.config.Config;
 import com.dream11.thunder.config.ServerConfig;
 import com.dream11.thunder.util.SharedDataUtils;
 import com.google.inject.AbstractModule;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 public class MainModule extends AbstractModule {
 
@@ -19,31 +21,35 @@ public class MainModule extends AbstractModule {
         bind(io.vertx.rxjava3.core.Vertx.class)
                 .toInstance(io.vertx.rxjava3.core.Vertx.newInstance(vertx));
 
-        bind(ServerConfig.class).toProvider(() -> {
-            JsonObject cfg = SharedDataUtils.get(vertx, JsonObject.class, "applicationConfig");
-            JsonObject server = cfg != null ? cfg.getJsonObject("server", new JsonObject()) : new JsonObject();
-            ServerConfig sc = new ServerConfig();
-            sc.setHost(server.getString("host", sc.getHost()));
-            sc.setPort(server.getInteger("port", sc.getPort()));
-            sc.setInstances(server.getInteger("instances", sc.getInstances()));
-            sc.setCompressionSupported(server.getBoolean("compressionSupported", sc.isCompressionSupported()));
-            sc.setIdleTimeout(server.getInteger("idleTimeout", sc.getIdleTimeout()));
-            return sc;
+        // Bind Config from shared data
+        bind(Config.class).toProvider(() -> {
+            Config config = SharedDataUtils.get(vertx, Config.class);
+            if (config == null) {
+                log.error("Config not found in SharedData!");
+                throw new IllegalStateException("Config must be initialized in MainVerticle before Guice injection");
+            }
+            log.info("Config retrieved from SharedData for injection");
+            return config;
         });
 
-        bind(AerospikeConfig.class).toProvider(() -> {
-            JsonObject cfg = SharedDataUtils.get(vertx, JsonObject.class, "applicationConfig");
-            JsonObject a = cfg != null ? cfg.getJsonObject("aerospike") : null;
-            AerospikeConfig ac = new AerospikeConfig();
-            if (a != null) {
-                ac.setHosts(a.getString("hosts", ac.getHosts()));
-                ac.setNamespace(a.getString("namespace", ac.getNamespace()));
-                ac.setPort(a.getInteger("port", ac.getPort()));
-                ac.setSocketTimeout(a.getInteger("socket-timeout", ac.getSocketTimeout()));
-                ac.setTotalTimeout(a.getInteger("total-timeout", ac.getTotalTimeout()));
-                ac.setMaxConnections(a.getInteger("max-connections", ac.getMaxConnections()));
+        // Bind ServerConfig from Config
+        bind(ServerConfig.class).toProvider(() -> {
+            Config config = SharedDataUtils.get(vertx, Config.class);
+            if (config == null || config.getServer() == null) {
+                log.error("ServerConfig not available!");
+                throw new IllegalStateException("ServerConfig must be initialized");
             }
-            return ac;
+            return config.getServer();
+        });
+
+        // Bind AerospikeConfig from Config
+        bind(AerospikeConfig.class).toProvider(() -> {
+            Config config = SharedDataUtils.get(vertx, Config.class);
+            if (config == null || config.getAerospike() == null) {
+                log.warn("AerospikeConfig not available, returning null");
+                return null;
+            }
+            return config.getAerospike();
         });
     }
 }

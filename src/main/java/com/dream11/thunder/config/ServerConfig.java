@@ -2,30 +2,32 @@ package com.dream11.thunder.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
+/**
+ * Server configuration class.
+ * Contains HTTP server settings.
+ */
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ServerConfig {
-
+    
     @JsonProperty("host")
-    private String host = "0.0.0.0";
-
+    private String host;
+    
     @JsonProperty("port")
-    private int port = 8080;
-
+    private Integer port;
+    
     @JsonProperty("instances")
-    private int instances = 1;
-
+    private Integer instances;
+    
     @JsonProperty("compressionSupported")
-    private boolean compressionSupported = true;
-
+    private Boolean compressionSupported;
+    
     @JsonProperty("idleTimeout")
-    private int idleTimeout = 60;
+    private Integer idleTimeout;
 }
 
 
