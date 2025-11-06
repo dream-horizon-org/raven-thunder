@@ -1,30 +1,45 @@
 package com.dream11.thunder.api;
 
-import com.dream11.thunder.api.verticle.MainVerticle;
+import com.dream11.thunder.api.injection.GuiceInjector;
+import com.dream11.thunder.api.injection.MainModule;
+import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Launcher;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
-import lombok.extern.slf4j.Slf4j;
+import io.vertx.core.impl.cpu.CpuCoreSensor;
 
-/**
- * Main entry point for Thunder API application.
- */
-@Slf4j
-public class Main {
+import java.util.List;
+
+public class Main extends Launcher {
 
     public static void main(String[] args) {
-        log.info("Starting Thunder API application...");
+        Main launcher = new Main();
+        launcher.dispatch(args);
+    }
 
-        VertxOptions options = new VertxOptions();
-        Vertx vertx = Vertx.vertx(options);
+    @Override
+    public void beforeStartingVertx(VertxOptions vertxOptions) {
+        vertxOptions
+                .setEventLoopPoolSize(getNumOfCores())
+                .setPreferNativeTransport(true)
+                .setWorkerPoolSize(10);
+    }
 
-        vertx.deployVerticle(new MainVerticle(), result -> {
-            if (result.succeeded()) {
-                log.info("Thunder API application started successfully");
-                log.info("Deployment ID: {}", result.result());
-            } else {
-                log.error("Failed to start Thunder API application", result.cause());
-                System.exit(1);
-            }
-        });
+    @Override
+    public void afterStartingVertx(Vertx vertx) {
+        initializeGuiceInjector(vertx);
+    }
+
+    @Override
+    public void beforeDeployingVerticle(DeploymentOptions deploymentOptions) {
+        deploymentOptions.setInstances(1);
+    }
+
+    private Integer getNumOfCores() {
+        return CpuCoreSensor.availableProcessors();
+    }
+
+    private void initializeGuiceInjector(Vertx vertx) {
+        GuiceInjector.initialize(List.of(new MainModule(vertx)));
     }
 }

@@ -24,7 +24,7 @@ public class MainVerticle extends AbstractVerticle {
 
     @Override
     public Completable rxStart() {
-        return ConfigUtil.getConfig(vertx, "thunder-api-default.conf", "thunder-api.conf")
+        return ConfigUtil.getConfig(vertx, "thunder-default.conf", "thunder.conf")
                 .map(config -> {
                     this.config = config;
                     SharedDataUtils.put(vertx.getDelegate(), config);
