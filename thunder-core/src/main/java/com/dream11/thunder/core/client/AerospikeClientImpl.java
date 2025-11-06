@@ -1,13 +1,27 @@
 package com.dream11.thunder.core.client;
 
+import com.aerospike.client.Bin;
+import com.aerospike.client.Key;
+import com.aerospike.client.Operation;
+import com.aerospike.client.Record;
 import com.aerospike.client.policy.ClientPolicy;
+import com.aerospike.client.policy.Policy;
+import com.aerospike.client.policy.QueryPolicy;
+import com.aerospike.client.policy.WritePolicy;
+import com.aerospike.client.query.KeyRecord;
+import com.aerospike.client.query.RecordSet;
+import com.aerospike.client.query.Statement;
 import com.dream11.thunder.core.config.AerospikeConfig;
 import com.google.inject.Inject;
 import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Maybe;
+import io.reactivex.rxjava3.core.Single;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
@@ -66,5 +80,42 @@ public class AerospikeClientImpl implements AerospikeClient {
     @Override
     public boolean isConnected() {
         return client != null && client.isConnected();
+    }
+
+    @Override
+    public Maybe<Record> rxGet(Policy policy, Key key) {
+        return Maybe.fromCallable(() -> getClient().get(policy, key));
+    }
+
+    @Override
+    public Maybe<Record> rxGet(Policy policy, Key key, String... bins) {
+        return Maybe.fromCallable(() -> getClient().get(policy, key, bins));
+    }
+
+    @Override
+    public Single<Key> rxPut(WritePolicy writePolicy, Key key, Bin... bins) {
+        return Single.fromCallable(() -> {
+            getClient().put(writePolicy, key, bins);
+            return key;
+        });
+    }
+
+    @Override
+    public Single<Record> rxOperate(WritePolicy writePolicy, Key key, Operation... operations) {
+        return Single.fromCallable(() -> getClient().operate(writePolicy, key, operations));
+    }
+
+    @Override
+    public Single<List<KeyRecord>> rxQuery(QueryPolicy queryPolicy, Statement statement) {
+        return Single.fromCallable(() -> {
+            List<KeyRecord> results = new ArrayList<>();
+            try (RecordSet recordSet = getClient().query(queryPolicy, statement)) {
+                while (recordSet.next()) {
+                    KeyRecord keyRecord = new KeyRecord(recordSet.getKey(), recordSet.getRecord());
+                    results.add(keyRecord);
+                }
+            }
+            return results;
+        });
     }
 }

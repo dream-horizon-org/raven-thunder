@@ -2,6 +2,17 @@
 
 Thunder is an open-source project built with Java 17 and Vert.x framework.
 
+## Migration Status
+
+This project is currently being migrated from an internal Thunder repository. For detailed migration status, see [MIGRATION_STATUS.md](./MIGRATION_STATUS.md).
+
+**Current Status**:
+- ✅ All core models and interfaces (24 files)
+- ✅ Aerospike client with reactive RxJava3 operations
+- ✅ **ALL repository implementations complete** (BehaviourTag, Nudge, NudgePreview, CTA)
+- ✅ Complete data access layer (62 Java files, ~5,000+ LOC)
+- ⏳ API and Admin controllers & services (next phase)
+
 ## Requirements
 
 - Java 17 (OpenJDK or equivalent)
