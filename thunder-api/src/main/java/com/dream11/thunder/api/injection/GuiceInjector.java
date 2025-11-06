@@ -1,40 +1,55 @@
 package com.dream11.thunder.api.injection;
 
-import com.dream11.rest.ClassInjector;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Module;
+import io.vertx.core.Vertx;
+import lombok.extern.slf4j.Slf4j;
 
-import java.util.List;
-import java.util.Objects;
+/**
+ * Guice injector holder for Thunder API.
+ * Provides centralized dependency injection.
+ */
+@Slf4j
+public class GuiceInjector {
 
-public class GuiceInjector implements ClassInjector {
+    private static Injector injector;
 
-    private static GuiceInjector guiceInjector;
-    private final Injector injector;
-
-    private GuiceInjector(List<Module> modules) {
-        injector = Guice.createInjector(modules);
-    }
-
-    public static synchronized void initialize(List<Module> modules) {
-        if (guiceInjector != null) {
-            throw new IllegalStateException("GuiceInjector is already initialised");
+    /**
+     * Initialize the Guice injector with Vertx instance.
+     *
+     * @param vertx Vertx instance
+     */
+    public static void initialize(Vertx vertx) {
+        if (injector == null) {
+            log.info("Initializing Guice injector for Thunder API");
+            injector = Guice.createInjector(new MainModule(vertx));
+            log.info("Guice injector initialized successfully");
         }
-        guiceInjector = new GuiceInjector(modules);
     }
 
-    public static GuiceInjector getGuiceInjector() {
-        if (guiceInjector == null) {
-            throw new IllegalStateException("GuiceInjector not initialised");
+    /**
+     * Get instance of a class from Guice.
+     *
+     * @param clazz Class to get instance of
+     * @param <T> Type parameter
+     * @return Instance of the class
+     */
+    public static <T> T getInstance(Class<T> clazz) {
+        if (injector == null) {
+            throw new IllegalStateException("Guice injector not initialized. Call initialize() first.");
         }
-        return guiceInjector;
-    }
-
-    @Override
-    public <T> T getInstance(Class<T> clazz) {
-        Objects.requireNonNull(injector, "injector is null, initialize first");
         return injector.getInstance(clazz);
     }
-}
 
+    /**
+     * Get the Guice injector.
+     *
+     * @return Guice injector
+     */
+    public static Injector getInjector() {
+        if (injector == null) {
+            throw new IllegalStateException("Guice injector not initialized. Call initialize() first.");
+        }
+        return injector;
+    }
+}
