@@ -4,21 +4,21 @@ import com.aerospike.client.Bin;
 import com.aerospike.client.Key;
 import com.aerospike.client.Value;
 import com.aerospike.client.policy.WritePolicy;
-import com.dream11.aerospike.reactivex.client.AerospikeClient;
 import com.dream11.thunder.api.dao.StateMachineRepository;
 import com.dream11.thunder.api.model.UserDataSnapshot;
+import com.dream11.thunder.core.client.AerospikeClient;
 import com.dream11.thunder.core.config.AerospikeConfig;
 import com.dream11.thunder.core.dao.AerospikeRepository;
 import com.dream11.thunder.core.util.ParseUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.reactivex.rxjava3.Maybe;
-import io.reactivex.rxjava3.Single;
+import io.reactivex.rxjava3.core.Maybe;
+import io.reactivex.rxjava3.core.Single;
 import com.google.inject.Inject;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-class StateMachineRepositoryImpl extends AerospikeRepository implements StateMachineRepository {
+public class StateMachineRepositoryImpl extends AerospikeRepository implements StateMachineRepository {
 
   private final String namespace;
 

@@ -12,7 +12,7 @@ public class BehaviourTagMapper
     implements Function<List<BehaviourTagSnapshot>, Map<String, BehaviourTagSnapshot>> {
   @Override
   public Map<String, BehaviourTagSnapshot> apply(
-      @NonNull List<BehaviourTagSnapshot> behaviourTagSnapshots) {
+      @io.reactivex.rxjava3.annotations.NonNull List<BehaviourTagSnapshot> behaviourTagSnapshots) {
     try {
       return behaviourTagSnapshots.stream()
           .collect(Collectors.toMap(BehaviourTagSnapshot::getBehaviourTagName, entity -> entity));

@@ -19,15 +19,15 @@ import com.dream11.thunder.core.model.rule.LifespanFrequency;
 import com.dream11.thunder.core.model.rule.SessionFrequency;
 import com.dream11.thunder.core.model.rule.WindowFrequency;
 import com.google.inject.Inject;
-import io.reactivex.rxjava3.Maybe;
-import io.reactivex.rxjava3.Single;
+import io.reactivex.rxjava3.core.Maybe;
+import io.reactivex.rxjava3.core.Single;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 
 @Slf4j
-class SdkServiceImpl implements SdkService {
+public class SdkServiceImpl implements SdkService {
 
   private final UserCohortsClient userCohortsClient;
   private final StateMachineRepository stateMachineRepository;
@@ -71,7 +71,7 @@ class SdkServiceImpl implements SdkService {
                         .filter(e -> Objects.equals(tenantId, e.getValue().getTenantId()))
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))))
         .filter(activeCTAs -> !activeCTAs.isEmpty())
-        .flatMapSingleElement(
+        .flatMapSingle(
             activeCTAs ->
                 stateMachineRepository
                     .find(tenantId, userId)

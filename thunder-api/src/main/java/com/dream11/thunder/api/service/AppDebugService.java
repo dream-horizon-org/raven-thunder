@@ -2,8 +2,8 @@ package com.dream11.thunder.api.service;
 
 import com.dream11.thunder.api.model.UserDataSnapshot;
 import com.dream11.thunder.core.model.CTA;
-import io.reactivex.rxjava3.Maybe;
-import io.reactivex.rxjava3.Single;
+import io.reactivex.rxjava3.core.Maybe;
+import io.reactivex.rxjava3.core.Single;
 import java.util.Map;
 
 public interface AppDebugService {

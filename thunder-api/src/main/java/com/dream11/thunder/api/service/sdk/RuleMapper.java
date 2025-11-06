@@ -7,9 +7,9 @@ import io.reactivex.rxjava3.functions.Function;
 
 public class RuleMapper implements Function<Rule, RuleResponse> {
 
-  @NonNull
+  @io.reactivex.rxjava3.annotations.NonNull
   @Override
-  public RuleResponse apply(@NonNull Rule rule) {
+  public RuleResponse apply(@io.reactivex.rxjava3.annotations.NonNull Rule rule) {
     return new RuleResponse(
         rule.getStateToAction(),
         rule.getResetStates(),

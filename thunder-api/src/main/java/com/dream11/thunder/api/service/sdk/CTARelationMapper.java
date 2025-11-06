@@ -8,7 +8,7 @@ import java.util.Collections;
 
 public class CTARelationMapper implements Function<CTARelation, CTARelationSnapshot> {
   @Override
-  public CTARelationSnapshot apply(@NonNull CTARelation ctaRelation) {
+  public CTARelationSnapshot apply(@io.reactivex.rxjava3.annotations.NonNull CTARelation ctaRelation) {
     return new CTARelationSnapshot(
         ctaRelation.getShownCta(), ctaRelation.getHideCta(), Collections.emptyList());
   }

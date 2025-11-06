@@ -7,12 +7,12 @@ import com.dream11.thunder.api.service.StaticDataCache;
 import com.dream11.thunder.core.dao.CTARepository;
 import com.dream11.thunder.core.model.CTA;
 import com.google.inject.Inject;
-import io.reactivex.rxjava3.Maybe;
-import io.reactivex.rxjava3.Single;
+import io.reactivex.rxjava3.core.Maybe;
+import io.reactivex.rxjava3.core.Single;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-class AppDebugServiceImpl implements AppDebugService {
+public class AppDebugServiceImpl implements AppDebugService {
 
   private final CTARepository ctaRepository;
   private final StateMachineRepository stateMachineRepository;

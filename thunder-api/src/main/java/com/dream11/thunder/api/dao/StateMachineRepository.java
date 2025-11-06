@@ -1,8 +1,8 @@
 package com.dream11.thunder.api.dao;
 
 import com.dream11.thunder.api.model.UserDataSnapshot;
-import io.reactivex.rxjava3.Maybe;
-import io.reactivex.rxjava3.Single;
+import io.reactivex.rxjava3.core.Maybe;
+import io.reactivex.rxjava3.core.Single;
 
 public interface StateMachineRepository {
 

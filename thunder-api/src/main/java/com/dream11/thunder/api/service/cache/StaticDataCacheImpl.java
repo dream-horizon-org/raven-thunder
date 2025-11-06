@@ -1,110 +1,92 @@
 package com.dream11.thunder.api.service.cache;
 
-import com.dream11.thunder.api.config.AppConfig;
-import com.dream11.thunder.api.config.CacheConfig;
 import com.dream11.thunder.api.service.StaticDataCache;
 import com.dream11.thunder.core.dao.BehaviourTagsRepository;
 import com.dream11.thunder.core.dao.CTARepository;
 import com.dream11.thunder.core.model.BehaviourTag;
 import com.dream11.thunder.core.model.CTA;
-import com.dream11.thunder.core.util.MetricUtil;
 import com.google.inject.Inject;
-import com.timgroup.statsd.StatsDClient;
-import io.reactivex.rxjava3.Completable;
-import io.reactivex.rxjava3.Single;
-import io.vertx.reactivex.core.Vertx;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicBoolean;
+import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
-class StaticDataCacheImpl implements StaticDataCache {
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
-  private final StatsDClient d11DDClient;
+/**
+ * Simple cache implementation for static data (CTAs and BehaviourTags).
+ * Loads data from repositories on initialization.
+ */
+@Slf4j
+@Singleton
+public class StaticDataCacheImpl implements StaticDataCache {
+
   private final CTARepository ctaRepository;
   private final BehaviourTagsRepository behaviourTagsRepository;
-  private MasterData masterDataCache;
-  private final CacheConfig cacheConfig;
-  private final AtomicBoolean isCacheInitiationProcessTriggered = new AtomicBoolean(false);
-  private final CompletableFuture<Void> cacheInitiationProcess = new CompletableFuture<>();
+
+  private final Map<Long, CTA> activeCTACache = new ConcurrentHashMap<>();
+  private final Map<Long, CTA> pausedCTACache = new ConcurrentHashMap<>();
+  private final Map<String, BehaviourTag> behaviourTagCache = new ConcurrentHashMap<>();
 
   @Inject
   public StaticDataCacheImpl(
-      StatsDClient d11DDClient,
       CTARepository ctaRepository,
-      BehaviourTagsRepository behaviourTagsRepository,
-      AppConfig config) {
-    this.d11DDClient = d11DDClient;
+      BehaviourTagsRepository behaviourTagsRepository) {
     this.ctaRepository = ctaRepository;
     this.behaviourTagsRepository = behaviourTagsRepository;
-    cacheConfig = config.getCache();
   }
 
   @Override
-  public synchronized CompletableFuture<?> initiateCache() {
-    if (isCacheInitiationProcessTriggered.get()) {
-      log.info("cache initiation process already triggered...");
-      return cacheInitiationProcess;
-    }
+  public CompletableFuture<?> initiateCache() {
+    log.info("Initializing static data cache...");
+    
+    CompletableFuture<Void> activeCTAFuture = new CompletableFuture<>();
+    ctaRepository.findAllWithStatusActive()
+        .doOnSuccess(ctas -> {
+          activeCTACache.clear();
+          activeCTACache.putAll(ctas);
+          log.info("Loaded {} active CTAs into cache", ctas.size());
+        })
+        .ignoreElement()
+        .subscribe(() -> activeCTAFuture.complete(null), activeCTAFuture::completeExceptionally);
 
-    log.info("initiating cache...");
-    populateCache()
-        .subscribe(
-            () -> {
-              log.info("cache initiated...");
-              scheduleCacheRefresh(cacheConfig.getRefresh().getInterval().getMs());
-              cacheInitiationProcess.complete(null);
-            },
-            cacheInitiationProcess::completeExceptionally);
+    CompletableFuture<Void> pausedCTAFuture = new CompletableFuture<>();
+    ctaRepository.findAllWithStatusPaused()
+        .doOnSuccess(ctas -> {
+          pausedCTACache.clear();
+          pausedCTACache.putAll(ctas);
+          log.info("Loaded {} paused CTAs into cache", ctas.size());
+        })
+        .ignoreElement()
+        .subscribe(() -> pausedCTAFuture.complete(null), pausedCTAFuture::completeExceptionally);
 
-    isCacheInitiationProcessTriggered.set(true);
-    return cacheInitiationProcess;
-  }
+    CompletableFuture<Void> behaviourTagsFuture = new CompletableFuture<>();
+    behaviourTagsRepository.findAll()
+        .doOnSuccess(tags -> {
+          behaviourTagCache.clear();
+          behaviourTagCache.putAll(tags);
+          log.info("Loaded {} behaviour tags into cache", tags.size());
+        })
+        .ignoreElement()
+        .subscribe(() -> behaviourTagsFuture.complete(null), behaviourTagsFuture::completeExceptionally);
 
-  private Completable populateCache() {
-    return Single.zip(
-            ctaRepository.findAllWithStatusActive(),
-            ctaRepository.findAllWithStatusPaused(),
-            behaviourTagsRepository.findAll(),
-            (activeCTAs, pausedCTAs, behaviourTags) -> {
-              MasterData masterData = new MasterData();
-              masterData.setActiveCTACache(activeCTAs);
-              masterData.setPausedCTACache(pausedCTAs);
-              masterData.setBehaviourTagCache(behaviourTags);
-              return masterData;
-            })
-        .doOnSuccess(
-            masterData -> {
-              this.masterDataCache = masterData;
-              log.info("cache updated...");
-            })
-        .doOnError(
-            error -> {
-              d11DDClient.incrementCounter(
-                  MetricUtil.aspect("background_process_error", "process:cache_update"));
-              log.error("error while updating cache", error);
-            })
-        .doOnSubscribe(disposable -> log.info("updating cache..."))
-        .ignoreElement();
-  }
-
-  private void scheduleCacheRefresh(Long delay) {
-    Vertx.currentContext().owner().setPeriodic(delay, timerId -> populateCache().subscribe());
+    return CompletableFuture.allOf(activeCTAFuture, pausedCTAFuture, behaviourTagsFuture)
+        .thenRun(() -> log.info("Static data cache initialized successfully"));
   }
 
   @Override
   public Map<Long, CTA> findAllActiveCTA() {
-    return masterDataCache.getActiveCTACache();
+    return new ConcurrentHashMap<>(activeCTACache);
   }
 
   @Override
   public Map<Long, CTA> findAllPausedCTA() {
-    return masterDataCache.getPausedCTACache();
+    return new ConcurrentHashMap<>(pausedCTACache);
   }
 
   @Override
   public Map<String, BehaviourTag> findAllBehaviourTags() {
-    return masterDataCache.getBehaviourTagCache();
+    return new ConcurrentHashMap<>(behaviourTagCache);
   }
 }
+

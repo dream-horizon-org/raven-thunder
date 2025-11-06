@@ -1,7 +1,7 @@
 package com.dream11.thunder.api.io.response;
 
+import com.dream11.thunder.core.model.Frequency;
 import com.dream11.thunder.core.model.GroupByConfig;
-import com.dream11.thunder.core.model.rule.Frequency;
 import com.dream11.thunder.core.model.rule.StateTransitionCondition;
 import java.util.List;
 import java.util.Map;
