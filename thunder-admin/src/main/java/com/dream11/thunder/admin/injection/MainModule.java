@@ -5,7 +5,7 @@ import com.dream11.thunder.admin.service.BehaviourTagService;
 import com.dream11.thunder.admin.service.admin.AdminServiceImpl;
 import com.dream11.thunder.admin.service.behaviourTag.BehaviourTagServiceImpl;
 import com.dream11.thunder.core.client.AerospikeClient;
-import com.dream11.thunder.core.client.AerospikeClientImpl;
+import com.dream11.thunder.core.client.AerospikeClientHolder;
 import com.dream11.thunder.core.config.AerospikeConfig;
 import com.dream11.thunder.core.config.Config;
 import com.dream11.thunder.core.config.ServerConfig;
@@ -68,8 +68,15 @@ public class MainModule extends AbstractModule {
             return config.getAerospike();
         });
 
-        // Bind Aerospike Client
-        bind(AerospikeClient.class).to(AerospikeClientImpl.class).in(Singleton.class);
+        // Bind Aerospike Client from AerospikeClientHolder (initialized in MainVerticle)
+        bind(AerospikeClient.class).toProvider(() -> {
+            AerospikeClient client = AerospikeClientHolder.get();
+            if (client == null) {
+                log.error("AerospikeClient not found in AerospikeClientHolder!");
+                throw new IllegalStateException("AerospikeClient must be initialized in MainVerticle before Guice injection");
+            }
+            return client;
+        });
 
         // Bind Repositories
         bind(CTARepository.class).to(CTARepositoryImpl.class).in(Singleton.class);
