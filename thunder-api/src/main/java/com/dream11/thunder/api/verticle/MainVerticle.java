@@ -1,5 +1,6 @@
 package com.dream11.thunder.api.verticle;
 
+import com.dream11.thunder.api.service.StaticDataCache;
 import com.dream11.thunder.core.client.AerospikeClient;
 import com.dream11.thunder.core.client.AerospikeClientHolder;
 import com.dream11.thunder.core.client.AerospikeClientImpl;
@@ -23,7 +24,7 @@ public class MainVerticle extends AbstractVerticle {
 
     @Override
     public Completable rxStart() {
-        return ConfigUtil.getConfig(vertx)
+        return ConfigUtil.getConfig(vertx, "thunder-default.conf", "thunder.conf")
                 .map(config -> {
                     this.config = config;
                     SharedDataUtils.put(vertx.getDelegate(), config);
@@ -84,7 +85,7 @@ public class MainVerticle extends AbstractVerticle {
         boolean compressionSupported = server.getCompressionSupported() != null ? server.getCompressionSupported() : true;
         int idleTimeout = server.getIdleTimeout() != null ? server.getIdleTimeout() : 60;
 
-        log.info("Starting Thunder application on {}:{} with {} instance(s)", host, port, instances);
+        log.info("Starting Thunder API application on {}:{} with {} instance(s)", host, port, instances);
 
         HttpServerOptions httpServerOptions = new HttpServerOptions()
                 .setHost(host)

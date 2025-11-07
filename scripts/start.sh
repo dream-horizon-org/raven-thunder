@@ -25,6 +25,8 @@ fi
 
 # Build and start containers
 echo "Building and starting containers..."
+# Increase timeout for slow network connections (standard docker-compose environment variable)
+export COMPOSE_HTTP_TIMEOUT=300
 docker-compose up -d --build
 
 echo ""

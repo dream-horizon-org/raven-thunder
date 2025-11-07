@@ -37,4 +37,3 @@ public class GuiceInjector implements ClassInjector {
         return injector.getInstance(clazz);
     }
 }
-

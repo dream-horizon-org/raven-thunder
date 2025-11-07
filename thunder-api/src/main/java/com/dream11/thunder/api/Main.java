@@ -43,4 +43,3 @@ public class Main extends Launcher {
         GuiceInjector.initialize(List.of(new MainModule(vertx)));
     }
 }
-
