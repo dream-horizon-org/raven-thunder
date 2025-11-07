@@ -143,6 +143,14 @@ docker-compose logs -f thunder
 docker-compose down
 ```
 
+**Note:** If you experience timeout issues during image pulls (e.g., "TLS handshake timeout"), you can increase the timeout:
+```bash
+export COMPOSE_HTTP_TIMEOUT=300
+docker-compose up -d --build
+```
+
+For persistent network issues, configure Docker daemon timeouts in `/etc/docker/daemon.json` (or Docker Desktop settings).
+
 ## Scripts
 
 Convenience scripts are available in the `scripts/` directory:

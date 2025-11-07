@@ -67,11 +67,13 @@ services:
         condition: service_healthy
     volumes:
       - ./thunder-admin/src/main/resources/seeds:/app/seeds:ro
+      - ./scripts/run-all-seeds.sh:/app/run-all-seeds.sh:ro
     environment:
       - AEROSPIKE_HOST=aerospike
       - AEROSPIKE_PORT=3000
-    entrypoint: ["wrapper"]
-    command: ["aql", "-h", "aerospike", "-p", "3000", "--socket-timeout=100000000", "--timeout=100000000", "-f", "/app/seeds/001_seed_meta_set.aql"]
+      - SEEDS_DIR=/app/seeds
+    entrypoint: ["/bin/sh"]
+    command: ["/app/run-all-seeds.sh"]
     networks:
       - thunder-network
     restart: "no"
