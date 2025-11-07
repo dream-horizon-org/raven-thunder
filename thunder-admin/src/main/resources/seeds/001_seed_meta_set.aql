@@ -1,0 +1,4 @@
+SET KEY_SEND TRUE
+DELETE FROM thunder-admin.meta_set WHERE PK = 'default'
+INSERT INTO thunder-admin.meta_set (PK, tags, teams, name, created_By) VALUES ('default', JSON('[]'), JSON('["default"]'), JSON('[]'), JSON('[]'))
+

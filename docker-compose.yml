@@ -55,6 +55,23 @@ services:
     networks:
       - thunder-network
 
+  aerospike-seed:
+    image: aerospike/aerospike-tools:latest
+    container_name: thunder-aerospike-seed
+    depends_on:
+      aerospike:
+        condition: service_healthy
+    volumes:
+      - ./thunder-admin/src/main/resources/seeds:/app/seeds:ro
+    environment:
+      - AEROSPIKE_HOST=aerospike
+      - AEROSPIKE_PORT=3000
+    entrypoint: ["wrapper"]
+    command: ["aql", "-h", "aerospike", "-p", "3000", "--socket-timeout=100000000", "--timeout=100000000", "-f", "/app/seeds/001_seed_meta_set.aql"]
+    networks:
+      - thunder-network
+    restart: "no"
+
   aerospike:
     image: aerospike/aerospike-server:latest
     container_name: thunder-aerospike
