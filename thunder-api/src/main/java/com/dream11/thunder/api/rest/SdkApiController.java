@@ -47,7 +47,7 @@ public class SdkApiController {
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<NudgePreview>> getNudgePreview(
       @PathParam("id") String id,
-      @DefaultValue("dream11") @HeaderParam("x-tenant-id") String tenantId) {
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId) {
     return ResponseWrapper.fromMaybe(service.findNudgePreview(tenantId, id), null, 200);
   }
 
@@ -56,7 +56,7 @@ public class SdkApiController {
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<CTAResponse>> appLaunch(
-      @DefaultValue("dream11") @HeaderParam("x-tenant-id") String tenantId,
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
       @NotNull(message = "auth-userid cannot be null") @HeaderParam("auth-userid") Long userId,
       @Nullable @HeaderParam("app_version") String appVersion,
       @Nullable @HeaderParam("codepush_version") String cpVersion,
@@ -74,7 +74,7 @@ public class SdkApiController {
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<CTAResponse>> appLaunchV1(
-      @DefaultValue("dream11") @HeaderParam("x-tenant-id") String tenantId,
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
       @NotNull(message = "auth-userid cannot be null") @HeaderParam("auth-userid") Long userId,
       @Nullable @HeaderParam("app_version") String appVersion,
       @Nullable @HeaderParam("codepush_version") String cpVersion,
@@ -90,7 +90,7 @@ public class SdkApiController {
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<Boolean>> merge(
-      @DefaultValue("dream11") @HeaderParam("x-tenant-id") String tenantId,
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
       @NotNull(message = "auth-userid cannot be null") @HeaderParam("auth-userid") Long userId,
       @Nullable @HeaderParam("app_version") String appVersion,
       @Nullable @HeaderParam("codepush_version") String cpVersion,

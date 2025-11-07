@@ -33,7 +33,7 @@ public class BehaviourTagController {
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<BehaviourTagsResponse>> getBehaviourTags(
-      @DefaultValue("dream11") @HeaderParam("x-tenant-id") String tenantId) {
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId) {
     return ResponseWrapper.fromSingle(service.fetchAllBehaviourTags(tenantId), 200);
   }
 
@@ -42,7 +42,7 @@ public class BehaviourTagController {
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<BehaviourTag>> getBehaviourTags(
-      @DefaultValue("dream11") @HeaderParam("x-tenant-id") String tenantId,
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
       @PathParam("behaviourTagName") String behaviourTagName) {
     return ResponseWrapper.fromSingle(
         service.fetchBehaviourTagDetail(tenantId, behaviourTagName), 200);
@@ -53,7 +53,7 @@ public class BehaviourTagController {
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<Object>> createBehaviour(
-      @DefaultValue("dream11") @HeaderParam("x-tenant-id") String tenantId,
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
       @NotNull @Valid BehaviourTagCreateRequest behaviourTagCreateRequest,
       @NotNull(message = USER_ID_NULL_ERROR_MESSAGE) @HeaderParam("user") String userId) {
     behaviourTagCreateRequest.validate();
@@ -66,7 +66,7 @@ public class BehaviourTagController {
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<Object>> updateBehaviourTag(
-      @DefaultValue("dream11") @HeaderParam("x-tenant-id") String tenantId,
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
       @NotNull @Valid BehaviourTagPutRequest behaviourTagPutRequest,
       @NotNull @PathParam("behaviourTagName") String behaviourTagName,
       @NotNull(message = USER_ID_NULL_ERROR_MESSAGE) @HeaderParam("user") String userId) {

@@ -33,7 +33,7 @@ public class AppDebugController {
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<Map<Long, CTA>>> findAllActiveCTA(
-      @DefaultValue("dream11") @HeaderParam("x-tenant-id") String tenantId,
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
       @NotNull @QueryParam("cache") Boolean cache) {
     return ResponseWrapper.fromSingle(service.findAllActiveCTA(tenantId, cache), 200);
   }
@@ -43,7 +43,7 @@ public class AppDebugController {
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<CTA>> findCTA(
-      @DefaultValue("dream11") @HeaderParam("x-tenant-id") String tenantId,
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
       @NotNull @PathParam("id") String id) {
     return ResponseWrapper.fromMaybe(service.findCTA(tenantId, Long.parseLong(id)), null, 200);
   }
@@ -53,7 +53,7 @@ public class AppDebugController {
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<UserDataSnapshot>> find(
-      @DefaultValue("dream11") @HeaderParam("x-tenant-id") String tenantId,
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
       @NotNull @HeaderParam("auth-userid") Long userId) {
     return ResponseWrapper.fromMaybe(service.findStateMachine(tenantId, userId), null, 200);
   }

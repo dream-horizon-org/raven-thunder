@@ -41,7 +41,7 @@ public class AdminController {
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<Object>> createNudge(
-      @DefaultValue("dream11") @HeaderParam("x-tenant-id") String tenantId,
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
       @NotNull @Valid Nudge template) {
     return ResponseWrapper.fromCompletable(service.createNudge(tenantId, template), null, 200);
   }
@@ -51,7 +51,7 @@ public class AdminController {
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<Object>> updateNudge(
-      @DefaultValue("dream11") @HeaderParam("x-tenant-id") String tenantId,
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
       @NotNull @Valid Nudge template) {
     return ResponseWrapper.fromCompletable(service.updateNudge(tenantId, template), null, 200);
   }
@@ -61,7 +61,7 @@ public class AdminController {
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<Object>> createOrUpdateNudgePreview(
-      @DefaultValue("dream11") @HeaderParam("x-tenant-id") String tenantId,
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
       @NotNull @Valid NudgePreview nudgePreview) {
     nudgePreview.validate();
     return ResponseWrapper.fromCompletable(
@@ -73,7 +73,7 @@ public class AdminController {
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<NudgePreview>> getNudgePreview(
-      @DefaultValue("dream11") @HeaderParam("x-tenant-id") String tenantId,
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
       @QueryParam("id") String id) {
     return ResponseWrapper.fromSingle(nudgePreviewRepository.find(tenantId, id).toSingle(), 200);
   }
@@ -83,7 +83,7 @@ public class AdminController {
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<Long>> createCta(
-      @DefaultValue("dream11") @HeaderParam("x-tenant-id") String tenantId,
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
       @NotNull @Valid CTARequest cta,
       @NotNull(message = USER_ID_NULL_ERROR_MESSAGE) @HeaderParam("user") String user) {
     cta.validate();
@@ -95,7 +95,7 @@ public class AdminController {
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<Object>> updateCta(
-      @DefaultValue("dream11") @HeaderParam("x-tenant-id") String tenantId,
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
       @NotNull @Valid CTAUpdateRequest cta,
       @NotNull @PathParam("ctaId") Long ctaId,
       @NotNull(message = USER_ID_NULL_ERROR_MESSAGE) @HeaderParam("user") String user) {
@@ -109,7 +109,7 @@ public class AdminController {
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<CTA>> getCTA(
-      @DefaultValue("dream11") @HeaderParam("x-tenant-id") String tenantId,
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
       @NotNull @PathParam("ctaId") Long ctaId) {
     return ResponseWrapper.fromSingle(service.fetchCTA(tenantId, ctaId), 200);
   }
@@ -119,7 +119,7 @@ public class AdminController {
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<CTAListResponse>> getCTAs(
-      @DefaultValue("dream11") @HeaderParam("x-tenant-id") String tenantId,
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
       @QueryParam("name") String name,
       @QueryParam("teams") String teams,
       @QueryParam("tags") String tags,
@@ -150,7 +150,7 @@ public class AdminController {
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<FilterResponse>> getFilterValues(
-      @DefaultValue("dream11") @HeaderParam("x-tenant-id") String tenantId) {
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId) {
     return ResponseWrapper.fromSingle(service.fetchFilters(tenantId), 200);
   }
 
@@ -159,7 +159,7 @@ public class AdminController {
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<Object>> updateStatusToLive(
-      @DefaultValue("dream11") @HeaderParam("x-tenant-id") String tenantId,
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
       @NotNull @PathParam("id") Long id) {
     return ResponseWrapper.fromCompletable(service.updateStatusToLive(tenantId, id), null, 200);
   }
@@ -169,7 +169,7 @@ public class AdminController {
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<Object>> updateStatusToPause(
-      @DefaultValue("dream11") @HeaderParam("x-tenant-id") String tenantId,
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
       @NotNull @PathParam("id") Long id) {
     return ResponseWrapper.fromCompletable(service.updateStatusToPaused(tenantId, id), null, 200);
   }
@@ -179,7 +179,7 @@ public class AdminController {
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<Object>> updateStatusToScheduled(
-      @DefaultValue("dream11") @HeaderParam("x-tenant-id") String tenantId,
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
       @NotNull @PathParam("id") Long id) {
     return ResponseWrapper.fromCompletable(
         service.updateStatusToScheduled(tenantId, id), null, 200);
@@ -190,7 +190,7 @@ public class AdminController {
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<Object>> updateStatusToConcluded(
-      @DefaultValue("dream11") @HeaderParam("x-tenant-id") String tenantId,
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
       @NotNull @PathParam("id") Long id) {
     return ResponseWrapper.fromCompletable(
         service.updateStatusToConcluded(tenantId, id), null, 200);
@@ -201,7 +201,7 @@ public class AdminController {
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<Object>> updateStatusToTerminated(
-      @DefaultValue("dream11") @HeaderParam("x-tenant-id") String tenantId,
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
       @NotNull @PathParam("id") Long id) {
     return ResponseWrapper.fromCompletable(
         service.updateStatusToTerminated(tenantId, id), null, 200);
