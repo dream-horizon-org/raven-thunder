@@ -6,7 +6,6 @@ import com.dream11.thunder.admin.io.response.CTAListResponse;
 import com.dream11.thunder.admin.model.FilterProps;
 import com.dream11.thunder.core.io.response.FilterResponse;
 import com.dream11.thunder.core.model.CTA;
-import com.dream11.thunder.core.model.Nudge;
 import com.dream11.thunder.core.model.NudgePreview;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
@@ -35,10 +34,6 @@ public interface AdminService {
   Completable updateStatusToScheduled(String tenantId, Long ctaId);
 
   Completable updateStatusToTerminated(String tenantId, Long ctaId);
-
-  Completable createNudge(String tenantId, Nudge template);
-
-  Completable updateNudge(String tenantId, Nudge template);
 
   Completable createOrUpdateNudgePreview(String tenantId, NudgePreview nudgePreview);
 

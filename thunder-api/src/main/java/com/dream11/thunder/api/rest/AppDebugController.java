@@ -5,7 +5,6 @@ import com.dream11.thunder.core.io.Response;
 import com.dream11.thunder.api.model.UserDataSnapshot;
 import com.dream11.thunder.api.service.AppDebugService;
 import com.dream11.thunder.core.model.CTA;
-import com.dream11.thunder.core.model.Nudge;
 import com.dream11.thunder.core.util.ResponseWrapper;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 public class AppDebugController {
 
   private final AppDebugService service;
-  Map<String, Nudge> emptyResponse = new HashMap<>();
 
   @Inject
   public AppDebugController(AppDebugService service) {

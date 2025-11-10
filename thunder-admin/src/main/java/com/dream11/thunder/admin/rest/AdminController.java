@@ -11,7 +11,6 @@ import com.dream11.thunder.core.dao.NudgePreviewRepository;
 import com.dream11.thunder.core.io.Response;
 import com.dream11.thunder.core.io.response.FilterResponse;
 import com.dream11.thunder.core.model.CTA;
-import com.dream11.thunder.core.model.Nudge;
 import com.dream11.thunder.core.model.NudgePreview;
 import com.dream11.thunder.core.util.FormatUtil;
 import com.dream11.thunder.core.util.ResponseWrapper;
@@ -34,26 +33,6 @@ public class AdminController {
   public AdminController(AdminService service, NudgePreviewRepository nudgePreviewRepository) {
     this.service = service;
     this.nudgePreviewRepository = nudgePreviewRepository;
-  }
-
-  @POST
-  @Path("/nudges/")
-  @Consumes(MediaType.WILDCARD)
-  @Produces(MediaType.APPLICATION_JSON)
-  public CompletionStage<Response<Object>> createNudge(
-      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
-      @NotNull @Valid Nudge template) {
-    return ResponseWrapper.fromCompletable(service.createNudge(tenantId, template), null, 200);
-  }
-
-  @PUT
-  @Path("/nudges/")
-  @Consumes(MediaType.WILDCARD)
-  @Produces(MediaType.APPLICATION_JSON)
-  public CompletionStage<Response<Object>> updateNudge(
-      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
-      @NotNull @Valid Nudge template) {
-    return ResponseWrapper.fromCompletable(service.updateNudge(tenantId, template), null, 200);
   }
 
   @POST

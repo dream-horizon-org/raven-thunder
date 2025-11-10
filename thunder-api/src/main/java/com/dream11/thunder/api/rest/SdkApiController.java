@@ -5,7 +5,6 @@ import com.dream11.thunder.core.io.Response;
 import com.dream11.thunder.api.io.request.CTASnapshotRequest;
 import com.dream11.thunder.api.io.response.CTAResponse;
 import com.dream11.thunder.api.service.SdkService;
-import com.dream11.thunder.core.model.Nudge;
 import com.dream11.thunder.core.model.NudgePreview;
 import com.dream11.thunder.core.util.ResponseWrapper;
 import io.reactivex.rxjava3.core.Maybe;
@@ -30,15 +29,6 @@ public class SdkApiController {
   @Inject
   public SdkApiController(SdkService service) {
     this.service = service;
-  }
-
-  @GET
-  @Deprecated
-  @Path("/nudges/{id}")
-  @Consumes(MediaType.WILDCARD)
-  @Produces(MediaType.APPLICATION_JSON)
-  public CompletionStage<Response<Nudge>> findNudge(@PathParam("id") String id) {
-    return ResponseWrapper.fromMaybe(service.findNudge(id), null, 200);
   }
 
   @GET
