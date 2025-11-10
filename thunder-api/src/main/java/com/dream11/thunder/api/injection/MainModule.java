@@ -2,13 +2,11 @@ package com.dream11.thunder.api.injection;
 
 import com.dream11.thunder.api.dao.StateMachineRepository;
 import com.dream11.thunder.api.dao.statemachine.StateMachineRepositoryImpl;
-import com.dream11.thunder.api.service.AppDebugService;
 import com.dream11.thunder.api.service.SdkService;
 import com.dream11.thunder.api.service.StaticDataCache;
 import com.dream11.thunder.api.service.UserCohortsClient;
 import com.dream11.thunder.api.service.cache.StaticDataCacheImpl;
 import com.dream11.thunder.api.service.cohort.UserCohortsClientImpl;
-import com.dream11.thunder.api.service.debug.AppDebugServiceImpl;
 import com.dream11.thunder.api.service.sdk.SdkServiceImpl;
 import com.dream11.thunder.core.client.AerospikeClient;
 import com.dream11.thunder.core.client.AerospikeClientHolder;
@@ -90,7 +88,6 @@ public class MainModule extends AbstractModule {
 
         // Bind Services
         bind(SdkService.class).to(SdkServiceImpl.class).in(Singleton.class);
-        bind(AppDebugService.class).to(AppDebugServiceImpl.class).in(Singleton.class);
         bind(UserCohortsClient.class).to(UserCohortsClientImpl.class).in(Singleton.class);
         bind(StaticDataCache.class).to(StaticDataCacheImpl.class).in(Singleton.class);
 
