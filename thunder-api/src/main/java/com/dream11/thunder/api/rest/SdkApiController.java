@@ -60,22 +60,6 @@ public class SdkApiController {
   }
 
   @POST
-  @Path("/v1/active/state-machines/")
-  @Consumes(MediaType.WILDCARD)
-  @Produces(MediaType.APPLICATION_JSON)
-  public CompletionStage<Response<CTAResponse>> appLaunchV1(
-      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
-      @NotNull(message = "auth-userid cannot be null") @HeaderParam("auth-userid") Long userId,
-      @Nullable @HeaderParam("app_version") String appVersion,
-      @Nullable @HeaderParam("codepush_version") String cpVersion,
-      @Nullable @HeaderParam("package_name") String packageName,
-      @Nullable @HeaderParam("api_version") Long apiVersion,
-      @Valid CTASnapshotRequest deltaSnapshot) {
-    // v1 endpoint is just an alias for the main endpoint
-    return appLaunch(tenantId, userId, appVersion, cpVersion, packageName, apiVersion, deltaSnapshot);
-  }
-
-  @POST
   @Path("/state-machines/snapshot/delta/")
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
