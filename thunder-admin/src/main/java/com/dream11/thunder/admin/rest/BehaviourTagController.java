@@ -38,14 +38,14 @@ public class BehaviourTagController {
   }
 
   @GET
-  @Path("/behaviour-tags/{behaviourTagName}")
+  @Path("/behaviour-tags/{id}")
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<BehaviourTag>> getBehaviourTags(
       @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
-      @PathParam("behaviourTagName") String behaviourTagName) {
+      @PathParam("id") Long id) {
     return ResponseWrapper.fromSingle(
-        service.fetchBehaviourTagDetail(tenantId, behaviourTagName), 200);
+        service.fetchBehaviourTagDetail(tenantId, id), 200);
   }
 
   @POST
@@ -62,18 +62,22 @@ public class BehaviourTagController {
   }
 
   @PUT
-  @Path("/behaviour-tags/{behaviourTagName}")
+  @Path("/behaviour-tags/{id}")
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   public CompletionStage<Response<Object>> updateBehaviourTag(
       @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
       @NotNull @Valid BehaviourTagPutRequest behaviourTagPutRequest,
-      @NotNull @PathParam("behaviourTagName") String behaviourTagName,
+      @NotNull @PathParam("id") Long id,
       @NotNull(message = USER_ID_NULL_ERROR_MESSAGE) @HeaderParam("user") String userId) {
-    behaviourTagPutRequest.validate(behaviourTagName);
-    return ResponseWrapper.fromCompletable(
-        service.updateBehaviourTag(tenantId, behaviourTagName, behaviourTagPutRequest, userId),
-        null,
+    return ResponseWrapper.fromSingle(
+        service
+            .fetchBehaviourTagDetail(tenantId, id)
+            .doOnSuccess(behaviourTag -> behaviourTagPutRequest.validate(behaviourTag.getName()))
+            .flatMapCompletable(
+                behaviourTag ->
+                    service.updateBehaviourTag(tenantId, id, behaviourTagPutRequest, userId))
+            .toSingleDefault(null),
         200);
   }
 }

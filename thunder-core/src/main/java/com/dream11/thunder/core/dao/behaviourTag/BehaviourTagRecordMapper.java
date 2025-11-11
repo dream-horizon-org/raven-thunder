@@ -14,6 +14,9 @@ public class BehaviourTagRecordMapper implements Function<Record, BehaviourTag> 
   @Override
   public BehaviourTag apply(@NonNull Record record) throws Exception {
     BehaviourTag behaviourTag = new BehaviourTag();
+    if (record.bins.get(Schema.ID_BIN) != null) {
+      behaviourTag.setId((Long) record.bins.get(Schema.ID_BIN));
+    }
     if (record.bins.get(Schema.NAME_BIN) != null) {
       behaviourTag.setName(record.bins.get(Schema.NAME_BIN).toString());
     }

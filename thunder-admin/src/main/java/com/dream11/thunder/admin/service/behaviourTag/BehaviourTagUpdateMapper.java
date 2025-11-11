@@ -6,12 +6,13 @@ import com.dream11.thunder.core.model.BehaviourTag;
 public class BehaviourTagUpdateMapper {
 
   public BehaviourTag apply(
-      String tenantId, BehaviourTagPutRequest behaviourTag, String behaviourTagName, String userId) {
+      String tenantId, BehaviourTagPutRequest behaviourTag, BehaviourTag existingBehaviourTag, String userId) {
     return new BehaviourTag(
-        behaviourTagName,
+        existingBehaviourTag.getId(),
+        existingBehaviourTag.getName(),
         behaviourTag.getDescription(),
-        0L,
-        null,
+        existingBehaviourTag.getCreatedAt(),
+        existingBehaviourTag.getCreatedBy(),
         System.currentTimeMillis(),
         userId,
         behaviourTag.getExposureRule(),

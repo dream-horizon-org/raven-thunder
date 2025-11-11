@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BehaviourTag {
+  private Long id;
   private String name;
   private String description;
   private long createdAt;
