@@ -11,14 +11,12 @@ import com.dream11.thunder.admin.service.AdminService;
 import com.dream11.thunder.admin.service.filters.CTAFilters;
 import com.dream11.thunder.core.dao.CTARepository;
 import com.dream11.thunder.core.dao.NudgePreviewRepository;
-import com.dream11.thunder.core.dao.NudgeRepository;
 import com.dream11.thunder.core.dao.cta.ActiveCTA;
 import com.dream11.thunder.core.error.ServiceError;
 import com.dream11.thunder.core.exception.ThunderException;
 import com.dream11.thunder.core.io.response.FilterResponse;
 import com.dream11.thunder.core.model.CTA;
 import com.dream11.thunder.core.model.CTAStatus;
-import com.dream11.thunder.core.model.Nudge;
 import com.dream11.thunder.core.model.NudgePreview;
 import com.google.inject.Inject;
 import io.reactivex.rxjava3.core.Completable;
@@ -35,17 +33,14 @@ import lombok.extern.slf4j.Slf4j;
 public class AdminServiceImpl implements AdminService {
 
   private final CTARepository ctaRepository;
-  private final NudgeRepository nudgeRepository;
   private final NudgePreviewRepository nudgePreviewRepository;
   private final CreateCTAMapper createCtaMapper = new CreateCTAMapper();
   private final CTAUpdateValidator ctaUpdateValidator = new CTAUpdateValidator();
 
   @Inject
   public AdminServiceImpl(
-      NudgeRepository nudgeRepository,
       CTARepository ctaRepository,
       NudgePreviewRepository nudgePreviewRepository) {
-    this.nudgeRepository = nudgeRepository;
     this.ctaRepository = ctaRepository;
     this.nudgePreviewRepository = nudgePreviewRepository;
   }
@@ -337,16 +332,6 @@ public class AdminServiceImpl implements AdminService {
                     .doOnError(error -> log.error("Error terminating CTA {} ", id, error));
               }
             });
-  }
-
-  @Override
-  public Completable createNudge(String tenantId, Nudge template) {
-    return nudgeRepository.create(tenantId, template);
-  }
-
-  @Override
-  public Completable updateNudge(String tenantId, Nudge template) {
-    return nudgeRepository.update(tenantId, template);
   }
 
   @Override

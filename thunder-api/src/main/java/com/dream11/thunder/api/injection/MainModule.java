@@ -2,13 +2,11 @@ package com.dream11.thunder.api.injection;
 
 import com.dream11.thunder.api.dao.StateMachineRepository;
 import com.dream11.thunder.api.dao.statemachine.StateMachineRepositoryImpl;
-import com.dream11.thunder.api.service.AppDebugService;
 import com.dream11.thunder.api.service.SdkService;
 import com.dream11.thunder.api.service.StaticDataCache;
 import com.dream11.thunder.api.service.UserCohortsClient;
 import com.dream11.thunder.api.service.cache.StaticDataCacheImpl;
 import com.dream11.thunder.api.service.cohort.UserCohortsClientImpl;
-import com.dream11.thunder.api.service.debug.AppDebugServiceImpl;
 import com.dream11.thunder.api.service.sdk.SdkServiceImpl;
 import com.dream11.thunder.core.client.AerospikeClient;
 import com.dream11.thunder.core.client.AerospikeClientHolder;
@@ -18,10 +16,8 @@ import com.dream11.thunder.core.config.ServerConfig;
 import com.dream11.thunder.core.dao.BehaviourTagsRepository;
 import com.dream11.thunder.core.dao.CTARepository;
 import com.dream11.thunder.core.dao.NudgePreviewRepository;
-import com.dream11.thunder.core.dao.NudgeRepository;
 import com.dream11.thunder.core.dao.behaviourTag.BehaviourTagRepositoryImpl;
 import com.dream11.thunder.core.dao.cta.CTARepositoryImpl;
-import com.dream11.thunder.core.dao.nudge.NudgeRepositoryImpl;
 import com.dream11.thunder.core.dao.nudge.preview.NudgePreviewRepositoryImpl;
 import com.dream11.thunder.core.util.SharedDataUtils;
 import com.google.inject.AbstractModule;
@@ -86,14 +82,12 @@ public class MainModule extends AbstractModule {
 
         // Bind Repositories
         bind(CTARepository.class).to(CTARepositoryImpl.class).in(Singleton.class);
-        bind(NudgeRepository.class).to(NudgeRepositoryImpl.class).in(Singleton.class);
         bind(BehaviourTagsRepository.class).to(BehaviourTagRepositoryImpl.class).in(Singleton.class);
         bind(NudgePreviewRepository.class).to(NudgePreviewRepositoryImpl.class).in(Singleton.class);
         bind(StateMachineRepository.class).to(StateMachineRepositoryImpl.class).in(Singleton.class);
 
         // Bind Services
         bind(SdkService.class).to(SdkServiceImpl.class).in(Singleton.class);
-        bind(AppDebugService.class).to(AppDebugServiceImpl.class).in(Singleton.class);
         bind(UserCohortsClient.class).to(UserCohortsClientImpl.class).in(Singleton.class);
         bind(StaticDataCache.class).to(StaticDataCacheImpl.class).in(Singleton.class);
 

@@ -12,10 +12,8 @@ import com.dream11.thunder.core.config.ServerConfig;
 import com.dream11.thunder.core.dao.BehaviourTagsRepository;
 import com.dream11.thunder.core.dao.CTARepository;
 import com.dream11.thunder.core.dao.NudgePreviewRepository;
-import com.dream11.thunder.core.dao.NudgeRepository;
 import com.dream11.thunder.core.dao.behaviourTag.BehaviourTagRepositoryImpl;
 import com.dream11.thunder.core.dao.cta.CTARepositoryImpl;
-import com.dream11.thunder.core.dao.nudge.NudgeRepositoryImpl;
 import com.dream11.thunder.core.dao.nudge.preview.NudgePreviewRepositoryImpl;
 import com.dream11.thunder.core.util.SharedDataUtils;
 import com.google.inject.AbstractModule;
@@ -80,7 +78,6 @@ public class MainModule extends AbstractModule {
 
         // Bind Repositories
         bind(CTARepository.class).to(CTARepositoryImpl.class).in(Singleton.class);
-        bind(NudgeRepository.class).to(NudgeRepositoryImpl.class).in(Singleton.class);
         bind(BehaviourTagsRepository.class).to(BehaviourTagRepositoryImpl.class).in(Singleton.class);
         bind(NudgePreviewRepository.class).to(NudgePreviewRepositoryImpl.class).in(Singleton.class);
 

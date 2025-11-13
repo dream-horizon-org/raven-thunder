@@ -52,12 +52,6 @@ public class SdkServiceImpl implements SdkService {
   }
 
   @Override
-  @Deprecated
-  public Maybe<Nudge> findNudge(String id) {
-    return Maybe.empty();
-  }
-
-  @Override
   public Maybe<CTAResponse> appLaunch(
       String tenantId, Long userId, CTASnapshotRequest deltaSnapshot) {
     return userCohortsClient

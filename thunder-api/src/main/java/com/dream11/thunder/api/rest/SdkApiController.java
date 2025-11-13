@@ -5,7 +5,6 @@ import com.dream11.thunder.core.io.Response;
 import com.dream11.thunder.api.io.request.CTASnapshotRequest;
 import com.dream11.thunder.api.io.response.CTAResponse;
 import com.dream11.thunder.api.service.SdkService;
-import com.dream11.thunder.core.model.Nudge;
 import com.dream11.thunder.core.model.NudgePreview;
 import com.dream11.thunder.core.util.ResponseWrapper;
 import io.reactivex.rxjava3.core.Maybe;
@@ -30,15 +29,6 @@ public class SdkApiController {
   @Inject
   public SdkApiController(SdkService service) {
     this.service = service;
-  }
-
-  @GET
-  @Deprecated
-  @Path("/nudges/{id}")
-  @Consumes(MediaType.WILDCARD)
-  @Produces(MediaType.APPLICATION_JSON)
-  public CompletionStage<Response<Nudge>> findNudge(@PathParam("id") String id) {
-    return ResponseWrapper.fromMaybe(service.findNudge(id), null, 200);
   }
 
   @GET
@@ -67,22 +57,6 @@ public class SdkApiController {
       return ResponseWrapper.fromMaybe(Maybe.just(emptyCTAResponse), emptyCTAResponse, 200);
     return ResponseWrapper.fromMaybe(
         service.appLaunch(tenantId, userId, deltaSnapshot), emptyCTAResponse, 200);
-  }
-
-  @POST
-  @Path("/v1/active/state-machines/")
-  @Consumes(MediaType.WILDCARD)
-  @Produces(MediaType.APPLICATION_JSON)
-  public CompletionStage<Response<CTAResponse>> appLaunchV1(
-      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
-      @NotNull(message = "auth-userid cannot be null") @HeaderParam("auth-userid") Long userId,
-      @Nullable @HeaderParam("app_version") String appVersion,
-      @Nullable @HeaderParam("codepush_version") String cpVersion,
-      @Nullable @HeaderParam("package_name") String packageName,
-      @Nullable @HeaderParam("api_version") Long apiVersion,
-      @Valid CTASnapshotRequest deltaSnapshot) {
-    // v1 endpoint is just an alias for the main endpoint
-    return appLaunch(tenantId, userId, appVersion, cpVersion, packageName, apiVersion, deltaSnapshot);
   }
 
   @POST
