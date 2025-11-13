@@ -5,6 +5,13 @@ import com.dream11.thunder.core.model.rule.Rule;
 
 public class RuleMapper {
 
+  /**
+   * Maps a RuleRequest and CTA validity to a Rule domain object.
+   *
+   * @param ruleRequest incoming rule definition
+   * @param ctaValidTill optional end time used in rule
+   * @return Rule model
+   */
   public Rule apply(RuleRequest ruleRequest, Long ctaValidTill) {
     return new Rule(
         ruleRequest.getCohortEligibility(),

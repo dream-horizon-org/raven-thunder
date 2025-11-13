@@ -6,6 +6,9 @@ import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.functions.Function;
 import java.util.Collections;
 
+/**
+ * Maps core CTARelation to API CTARelationSnapshot used in SDK responses.
+ */
 public class CTARelationMapper implements Function<CTARelation, CTARelationSnapshot> {
   @Override
   public CTARelationSnapshot apply(@io.reactivex.rxjava3.annotations.NonNull CTARelation ctaRelation) {

@@ -39,39 +39,58 @@ public class StaticDataCacheImpl implements StaticDataCache {
   @Override
   public CompletableFuture<?> initiateCache() {
     log.info("Initializing static data cache...");
-    
-    CompletableFuture<Void> activeCTAFuture = new CompletableFuture<>();
-    ctaRepository.findAllWithStatusActive()
-        .doOnSuccess(ctas -> {
-          activeCTACache.clear();
-          activeCTACache.putAll(ctas);
-          log.info("Loaded {} active CTAs into cache", ctas.size());
-        })
-        .ignoreElement()
-        .subscribe(() -> activeCTAFuture.complete(null), activeCTAFuture::completeExceptionally);
 
-    CompletableFuture<Void> pausedCTAFuture = new CompletableFuture<>();
-    ctaRepository.findAllWithStatusPaused()
-        .doOnSuccess(ctas -> {
-          pausedCTACache.clear();
-          pausedCTACache.putAll(ctas);
-          log.info("Loaded {} paused CTAs into cache", ctas.size());
-        })
-        .ignoreElement()
-        .subscribe(() -> pausedCTAFuture.complete(null), pausedCTAFuture::completeExceptionally);
-
-    CompletableFuture<Void> behaviourTagsFuture = new CompletableFuture<>();
-    behaviourTagsRepository.findAll()
-        .doOnSuccess(tags -> {
-          behaviourTagCache.clear();
-          behaviourTagCache.putAll(tags);
-          log.info("Loaded {} behaviour tags into cache", tags.size());
-        })
-        .ignoreElement()
-        .subscribe(() -> behaviourTagsFuture.complete(null), behaviourTagsFuture::completeExceptionally);
+    CompletableFuture<Void> activeCTAFuture = loadActiveCTAs();
+    CompletableFuture<Void> pausedCTAFuture = loadPausedCTAs();
+    CompletableFuture<Void> behaviourTagsFuture = loadBehaviourTags();
 
     return CompletableFuture.allOf(activeCTAFuture, pausedCTAFuture, behaviourTagsFuture)
         .thenRun(() -> log.info("Static data cache initialized successfully"));
+  }
+
+  private CompletableFuture<Void> loadActiveCTAs() {
+    CompletableFuture<Void> future = new CompletableFuture<>();
+    ctaRepository
+        .findAllWithStatusActive()
+        .doOnSuccess(
+            ctas -> {
+              activeCTACache.clear();
+              activeCTACache.putAll(ctas);
+              log.info("Loaded {} active CTAs into cache", ctas.size());
+            })
+        .ignoreElement()
+        .subscribe(() -> future.complete(null), future::completeExceptionally);
+    return future;
+  }
+
+  private CompletableFuture<Void> loadPausedCTAs() {
+    CompletableFuture<Void> future = new CompletableFuture<>();
+    ctaRepository
+        .findAllWithStatusPaused()
+        .doOnSuccess(
+            ctas -> {
+              pausedCTACache.clear();
+              pausedCTACache.putAll(ctas);
+              log.info("Loaded {} paused CTAs into cache", ctas.size());
+            })
+        .ignoreElement()
+        .subscribe(() -> future.complete(null), future::completeExceptionally);
+    return future;
+  }
+
+  private CompletableFuture<Void> loadBehaviourTags() {
+    CompletableFuture<Void> future = new CompletableFuture<>();
+    behaviourTagsRepository
+        .findAll()
+        .doOnSuccess(
+            tags -> {
+              behaviourTagCache.clear();
+              behaviourTagCache.putAll(tags);
+              log.info("Loaded {} behaviour tags into cache", tags.size());
+            })
+        .ignoreElement()
+        .subscribe(() -> future.complete(null), future::completeExceptionally);
+    return future;
   }
 
   @Override

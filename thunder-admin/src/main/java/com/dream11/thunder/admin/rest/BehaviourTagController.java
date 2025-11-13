@@ -17,6 +17,9 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * REST controller for behaviour tag management (list, detail, create, update).
+ */
 @Slf4j
 @Path("/thunder")
 public class BehaviourTagController {

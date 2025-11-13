@@ -8,6 +8,10 @@ public class UpdateCTAMapper {
 
   RuleMapper ruleMapper = new RuleMapper();
 
+  /**
+   * Maps a CTA update request and existing details into an updated CTA model.
+   * Preserves immutable fields like id, createdAt, createdBy, tenantId.
+   */
   public CTA apply(CTAUpdateRequest ctaRequest, CTADetails cta, String user, Long ctaId) {
     return new CTA(
         ctaId,

@@ -22,6 +22,10 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Admin REST controller for managing CTAs, filters and nudge previews.
+ * Exposes endpoints under "/thunder" for create/update/list/status transitions.
+ */
 @Slf4j
 @Path("/thunder")
 public class AdminController {
