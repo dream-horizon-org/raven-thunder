@@ -72,8 +72,12 @@ public class BehaviourTagServiceImpl implements BehaviourTagService {
         .flatMapCompletable(
             result ->
                 behaviourTagRepository
-                    .create(tenantId, behaviourTagMapper.apply(tenantId, behaviourTag, userId))
-                    .doOnComplete(
+                    .generatedIncrementId(tenantId)
+                    .flatMapCompletable(
+                        id ->
+                            behaviourTagRepository
+                                .create(tenantId, behaviourTagMapper.apply(tenantId, behaviourTag, userId, id))
+                                .doOnComplete(
                         () -> {
                           log.info(
                               "Behaviour tag BT : {} created with ctas {}",
@@ -142,14 +146,17 @@ public class BehaviourTagServiceImpl implements BehaviourTagService {
                                                 return Completable.complete();
                                               })
                                           .subscribe());
-                        }));
+                                }))
+                    .onErrorResumeNext(
+                        throwable ->
+                            Completable.error(new DefinedException(ErrorEntity.INVALID_BEHAVIOUR_TAG_CREATION))));
   }
 
   @SneakyThrows
   @Override
   public Completable updateBehaviourTag(
       String tenantId,
-      String behaviourTagName,
+      Long id,
       BehaviourTagPutRequest behaviourTag,
       String userId) {
     return ctaRepository
@@ -171,8 +178,8 @@ public class BehaviourTagServiceImpl implements BehaviourTagService {
                       });
               if (invalid.get()) {
                 log.info(
-                    "Error in Behaviour tags linking for BT : {} , ctas {}",
-                    behaviourTagName,
+                    "Error in Behaviour tags linking for BT id : {} , ctas {}",
+                    id,
                     invalidCTAList);
                 throw new DefinedException(
                     ErrorEntity.INVALID_BEHAVIOUR_TAG_UPDATION,
@@ -183,11 +190,12 @@ public class BehaviourTagServiceImpl implements BehaviourTagService {
         .flatMapCompletable(
             result ->
                 behaviourTagRepository
-                    .find(tenantId, behaviourTagName)
+                    .find(tenantId, id)
                     .switchIfEmpty(
                         Single.error(new DefinedException(ErrorEntity.NO_SUCH_BEHAVIOUR_TAG)))
                     .flatMapCompletable(
                         it -> {
+                          String behaviourTagName = it.getName();
                           Set<String> linkedCtas = it.getLinkedCtas();
                           List<String> unlinkedCtas = new ArrayList<>(linkedCtas);
                           List<String> newLinkedCtas = new ArrayList<>();
@@ -235,9 +243,9 @@ public class BehaviourTagServiceImpl implements BehaviourTagService {
                           behaviourTagRepository
                               .update(
                                   tenantId,
-                                  behaviourTagName,
+                                  it.getId(),
                                   behaviourTagUpdateMapper.apply(
-                                      tenantId, behaviourTag, behaviourTagName, userId))
+                                      tenantId, behaviourTag, it, userId))
                               .doOnComplete(
                                   () -> {
                                     log.info(
@@ -268,9 +276,9 @@ public class BehaviourTagServiceImpl implements BehaviourTagService {
   }
 
   @Override
-  public Single<BehaviourTag> fetchBehaviourTagDetail(String tenantId, String behaviourTagName) {
+  public Single<BehaviourTag> fetchBehaviourTagDetail(String tenantId, Long id) {
     return behaviourTagRepository
-        .find(tenantId, behaviourTagName)
+        .find(tenantId, id)
         .switchIfEmpty(
             Single.defer(
                 () -> Single.error(new DefinedException(ErrorEntity.NO_SUCH_BEHAVIOUR_TAG))));

@@ -2,7 +2,9 @@ package com.dream11.thunder.core.dao.behaviourTag;
 
 import com.aerospike.client.Bin;
 import com.aerospike.client.Key;
+import com.aerospike.client.Operation;
 import com.aerospike.client.Value;
+import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.RecordExistsAction;
 import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.client.query.Filter;
@@ -29,6 +31,8 @@ public class BehaviourTagRepositoryImpl extends AerospikeRepository
   private final BehaviourTagRecordMapper behaviourTagRecordMapper = new BehaviourTagRecordMapper();
   private final WritePolicy createWritePolicy = new WritePolicy();
   private final WritePolicy updateWritePolicy = new WritePolicy();
+  private final Policy defaultReadPolicy = new Policy();
+  private final WritePolicy defaultWritePolicy = new WritePolicy();
 
   @Inject
   public BehaviourTagRepositoryImpl(AerospikeConfig config, AerospikeClient client) {
@@ -45,6 +49,29 @@ public class BehaviourTagRepositoryImpl extends AerospikeRepository
     setDefaultWritePolicyParams(updateWritePolicy, config);
     updateWritePolicy.sendKey = true;
     updateWritePolicy.recordExistsAction = RecordExistsAction.UPDATE_ONLY;
+
+    setDefaultReadPolicyParams(defaultReadPolicy, config);
+    defaultReadPolicy.sendKey = true;
+
+    setDefaultWritePolicyParams(defaultWritePolicy, config);
+    defaultWritePolicy.sendKey = true;
+  }
+
+  @Override
+  public Single<Long> generatedIncrementId(String tenantId) {
+    Bin incrementCounter = new Bin(Schema.COUNTER_BIN, 1);
+    Key globalKey = new Key(namespace, Schema.BEHAVIOUR_TAG_COUNTER, Schema.GLOBAL_BEHAVIOUR_TAG_KEY);
+    Key tenantKey = new Key(namespace, Schema.BEHAVIOUR_TAG_COUNTER, tenantId);
+    Operation[] operations = new Operation[2];
+    operations[0] = Operation.add(incrementCounter);
+    operations[1] = Operation.get(Schema.COUNTER_BIN);
+    Single<Long> globalValueSingle =
+        operate(defaultWritePolicy, globalKey, operations)
+            .map(record -> (Long) record.bins.get(Schema.COUNTER_BIN));
+    Single<Long> tenantValueSingle =
+        operate(defaultWritePolicy, tenantKey, operations)
+            .map(record -> (Long) record.bins.get(Schema.COUNTER_BIN));
+    return Single.zip(globalValueSingle, tenantValueSingle, (global, ignore) -> global);
   }
 
   @Override
@@ -53,6 +80,7 @@ public class BehaviourTagRepositoryImpl extends AerospikeRepository
     query.setSetName(Schema.SET);
     query.setNamespace(this.namespace);
     query.setBinNames(
+        Schema.ID_BIN,
         Schema.NAME_BIN,
         Schema.DESCRIPTION_BIN,
         Schema.LINKED_CTAS,
@@ -74,6 +102,7 @@ public class BehaviourTagRepositoryImpl extends AerospikeRepository
     query.setIndexName(Schema.TENANT_BIN);
     query.setFilter(Filter.equal(Schema.TENANT_BIN, tenantId));
     query.setBinNames(
+        Schema.ID_BIN,
         Schema.NAME_BIN,
         Schema.DESCRIPTION_BIN,
         Schema.LINKED_CTAS,
@@ -88,11 +117,12 @@ public class BehaviourTagRepositoryImpl extends AerospikeRepository
   }
 
   @Override
-  public Maybe<BehaviourTag> find(String tenantId, String behaviourTagName) {
+  public Maybe<BehaviourTag> find(String tenantId, Long id) {
     return find(
         defaultReadPolicy,
-        new Key(namespace, Schema.SET, tenantId + ":" + behaviourTagName),
+        new Key(namespace, Schema.SET, id),
         behaviourTagRecordMapper,
+        Schema.ID_BIN,
         Schema.NAME_BIN,
         Schema.DESCRIPTION_BIN,
         Schema.LINKED_CTAS,
@@ -102,12 +132,14 @@ public class BehaviourTagRepositoryImpl extends AerospikeRepository
         Schema.CREATED_BY_BIN,
         Schema.LAST_UPDATED_AT_BIN,
         Schema.LAST_UPDATED_BY_BIN,
-        Schema.TENANT_BIN);
+        Schema.TENANT_BIN)
+        .filter(behaviourTag -> tenantId.equals(behaviourTag.getTenantId()));
   }
 
   @Override
   @SneakyThrows(JsonProcessingException.class)
   public Completable create(String tenantId, BehaviourTag behaviourTag) {
+    Bin idBin = new Bin(Schema.ID_BIN, new Value.LongValue(behaviourTag.getId()));
     Bin nameBin = new Bin(Schema.NAME_BIN, new Value.StringValue(behaviourTag.getName()));
     Bin descriptionBin =
         new Bin(Schema.DESCRIPTION_BIN, new Value.StringValue(behaviourTag.getDescription()));
@@ -129,7 +161,8 @@ public class BehaviourTagRepositoryImpl extends AerospikeRepository
     Bin tenantBin = new Bin(Schema.TENANT_BIN, new Value.StringValue(tenantId));
     return upsert(
             createWritePolicy,
-            new Key(namespace, Schema.SET, tenantId + ":" + behaviourTag.getName()),
+            new Key(namespace, Schema.SET, behaviourTag.getId()),
+            idBin,
             nameBin,
             descriptionBin,
             exposureRuleBin,
@@ -143,7 +176,7 @@ public class BehaviourTagRepositoryImpl extends AerospikeRepository
 
   @Override
   @SneakyThrows(JsonProcessingException.class)
-  public Completable update(String tenantId, String behaviourTagName, BehaviourTag behaviourTag) {
+  public Completable update(String tenantId, Long id, BehaviourTag behaviourTag) {
 
     Bin descriptionBin =
         new Bin(Schema.DESCRIPTION_BIN, new Value.StringValue(behaviourTag.getDescription()));
@@ -165,7 +198,7 @@ public class BehaviourTagRepositoryImpl extends AerospikeRepository
 
     return upsert(
             updateWritePolicy,
-            new Key(namespace, Schema.SET, tenantId + ":" + behaviourTagName),
+            new Key(namespace, Schema.SET, id),
             descriptionBin,
             exposureRuleBin,
             ctaRelationBin,

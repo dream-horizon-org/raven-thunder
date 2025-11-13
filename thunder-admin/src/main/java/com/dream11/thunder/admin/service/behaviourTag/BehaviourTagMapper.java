@@ -5,8 +5,9 @@ import com.dream11.thunder.core.model.BehaviourTag;
 
 public class BehaviourTagMapper {
 
-  public BehaviourTag apply(String tenantId, BehaviourTagCreateRequest behaviourTag, String user) {
+  public BehaviourTag apply(String tenantId, BehaviourTagCreateRequest behaviourTag, String user, Long id) {
     return new BehaviourTag(
+        id,
         behaviourTag.getBehaviourTagName(),
         behaviourTag.getDescription(),
         System.currentTimeMillis(),

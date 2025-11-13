@@ -12,10 +12,12 @@ public interface BehaviourTagsRepository {
 
   Single<Map<String, BehaviourTag>> findAll(String tenantId);
 
-  Maybe<BehaviourTag> find(String tenantId, String behaviourTagName);
+  Maybe<BehaviourTag> find(String tenantId, Long id);
+
+  Single<Long> generatedIncrementId(String tenantId);
 
   Completable create(String tenantId, BehaviourTag behaviourTag);
 
-  Completable update(String tenantId, String behaviourTagName, BehaviourTag behaviourTag);
+  Completable update(String tenantId, Long id, BehaviourTag behaviourTag);
 }
 

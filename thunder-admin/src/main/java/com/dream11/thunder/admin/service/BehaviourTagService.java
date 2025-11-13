@@ -11,14 +11,14 @@ public interface BehaviourTagService {
 
   Single<BehaviourTagsResponse> fetchAllBehaviourTags(String tenantId);
 
-  Single<BehaviourTag> fetchBehaviourTagDetail(String tenantId, String behaviourTagName);
+  Single<BehaviourTag> fetchBehaviourTagDetail(String tenantId, Long id);
 
   Completable createBehaviourTag(
       String tenantId, String user, BehaviourTagCreateRequest behaviourTagCreateRequest);
 
   Completable updateBehaviourTag(
       String tenantId,
-      String behaviourTagName,
+      Long id,
       BehaviourTagPutRequest behaviourTagPutRequest,
       String userId);
 }
