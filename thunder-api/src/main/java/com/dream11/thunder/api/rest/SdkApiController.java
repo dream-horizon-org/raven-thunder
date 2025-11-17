@@ -18,6 +18,10 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * SDK API controller exposing endpoints for CTA activation and snapshot merge.
+ * Base path: /cta
+ */
 @Slf4j
 @Path("/cta")
 public class SdkApiController {
