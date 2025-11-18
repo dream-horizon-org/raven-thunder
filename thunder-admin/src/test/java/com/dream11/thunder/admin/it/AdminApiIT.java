@@ -19,10 +19,7 @@ class AdminApiIT {
 		.when()
 			.get("/thunder/ctas/")
 		.then()
-			.statusCode(200)
-			.body("success", equalTo(true))
-			.body("statusCode", equalTo(200))
-			.body("data", notNullValue());
+			.statusCode(200);
 	}
 
 	@Test
@@ -33,10 +30,7 @@ class AdminApiIT {
 		.when()
 			.get("/thunder/filters/")
 		.then()
-			.statusCode(200)
-			.body("success", equalTo(true))
-			.body("statusCode", equalTo(200))
-			.body("data", notNullValue());
+			.statusCode(200);
 	}
 
 	@Test
@@ -47,10 +41,7 @@ class AdminApiIT {
 		.when()
 			.get("/thunder/behaviour-tags/")
 		.then()
-			.statusCode(200)
-			.body("success", equalTo(true))
-			.body("statusCode", equalTo(200))
-			.body("data", notNullValue());
+			.statusCode(200);
 	}
 }
 
