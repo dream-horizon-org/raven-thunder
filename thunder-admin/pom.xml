@@ -28,6 +28,17 @@
             <artifactId>thunder-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- Testcontainers for Aerospike in ITs (versions managed by parent) -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

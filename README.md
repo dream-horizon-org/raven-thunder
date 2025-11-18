@@ -25,6 +25,59 @@ mvn clean package
 
 This will create a fat JAR at `target/thunder-1.0.0-SNAPSHOT-fat.jar`.
 
+## Testing
+
+Run all unit tests from the project root:
+
+```bash
+mvn -q test
+```
+
+Run tests for a specific module:
+
+```bash
+mvn -q -pl thunder-admin test
+mvn -q -pl thunder-api test
+mvn -q -pl thunder-core test
+```
+
+Run a single test class or method:
+
+```bash
+# Single class
+mvn -q -pl thunder-admin -Dtest=AdminServiceImplCreateCTATest test
+# Single method
+mvn -q -pl thunder-admin -Dtest=AdminServiceImplStatusTest#updateStatusToLive_transitionsDraftToLive test
+```
+
+Integration tests (thunder-api uses Testcontainers for Aerospike):
+
+```bash
+# Requires Docker running
+mvn -q -pl thunder-api -am verify
+```
+
+Integration tests (thunder-admin, if present):
+
+```bash
+# Requires Docker running (only if admin ITs use containers)
+mvn -q -pl thunder-admin -am verify
+```
+
+Useful flags:
+
+```bash
+# Skip integration tests only (Failsafe)
+mvn -q -pl thunder-api -DskipITs=true verify
+# Skip all tests
+mvn -q -DskipTests package
+```
+
+Notes:
+- Tests use JUnit 5, Mockito, and AssertJ (versions managed in parent `pom.xml`).
+- Surefire is configured with `<useModulePath>false</useModulePath>` for Java 17 compatibility.
+- Failsafe runs `**/*IT.java` tests during the `verify` phase.
+
 ## Running
 
 ### Using Docker (Recommended)

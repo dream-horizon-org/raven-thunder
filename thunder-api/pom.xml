@@ -28,6 +28,17 @@
             <artifactId>thunder-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- Testcontainers for Aerospike in ITs (versions managed by parent) -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -38,10 +49,16 @@
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
 
-            <!-- Maven Surefire Plugin (for running tests) -->
+            <!-- Maven Surefire Plugin (for running unit tests) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+
+            <!-- Maven Failsafe Plugin - uses parent pluginManagement -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
             </plugin>
 
             <!-- Maven Shade Plugin (for creating fat JAR) -->
