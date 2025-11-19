@@ -9,6 +9,7 @@ Thunder is an open-source project built with Java 17 and Vert.x framework for ma
 - ✅ **Aerospike integration**: Reactive data access with RxJava3
 - ✅ **Docker-ready**: Full Docker Compose setup with Aerospike, seed data, and indexes
 - ✅ **Health checks**: Comprehensive health monitoring for services and Aerospike
+- ✅ **CI & Security**: GitHub Actions CI, release pipelines, and CodeQL code scanning
 
 ## Requirements
 
@@ -165,6 +166,53 @@ Convenience scripts are available in the `scripts/` directory:
 - `stop.sh` - Stop Thunder Docker container
 - `restart.sh` - Restart Thunder Docker container
 - `logs.sh` - View Thunder Docker logs
+
+## Continuous Integration (CI)
+
+We use GitHub Actions in `.github/workflows/ci.yml`:
+
+- Runs on pull requests (opened/reopened/synchronize) and pushes to `main`
+- Builds with Java 17 and runs `mvn clean verify` (unit + integration tests)
+- Publishes JUnit results back to the PR for quick feedback
+- Cancels superseded runs to save time
+
+Security scanning is performed by CodeQL via `.github/workflows/codeql.yml`.
+
+## Releases
+
+We publish both Docker images and fat JARs so different consumers can choose what fits their environment.
+
+### Docker images (GHCR)
+
+Images are pushed to GitHub Container Registry (GHCR) on tag pushes (see `.github/workflows/release.yml`). Example usage:
+
+```bash
+# Pull API/Admin images (replace <owner> and <repo> with your org/repo and <VERSION> with a tag)
+docker pull ghcr.io/<owner>/<repo>-thunder-api:<VERSION>
+docker pull ghcr.io/<owner>/<repo>-thunder-admin:<VERSION>
+
+# Run API locally
+docker run --rm -p 8080:8080 ghcr.io/<owner>/<repo>-thunder-api:<VERSION>
+
+# Run Admin locally
+docker run --rm -p 8081:8081 ghcr.io/<owner>/<repo>-thunder-admin:<VERSION>
+```
+
+Tags include semantic versions (e.g., `1.2.3`, `1.2`, `1`, `latest`) when pushed from a semver tag like `v1.2.3`.
+
+### Release assets (fat JARs)
+
+On GitHub Release publication, fat JARs are attached as assets (see `.github/workflows/release-assets.yml`). Download from the project’s Releases page and run:
+
+```bash
+# Example: thunder-api
+java -jar thunder-api-<VERSION>-fat.jar
+
+# Example: thunder-admin
+java -jar thunder-admin-<VERSION>-fat.jar
+```
+
+Artifacts remain available until manually deleted (Docker images can be managed via GHCR cleanup policies).
 
 ## Project Structure
 
