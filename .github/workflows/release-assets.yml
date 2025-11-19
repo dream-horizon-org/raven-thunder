@@ -1,0 +1,35 @@
+name: Release (Assets)
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  ci:
+    name: CI
+    runs-on:
+      - ubuntu-24.04
+    steps:
+      - name: Checkout repo
+        # v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Set up Temurin JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Test and Package
+        run: mvn -B -ntp -DskipITs=false -Dstyle.color=always clean verify
+
+      - name: Upload Release Assets (fat JARs)
+        # v2.2.1
+        uses: softprops/action-gh-release@c95fe1489396fe8a9eb87c0abf8aa5b2ef267fda
+        with:
+          files: |
+            **/target/*-fat.jar
+
+
