@@ -54,16 +54,23 @@ Integration tests (thunder-api uses Testcontainers for Aerospike):
 
 ```bash
 # Requires Docker running
-mvn -q -pl thunder-api verify
+mvn -pl thunder-api -am verify
+```
+
+Integration tests (thunder-admin, if present):
+
+```bash
+# Requires Docker running (only if admin ITs use containers)
+mvn -pl thunder-admin -am verify
 ```
 
 Useful flags:
 
 ```bash
 # Skip integration tests only (Failsafe)
-mvn -q -pl thunder-api -DskipITs=true verify
+mvn -pl thunder-api -DskipITs=true verify
 # Skip all tests
-mvn -q -DskipTests package
+mvn -DskipTests package
 ```
 
 Notes:

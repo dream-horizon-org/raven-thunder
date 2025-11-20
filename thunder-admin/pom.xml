@@ -45,6 +45,12 @@
                 <artifactId>maven-surefire-plugin</artifactId>
             </plugin>
 
+            <!-- Maven Failsafe Plugin - uses parent pluginManagement -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+            </plugin>
+
             <!-- Maven Shade Plugin (for creating fat JAR) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -71,6 +77,11 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <!-- Activate parent Failsafe executions -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
