@@ -30,24 +30,24 @@ This will create a fat JAR at `target/thunder-1.0.0-SNAPSHOT-fat.jar`.
 Run all unit tests from the project root:
 
 ```bash
-mvn test
+mvn -q test
 ```
 
 Run tests for a specific module:
 
 ```bash
-mvn -pl thunder-admin test
-mvn -pl thunder-api test
-mvn -pl thunder-core test
+mvn -q -pl thunder-admin test
+mvn -q -pl thunder-api test
+mvn -q -pl thunder-core test
 ```
 
 Run a single test class or method:
 
 ```bash
 # Single class
-mvn -pl thunder-admin -Dtest=AdminServiceImplCreateCTATest test
+mvn -q -pl thunder-admin -Dtest=AdminServiceImplCreateCTATest test
 # Single method
-mvn -pl thunder-admin -Dtest=AdminServiceImplStatusTest#updateStatusToLive_transitionsDraftToLive test
+mvn -q -pl thunder-admin -Dtest=AdminServiceImplStatusTest#updateStatusToLive_transitionsDraftToLive test
 ```
 
 Integration tests (thunder-api uses Testcontainers for Aerospike):

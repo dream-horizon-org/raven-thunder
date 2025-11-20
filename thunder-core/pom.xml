@@ -16,10 +16,8 @@
     <name>Thunder Core</name>
     <description>Common module containing shared clients, configs, and utilities</description>
 
-    <properties/>
-
     <dependencies>
-        <!-- Test dependencies are inherited from parent -->
+        <!-- Test Dependencies inherited from parent -->
     </dependencies>
 
     <build>
