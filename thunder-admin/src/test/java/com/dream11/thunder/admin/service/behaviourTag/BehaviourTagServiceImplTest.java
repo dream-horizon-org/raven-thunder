@@ -88,7 +88,6 @@ class BehaviourTagServiceImplTest {
 
     // For unlink/link calls
     when(ctaRepository.update(eq(1L), eq(List.of()))).thenReturn(Completable.complete());
-    when(ctaRepository.update(eq(2L), eq(List.of(name)))).thenReturn(Completable.complete());
     when(ctaRepository.update(eq(3L), eq(List.of(name)))).thenReturn(Completable.complete());
 
     BehaviourTagService btService = new BehaviourTagServiceImpl(behaviourTagsRepository, ctaRepository);
@@ -96,8 +95,7 @@ class BehaviourTagServiceImplTest {
 
     // unlink 1
     verify(ctaRepository, atLeastOnce()).update(1L, List.of());
-    // link 2 and 3 (2 might be linked already by the main loop; implementation links incoming set)
-    verify(ctaRepository, atLeastOnce()).update(2L, List.of(name));
+    // link only newly added CTA (3). CTA 2 remains linked and is not re-updated.
     verify(ctaRepository, atLeastOnce()).update(3L, List.of(name));
     // BT updated
     verify(behaviourTagsRepository, times(1)).update(eq(tenantId), eq(name), any());
