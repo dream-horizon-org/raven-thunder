@@ -1,0 +1,13 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Thunder">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff8a65"/>
+      <stop offset="100%" stop-color="#ff3d00"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="16" fill="#111827"/>
+  <path d="M72 16L24 72h28l-8 40 60-68H80l8-28z" fill="url(#g)"/>
+</svg>
+
+
+
