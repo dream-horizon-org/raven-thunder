@@ -21,6 +21,8 @@ jobs:
       - ubuntu-24.04
     permissions:
       contents: read
+      checks: write
+      pull-requests: write
     steps:
       - name: Checkout repo
         # v4.2.2
