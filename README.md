@@ -10,6 +10,21 @@ Thunder is an open-source project built with Java 17 and Vert.x framework for ma
 - ✅ **Docker-ready**: Full Docker Compose setup with Aerospike, seed data, and indexes
 - ✅ **Health checks**: Comprehensive health monitoring for services and Aerospike
 
+## Documentation (Docusaurus)
+
+Run the docs site locally:
+
+```bash
+cd docs
+npm install
+npm run start
+# open http://localhost:3000
+```
+
+Requirements:
+- Node.js 18 or 20 (repo includes `.nvmrc`, so you can run `nvm use`)
+- Do not commit `docs/node_modules` or `docs/build` (gitignored).
+
 ## Requirements
 
 - Java 17 (OpenJDK or equivalent)
