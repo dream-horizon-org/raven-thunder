@@ -99,16 +99,22 @@ components:
           items:
             $ref: "#/components/schemas/BehaviourTagSnapshot"
     CTASnapshotRequest:
+      description: "Request containing current state snapshot from client including\
+        \ CTAs, active state machines, and behaviour tags"
       type: object
       properties:
         ctas:
           type: array
           items:
             $ref: "#/components/schemas/StateMachineSnapshot"
+          description: "List of CTA state machine snapshots containing active state\
+            \ machines, reset times, and action done times"
         behaviourTags:
           type: array
           items:
             $ref: "#/components/schemas/BehaviourTagSnapshot"
+          description: List of behaviour tag snapshots containing exposure rules and
+            CTA relations
     CTAStatus:
       type: string
       enum:
