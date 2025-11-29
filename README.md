@@ -162,24 +162,29 @@ For persistent network issues, configure Docker daemon timeouts in `/etc/docker/
 
 Thunder provides comprehensive API documentation via OpenAPI 3.0 specification:
 
-- **OpenAPI Spec**: `docs/openapi.yaml` (auto-generated from code)
-- **Scalar API Reference**: http://localhost:8082 (Interactive API explorer)
+- **Thunder API Spec**: `docs/thunder-api-openapi.yaml` (auto-generated from code)
+- **Thunder Admin Spec**: `docs/thunder-admin-openapi.yaml` (auto-generated from code)
+- **Scalar API Reference**: 
+  - Thunder API: http://localhost:8082 (SDK & Debug endpoints)
+  - Thunder Admin: http://localhost:8083 (Management endpoints)
 
 ### OpenAPI in Docker
 
-The OpenAPI specification file (`docs/openapi.yaml`) should be generated before starting Docker. Use the local script:
+The OpenAPI specification files should be generated before starting Docker. Use the local script:
 
 ```bash
 ./scripts/generate-openapi.sh
 ```
 
 This will:
-1. Build `thunder-admin` module
-2. Generate OpenAPI spec from JAX-RS annotations using SmallRye OpenAPI
-3. Copy it to `docs/openapi.yaml` file
-4. Make it available to Scalar API Reference service
+1. Build both `thunder-api` and `thunder-admin` modules
+2. Generate OpenAPI specs from JAX-RS annotations using SmallRye OpenAPI
+3. Copy them to `docs/thunder-api-openapi.yaml` and `docs/thunder-admin-openapi.yaml`
+4. Make them available to separate Scalar API Reference services
 
-The OpenAPI file is served by Scalar at http://localhost:8082.
+Each service has its own Scalar instance:
+- Thunder API docs: http://localhost:8082
+- Thunder Admin docs: http://localhost:8083
 
 ### Generating OpenAPI Locally
 
@@ -221,7 +226,8 @@ thunder-oss/
 │   ├── logs.sh
 │   └── generate-openapi.sh  # Generate OpenAPI specification
 ├── docs/
-│   └── openapi.yaml          # OpenAPI specification (auto-generated, served by Scalar)
+│   ├── thunder-api-openapi.yaml    # Thunder API OpenAPI spec (auto-generated)
+│   └── thunder-admin-openapi.yaml  # Thunder Admin OpenAPI spec (auto-generated)
 ├── thunder-admin/src/main/resources/seeds/
 │   └── 001_seed_meta_set.aql # Seed data for meta_set
 ├── Dockerfile

@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Generate OpenAPI specification from thunder-admin module
-# This script generates OpenAPI file from thunder-admin and outputs it to docs/openapi.yaml
+# Generate OpenAPI specifications from both modules
+# This script generates separate OpenAPI files for thunder-api and thunder-admin
+# Each service gets its own OpenAPI spec file
 
 set -e
 
@@ -12,16 +13,32 @@ cd "$PROJECT_ROOT" || exit 1
 echo "📝 Generating OpenAPI specifications..."
 echo ""
 
-# Build thunder-admin module to generate OpenAPI file
-echo "🔨 Building thunder-admin module..."
-mvn clean compile -pl thunder-admin -am -DskipTests
+# Build both modules to generate OpenAPI files
+# Using package phase to ensure process-classes phase runs (where OpenAPI plugin executes)
+echo "🔨 Building thunder-api module..."
+mvn clean package -pl thunder-api -am -DskipTests
 
-# Check if OpenAPI file was generated (plugin generates openapi.yaml by default)
+echo "🔨 Building thunder-admin module..."
+mvn clean package -pl thunder-admin -am -DskipTests
+
+# Check if OpenAPI files were generated (plugin generates openapi.yaml by default)
+API_OPENAPI="$PROJECT_ROOT/thunder-api/target/openapi/openapi.yaml"
 ADMIN_OPENAPI="$PROJECT_ROOT/thunder-admin/target/openapi/openapi.yaml"
-OUTPUT_FILE="$PROJECT_ROOT/docs/openapi.yaml"
+
+# Output files
+API_OUTPUT="$PROJECT_ROOT/docs/thunder-api-openapi.yaml"
+ADMIN_OUTPUT="$PROJECT_ROOT/docs/thunder-admin-openapi.yaml"
 
 # Create docs directory if it doesn't exist
 mkdir -p "$PROJECT_ROOT/docs"
+
+if [ ! -f "$API_OPENAPI" ]; then
+    echo "❌ Error: thunder-api OpenAPI file not found at $API_OPENAPI"
+    echo "   Looking for: $API_OPENAPI"
+    echo "   Files in directory:"
+    ls -la "$PROJECT_ROOT/thunder-api/target/openapi/" 2>/dev/null || echo "   Directory does not exist"
+    exit 1
+fi
 
 if [ ! -f "$ADMIN_OPENAPI" ]; then
     echo "❌ Error: thunder-admin OpenAPI file not found at $ADMIN_OPENAPI"
@@ -32,22 +49,27 @@ if [ ! -f "$ADMIN_OPENAPI" ]; then
 fi
 
 echo ""
-echo "📋 Copying OpenAPI specification..."
+echo "📋 Copying OpenAPI specifications..."
 
-# Copy thunder-admin OpenAPI spec to docs/
-cp "$ADMIN_OPENAPI" "$OUTPUT_FILE"
+# Copy thunder-api OpenAPI spec
+cp "$API_OPENAPI" "$API_OUTPUT"
+echo "  ✅ thunder-api: $API_OUTPUT"
 
-if [ $? -ne 0 ]; then
-    echo "⚠️  Failed to copy OpenAPI file"
-    exit 1
-fi
+# Copy thunder-admin OpenAPI spec
+cp "$ADMIN_OPENAPI" "$ADMIN_OUTPUT"
+echo "  ✅ thunder-admin: $ADMIN_OUTPUT"
 
 echo ""
-echo "✅ OpenAPI specification generated successfully!"
-echo "📄 Output file: $OUTPUT_FILE"
+echo "✅ OpenAPI specifications generated successfully!"
+echo ""
+echo "📄 Generated files:"
+echo "   - $API_OUTPUT (Thunder API - SDK & Debug)"
+echo "   - $ADMIN_OUTPUT (Thunder Admin - Management)"
 echo ""
 echo "💡 Next steps:"
-echo "   - Review the generated docs/openapi.yaml"
-echo "   - Commit it to the repository"
-echo "   - Access Scalar API Reference at http://localhost:8082"
+echo "   - Review the generated OpenAPI files"
+echo "   - Commit them to the repository"
+echo "   - Access Scalar API Reference:"
+echo "     • Thunder API: http://localhost:8082"
+echo "     • Thunder Admin: http://localhost:8083"
 

@@ -117,18 +117,30 @@ services:
     networks:
       - thunder-network
 
-  scalar:
+  scalar-api:
     image: scalarapi/api-reference:latest
-    container_name: thunder-scalar
+    container_name: thunder-scalar-api
     ports:
       - "8082:8080"
     volumes:
-      - ./docs:/docs:ro
+      - ./docs/thunder-api-openapi.yaml:/docs/openapi.yaml:ro
     networks:
       - thunder-network
     restart: unless-stopped
     depends_on:
       - thunder-api
+
+  scalar-admin:
+    image: scalarapi/api-reference:latest
+    container_name: thunder-scalar-admin
+    ports:
+      - "8083:8080"
+    volumes:
+      - ./docs/thunder-admin-openapi.yaml:/docs/openapi.yaml:ro
+    networks:
+      - thunder-network
+    restart: unless-stopped
+    depends_on:
       - thunder-admin
 
 networks:
