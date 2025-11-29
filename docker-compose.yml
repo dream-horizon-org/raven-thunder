@@ -117,30 +117,21 @@ services:
     networks:
       - thunder-network
 
-  scalar-api:
+  scalar:
     image: scalarapi/api-reference:latest
-    container_name: thunder-scalar-api
+    container_name: thunder-scalar
     ports:
       - "8082:8080"
     volumes:
-      - ./docs/thunder-api-openapi.yaml:/docs/openapi.yaml:ro
+      - ./docs:/docs:ro
+    environment:
+      # Optional: Add theme configuration (JSON must be properly escaped)
+      - 'API_REFERENCE_CONFIG={"theme": "purple"}'
     networks:
       - thunder-network
     restart: unless-stopped
     depends_on:
       - thunder-api
-
-  scalar-admin:
-    image: scalarapi/api-reference:latest
-    container_name: thunder-scalar-admin
-    ports:
-      - "8083:8080"
-    volumes:
-      - ./docs/thunder-admin-openapi.yaml:/docs/openapi.yaml:ro
-    networks:
-      - thunder-network
-    restart: unless-stopped
-    depends_on:
       - thunder-admin
 
 networks:
