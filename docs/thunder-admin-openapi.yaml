@@ -31,21 +31,41 @@ components:
         tenantId:
           type: string
     BehaviourTagCreateRequest:
+      description: Request to create a new Behaviour Tag
       type: object
+      required:
+      - behaviourTagName
+      - exposureRule
+      - ctaRelation
       properties:
         behaviourTagName:
           type: string
+          description: Name of the Behaviour Tag
+          examples:
+          - new_user_tag
         description:
           type: string
+          description: Description of the Behaviour Tag
+          examples:
+          - Users eligible for onboarding nudges
         exposureRule:
+          description: Exposure rules defining when this behaviour tag applies to
+            users
+          type: object
           $ref: "#/components/schemas/ExposureRule"
         ctaRelation:
+          description: CTA relation rules defining which CTAs are shown/hidden for
+            this behaviour tag
+          type: object
           $ref: "#/components/schemas/CTARelation"
         linkedCtas:
           type: array
           uniqueItems: true
           items:
             type: string
+          description: Set of CTA IDs linked to this behaviour tag
+          examples:
+          - []
     BehaviourTagPutRequest:
       type: object
       properties:
@@ -140,25 +160,55 @@ components:
         hideCta:
           $ref: "#/components/schemas/CtaRelationRule"
     CTARequest:
+      description: Request to create a new CTA (Call-to-Action)
       type: object
+      required:
+      - name
+      - team
+      - rule
       properties:
         name:
           type: string
+          maxLength: 100
+          description: Name of the CTA
+          examples:
+          - Welcome Bonus
         tags:
           type: array
           items:
             type: string
+          description: Tags associated with the CTA for categorization
+          examples:
+          - - growth
+            - notifications
         description:
           type: string
+          maxLength: 500
+          description: Detailed description of the CTA
+          examples:
+          - Bottom sheet to prompt enabling notifications when lineups are out
         team:
           type: string
+          description: Team that owns this CTA
+          examples:
+          - marketing
         startTime:
           type: integer
           format: int64
+          description: "Start time in epoch milliseconds. If null, CTA starts immediately\
+            \ when activated."
+          examples:
+          - 1609459200000
         endTime:
           type: integer
           format: int64
+          description: "End time in epoch milliseconds. If null, CTA has no end time."
+          examples:
+          - 1640995200000
         rule:
+          description: "Rule configuration for the CTA including cohort eligibility,\
+            \ state transitions, actions, and frequency controls"
+          type: object
           $ref: "#/components/schemas/RuleRequest"
     CTAStatus:
       type: string
@@ -338,77 +388,6 @@ components:
         statusCode:
           type: integer
           format: int32
-    ResponseCTA:
-      type: object
-      properties:
-        success:
-          type: boolean
-        data:
-          $ref: "#/components/schemas/CTA"
-        error:
-          type: string
-        message:
-          type: string
-        statusCode:
-          type: integer
-          format: int32
-    ResponseCTAListResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-        data:
-          $ref: "#/components/schemas/CTAListResponse"
-        error:
-          type: string
-        message:
-          type: string
-        statusCode:
-          type: integer
-          format: int32
-    ResponseFilterResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-        data:
-          $ref: "#/components/schemas/FilterResponse"
-        error:
-          type: string
-        message:
-          type: string
-        statusCode:
-          type: integer
-          format: int32
-    ResponseLong:
-      type: object
-      properties:
-        success:
-          type: boolean
-        data:
-          type: integer
-          format: int64
-        error:
-          type: string
-        message:
-          type: string
-        statusCode:
-          type: integer
-          format: int32
-    ResponseNudgePreview:
-      type: object
-      properties:
-        success:
-          type: boolean
-        data:
-          $ref: "#/components/schemas/NudgePreview"
-        error:
-          type: string
-        message:
-          type: string
-        statusCode:
-          type: integer
-          format: int32
     ResponseObject:
       type: object
       properties:
@@ -581,6 +560,25 @@ components:
       - hours
       - minutes
       - seconds
+tags:
+- name: CTA Status
+  description: "APIs for managing CTA lifecycle status transitions. CTAs move through\
+    \ states: DRAFT → SCHEDULED → LIVE → PAUSED → CONCLUDED/TERMINATED."
+- name: CTAs
+  description: "APIs for managing Call-to-Actions (CTAs). Includes CRUD operations\
+    \ for creating, updating, retrieving, and listing CTAs with filtering and pagination\
+    \ support."
+- name: Filters
+  description: "APIs for retrieving filter values used in the admin UI. Provides available\
+    \ options for tags, teams, statuses, behaviour tags, and creators."
+- name: Nudge Previews
+  description: APIs for managing Nudge Previews. Nudge Previews are used to preview
+    nudge templates before they are used in CTAs. The preview includes the nudge template
+    and TTL (time-to-live) configuration.
+- name: Nudges
+  description: "APIs for managing Nudge templates and Nudge Previews. Nudges define\
+    \ the UI components and actions displayed to users in CTAs. Note: Nudge routes\
+    \ are deprecated. Use Nudge Preview routes instead."
 paths:
   /healthcheck:
     get:
@@ -709,334 +707,583 @@ paths:
                 $ref: "#/components/schemas/ResponseBehaviourTag"
   /thunder/ctas:
     get:
+      summary: List CTAs
+      description: Retrieves a paginated list of CTAs matching the specified filters.
+        All query parameters are optional. Results are sorted by creation date (newest
+        first). Use pagination parameters to control page size and navigation.
+      operationId: listCTAs
+      tags:
+      - CTAs
       parameters:
-      - name: behaviourTag
+      - description: Filter by behaviour tag name
+        example: new_user
+        name: behaviourTag
+        required: false
         in: query
         schema:
           type: string
-      - name: createdBy
+      - description: Filter by creator user ID
+        example: admin@example.com
+        name: createdBy
+        required: false
         in: query
         schema:
           type: string
-      - name: name
+      - description: Filter by exact CTA name (case-sensitive)
+        example: Welcome Bonus
+        name: name
+        required: false
         in: query
         schema:
           type: string
-      - name: pageNumber
-        in: query
+      - description: Page number (0-indexed). Default is 0.
+        example: 0
+        name: pageNumber
+        required: false
         schema:
+          minimum: 0
           type: integer
-          format: int32
-      - name: pageSize
+          default: 0
         in: query
+      - description: "Number of items per page. Default is 10, maximum is 100."
+        example: 10
+        name: pageSize
+        required: false
         schema:
+          maximum: 100
+          minimum: 1
           type: integer
-          format: int32
-      - name: searchName
+          default: 10
+        in: query
+      - description: Search CTA names (partial match)
+        example: welcome
+        name: searchName
+        required: false
         in: query
         schema:
           type: string
-      - name: status
+      - description: Filter by CTA status
+        example: LIVE
+        name: status
+        required: false
+        schema:
+          type: string
+          enum:
+          - DRAFT
+          - SCHEDULED
+          - LIVE
+          - PAUSED
+          - CONCLUDED
+          - TERMINATED
+        in: query
+      - description: Comma-separated list of tags to filter by
+        example: "promotion,signup"
+        name: tags
+        required: false
         in: query
         schema:
           type: string
-      - name: tags
+      - description: Comma-separated list of teams to filter by
+        example: "marketing,growth"
+        name: teams
+        required: false
         in: query
         schema:
           type: string
-      - name: teams
-        in: query
-        schema:
-          type: string
-      - name: x-tenant-id
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
         in: header
         schema:
           type: string
           default: default
       responses:
         "200":
-          description: OK
+          description: List of CTAs retrieved successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ResponseCTAListResponse"
+                $ref: "#/components/schemas/CTAListResponse"
     post:
+      summary: Create CTA
+      description: "Creates a new Call-to-Action (CTA) with the provided details.\
+        \ The CTA will be created in DRAFT status and can be activated later using\
+        \ status update endpoints. Includes rule configuration, state machine setup,\
+        \ actions, and frequency controls."
+      operationId: createCTA
+      tags:
+      - CTAs
       parameters:
-      - name: user
-        in: header
+      - description: User ID of the person creating the CTA
+        example: admin@example.com
+        name: user
+        required: true
         schema:
           type: string
-        required: true
-      - name: x-tenant-id
         in: header
+      - description: Tenant identifier for multi-tenancy support
+        example: tenant1
+        name: x-tenant-id
+        required: false
         schema:
           type: string
           default: default
+        in: header
       requestBody:
+        description: "CTA creation request containing name, description, tags, team,\
+          \ rule configuration, state machine setup, actions, and frequency controls"
         content:
-          '*/*':
+          application/json:
             schema:
               $ref: "#/components/schemas/CTARequest"
         required: true
       responses:
         "200":
-          description: OK
+          description: CTA created successfully. Returns the new CTA ID.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ResponseLong"
+                description: New CTA ID
+                format: int64
+                type: integer
+        "400":
+          description: Invalid request data or validation failed
   /thunder/ctas/{ctaId}:
     put:
+      summary: Update CTA
+      description: "Updates an existing CTA. Only the fields provided in the request\
+        \ will be updated. Can update rule configuration, state machine setup, actions,\
+        \ and frequency controls."
+      operationId: updateCTA
+      tags:
+      - CTAs
       parameters:
-      - name: ctaId
-        in: path
+      - description: Unique identifier of the CTA to update
+        example: 12345
+        name: ctaId
         required: true
         schema:
-          type: integer
           format: int64
-      - name: user
+          type: integer
+        in: path
+      - description: User ID of the person updating the CTA
+        example: admin@example.com
+        name: user
+        required: true
         in: header
         schema:
           type: string
-        required: true
-      - name: x-tenant-id
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
         in: header
         schema:
           type: string
           default: default
       requestBody:
+        description: CTA update request containing fields to update
         content:
-          '*/*':
+          application/json:
             schema:
               $ref: "#/components/schemas/CTAUpdateRequest"
         required: true
       responses:
         "200":
-          description: OK
+          description: CTA updated successfully
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ResponseObject"
+        "400":
+          description: Invalid request data or validation failed
+        "404":
+          description: CTA not found
     get:
+      summary: Get CTA by ID
+      description: "Retrieves a specific CTA by its unique identifier. Returns the\
+        \ complete CTA object including all metadata, rules, status, and configuration."
+      operationId: getCTA
+      tags:
+      - CTAs
       parameters:
-      - name: ctaId
-        in: path
+      - description: Unique identifier of the CTA
+        example: 12345
+        name: ctaId
         required: true
         schema:
-          type: integer
           format: int64
-      - name: x-tenant-id
+          type: integer
+        in: path
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
         in: header
         schema:
           type: string
           default: default
       responses:
         "200":
-          description: OK
+          description: CTA retrieved successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ResponseCTA"
+                $ref: "#/components/schemas/CTA"
+        "404":
+          description: CTA not found
   /thunder/ctas/{id}/conclude:
     put:
+      summary: Conclude CTA
+      description: Changes the CTA status to CONCLUDED. The CTA must be in LIVE or
+        PAUSED status. Concluded CTAs have completed their lifecycle and are no longer
+        available to end users.
+      operationId: concludeCTA
+      tags:
+      - CTA Status
       parameters:
-      - name: id
-        in: path
+      - description: Unique identifier of the CTA to conclude
+        example: 12345
+        name: id
         required: true
         schema:
-          type: integer
           format: int64
-      - name: x-tenant-id
+          type: integer
+        in: path
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
         in: header
         schema:
           type: string
           default: default
       responses:
         "200":
-          description: OK
+          description: CTA concluded successfully
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ResponseObject"
+        "400":
+          description: CTA cannot be concluded from current status. Only LIVE or PAUSED
+            CTAs can be concluded.
+        "404":
+          description: CTA not found
   /thunder/ctas/{id}/live:
     put:
+      summary: Activate CTA
+      description: "Changes the CTA status to LIVE. The CTA must be in SCHEDULED or\
+        \ PAUSED status. Once LIVE, the CTA will be available to end users through\
+        \ the SDK APIs."
+      operationId: activateCTA
+      tags:
+      - CTA Status
       parameters:
-      - name: id
-        in: path
+      - description: Unique identifier of the CTA to activate
+        example: 12345
+        name: id
         required: true
         schema:
-          type: integer
           format: int64
-      - name: x-tenant-id
+          type: integer
+        in: path
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
         in: header
         schema:
           type: string
           default: default
       responses:
         "200":
-          description: OK
+          description: CTA activated successfully
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ResponseObject"
+        "400":
+          description: CTA cannot be activated from current status. Only SCHEDULED
+            or PAUSED CTAs can be activated.
+        "404":
+          description: CTA not found
   /thunder/ctas/{id}/pause:
     put:
+      summary: Pause CTA
+      description: Changes the CTA status to PAUSED. The CTA must be in LIVE status.
+        Paused CTAs are not available to end users but can be reactivated later.
+      operationId: pauseCTA
+      tags:
+      - CTA Status
       parameters:
-      - name: id
-        in: path
+      - description: Unique identifier of the CTA to pause
+        example: 12345
+        name: id
         required: true
         schema:
-          type: integer
           format: int64
-      - name: x-tenant-id
+          type: integer
+        in: path
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
         in: header
         schema:
           type: string
           default: default
       responses:
         "200":
-          description: OK
+          description: CTA paused successfully
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ResponseObject"
+        "400":
+          description: CTA cannot be paused from current status. Only LIVE CTAs can
+            be paused.
+        "404":
+          description: CTA not found
   /thunder/ctas/{id}/schedule:
     put:
+      summary: Schedule CTA
+      description: Changes the CTA status to SCHEDULED. The CTA must be in DRAFT status.
+        Scheduled CTAs will become LIVE automatically based on their startTime configuration.
+      operationId: scheduleCTA
+      tags:
+      - CTA Status
       parameters:
-      - name: id
-        in: path
+      - description: Unique identifier of the CTA to schedule
+        example: 12345
+        name: id
         required: true
         schema:
-          type: integer
           format: int64
-      - name: x-tenant-id
+          type: integer
+        in: path
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
         in: header
         schema:
           type: string
           default: default
       responses:
         "200":
-          description: OK
+          description: CTA scheduled successfully
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ResponseObject"
+        "400":
+          description: CTA cannot be scheduled from current status. Only DRAFT CTAs
+            can be scheduled.
+        "404":
+          description: CTA not found
   /thunder/ctas/{id}/terminate:
     put:
+      summary: Terminate CTA
+      description: "Changes the CTA status to TERMINATED. The CTA must be in DRAFT,\
+        \ SCHEDULED, LIVE, or PAUSED status. Terminated CTAs are permanently stopped\
+        \ and cannot be reactivated."
+      operationId: terminateCTA
+      tags:
+      - CTA Status
       parameters:
-      - name: id
-        in: path
+      - description: Unique identifier of the CTA to terminate
+        example: 12345
+        name: id
         required: true
         schema:
-          type: integer
           format: int64
-      - name: x-tenant-id
+          type: integer
+        in: path
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
         in: header
         schema:
           type: string
           default: default
       responses:
         "200":
-          description: OK
+          description: CTA terminated successfully
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ResponseObject"
+        "400":
+          description: "CTA cannot be terminated from current status. Only DRAFT,\
+            \ SCHEDULED, LIVE, or PAUSED CTAs can be terminated."
+        "404":
+          description: CTA not found
   /thunder/filters:
     get:
+      summary: Get Filters
+      description: "Retrieves available filter values for CTAs including tags, teams,\
+        \ statuses, behaviour tags, and creators. Used to populate filter dropdowns\
+        \ in the admin UI."
+      operationId: getFilters
+      tags:
+      - Filters
       parameters:
-      - name: x-tenant-id
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
         in: header
         schema:
           type: string
           default: default
       responses:
         "200":
-          description: OK
+          description: Filter values retrieved successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ResponseFilterResponse"
+                $ref: "#/components/schemas/FilterResponse"
   /thunder/nudge/preview:
     get:
+      summary: Get Nudge Preview
+      description: Retrieves a Nudge Preview by its ID. Returns the preview template
+        and TTL configuration.
+      operationId: getNudgePreview
+      tags:
+      - Nudge Previews
       parameters:
-      - name: id
-        in: query
+      - description: Unique identifier of the Nudge Preview
+        example: preview_001
+        name: id
+        required: true
         schema:
           type: string
-      - name: x-tenant-id
+        in: query
+      - description: Tenant identifier
+        example: default
+        name: x-tenant-id
+        required: false
         in: header
         schema:
           type: string
           default: default
       responses:
         "200":
-          description: OK
+          description: Nudge Preview retrieved successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ResponseNudgePreview"
+                $ref: "#/components/schemas/NudgePreview"
+        "404":
+          description: Nudge Preview not found
     post:
+      summary: Create or Update Nudge Preview
+      description: Creates a new Nudge Preview or updates an existing one if it already
+        exists. Nudge Previews are used to preview nudge templates before they are
+        used in CTAs. The preview includes the nudge template and TTL (time-to-live)
+        configuration.
+      operationId: createOrUpdateNudgePreview
+      tags:
+      - Nudge Previews
       parameters:
-      - name: x-tenant-id
+      - description: Tenant identifier
+        example: default
+        name: x-tenant-id
+        required: false
         in: header
         schema:
           type: string
           default: default
       requestBody:
+        description: "Nudge Preview definition with id, template, and TTL"
         content:
-          '*/*':
+          application/json:
             schema:
               $ref: "#/components/schemas/NudgePreview"
         required: true
       responses:
         "200":
-          description: OK
+          description: Nudge Preview created or updated successfully
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ResponseObject"
+        "400":
+          description: Invalid request data or validation failed
   /thunder/nudges:
     put:
+      summary: Update an existing Nudge (Deprecated)
+      description: Updates an existing Nudge template. All fields in the request will
+        update the corresponding fields in the Nudge. ⚠️ This endpoint is deprecated.
+        Use Nudge Preview endpoints instead.
+      operationId: updateNudge
+      deprecated: true
+      tags:
+      - Nudges
       parameters:
-      - name: x-tenant-id
+      - description: Tenant identifier
+        example: default
+        name: x-tenant-id
+        required: false
         in: header
         schema:
           type: string
           default: default
       requestBody:
+        description: Updated Nudge template definition
         content:
-          '*/*':
+          application/json:
             schema:
               $ref: "#/components/schemas/Nudge"
         required: true
       responses:
         "200":
-          description: OK
+          description: Nudge updated successfully
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ResponseObject"
+        "400":
+          description: Invalid request data or validation failed
+        "404":
+          description: Nudge not found
     post:
+      summary: Create a new Nudge (Deprecated)
+      description: Creates a new Nudge template that can be used in CTAs. Nudges define
+        the UI components and actions that will be displayed to users. ⚠️ This endpoint
+        is deprecated. Use Nudge Preview endpoints instead.
+      operationId: createNudge
+      deprecated: true
+      tags:
+      - Nudges
       parameters:
-      - name: x-tenant-id
-        in: header
+      - description: Tenant identifier for multi-tenancy support
+        example: default
+        name: x-tenant-id
+        required: false
         schema:
           type: string
           default: default
+        in: header
       requestBody:
+        description: Nudge template definition
         content:
-          '*/*':
+          application/json:
             schema:
               $ref: "#/components/schemas/Nudge"
         required: true
       responses:
         "200":
-          description: OK
+          description: Nudge created successfully
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ResponseObject"
+        "400":
+          description: Invalid request data or validation failed
 info:
   title: Generated API
   version: "1.0"

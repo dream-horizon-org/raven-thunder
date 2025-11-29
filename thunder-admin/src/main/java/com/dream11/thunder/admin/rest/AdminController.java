@@ -32,11 +32,6 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 
 @Slf4j
-@Tag(
-    name = "Admin",
-    description = "Admin APIs for managing CTAs (Call-to-Actions), Nudges, and Nudge Previews. " +
-                  "Includes CRUD operations, status transitions, and filtering capabilities."
-)
 @Path("/thunder")
 public class AdminController {
 
@@ -49,11 +44,19 @@ public class AdminController {
     this.nudgePreviewRepository = nudgePreviewRepository;
   }
 
+  @Tag(
+      name = "Nudges",
+      description = "APIs for managing Nudge templates and Nudge Previews. " +
+                    "Nudges define the UI components and actions displayed to users in CTAs. " +
+                    "Note: Nudge routes are deprecated. Use Nudge Preview routes instead."
+  )
   @Operation(
-      summary = "Create a new Nudge",
+      summary = "Create a new Nudge (Deprecated)",
       description = "Creates a new Nudge template that can be used in CTAs. " +
-                    "Nudges define the UI components and actions that will be displayed to users.",
-      operationId = "createNudge"
+                    "Nudges define the UI components and actions that will be displayed to users. " +
+                    "⚠️ This endpoint is deprecated. Use Nudge Preview endpoints instead.",
+      operationId = "createNudge",
+      deprecated = true
   )
   @APIResponse(
       responseCode = "200",
@@ -88,10 +91,13 @@ public class AdminController {
     return ResponseWrapper.fromCompletable(service.createNudge(tenantId, template), null, 200);
   }
 
+  @Tag(name = "Nudges")
   @Operation(
-      summary = "Update an existing Nudge",
-      description = "Updates an existing Nudge template. All fields in the request will update the corresponding fields in the Nudge.",
-      operationId = "updateNudge"
+      summary = "Update an existing Nudge (Deprecated)",
+      description = "Updates an existing Nudge template. All fields in the request will update the corresponding fields in the Nudge. " +
+                    "⚠️ This endpoint is deprecated. Use Nudge Preview endpoints instead.",
+      operationId = "updateNudge",
+      deprecated = true
   )
   @APIResponse(
       responseCode = "200",
@@ -129,6 +135,12 @@ public class AdminController {
     return ResponseWrapper.fromCompletable(service.updateNudge(tenantId, template), null, 200);
   }
 
+  @Tag(
+      name = "Nudge Previews",
+      description = "APIs for managing Nudge Previews. " +
+                    "Nudge Previews are used to preview nudge templates before they are used in CTAs. " +
+                    "The preview includes the nudge template and TTL (time-to-live) configuration."
+  )
   @Operation(
       summary = "Create or Update Nudge Preview",
       description = "Creates a new Nudge Preview or updates an existing one if it already exists. " +
@@ -170,6 +182,7 @@ public class AdminController {
         service.createOrUpdateNudgePreview(tenantId, nudgePreview), null, 200);
   }
 
+  @Tag(name = "Nudge Previews")
   @Operation(
       summary = "Get Nudge Preview",
       description = "Retrieves a Nudge Preview by its ID. Returns the preview template and TTL configuration.",
@@ -209,6 +222,11 @@ public class AdminController {
     return ResponseWrapper.fromSingle(nudgePreviewRepository.find(tenantId, id).toSingle(), 200);
   }
 
+  @Tag(
+      name = "CTAs",
+      description = "APIs for managing Call-to-Actions (CTAs). Includes CRUD operations for creating, " +
+                    "updating, retrieving, and listing CTAs with filtering and pagination support."
+  )
   @Operation(
       summary = "Create CTA",
       description = "Creates a new Call-to-Action (CTA) with the provided details. " +
@@ -263,6 +281,7 @@ public class AdminController {
     return ResponseWrapper.fromSingle(service.createCTA(tenantId, cta, user), 200);
   }
 
+  @Tag(name = "CTAs")
   @Operation(
       summary = "Update CTA",
       description = "Updates an existing CTA. Only the fields provided in the request will be updated. " +
@@ -322,6 +341,7 @@ public class AdminController {
         service.updateCTA(tenantId, cta, ctaId, user), null, 200);
   }
 
+  @Tag(name = "CTAs")
   @Operation(
       summary = "Get CTA by ID",
       description = "Retrieves a specific CTA by its unique identifier. " +
@@ -362,6 +382,7 @@ public class AdminController {
     return ResponseWrapper.fromSingle(service.fetchCTA(tenantId, ctaId), 200);
   }
 
+  @Tag(name = "CTAs")
   @Operation(
       summary = "List CTAs",
       description = "Retrieves a paginated list of CTAs matching the specified filters. " +
@@ -478,6 +499,11 @@ public class AdminController {
         200);
   }
 
+  @Tag(
+      name = "Filters",
+      description = "APIs for retrieving filter values used in the admin UI. " +
+                    "Provides available options for tags, teams, statuses, behaviour tags, and creators."
+  )
   @Operation(
       summary = "Get Filters",
       description = "Retrieves available filter values for CTAs including tags, teams, statuses, " +
@@ -506,6 +532,11 @@ public class AdminController {
     return ResponseWrapper.fromSingle(service.fetchFilters(tenantId), 200);
   }
 
+  @Tag(
+      name = "CTA Status",
+      description = "APIs for managing CTA lifecycle status transitions. " +
+                    "CTAs move through states: DRAFT → SCHEDULED → LIVE → PAUSED → CONCLUDED/TERMINATED."
+  )
   @Operation(
       summary = "Activate CTA",
       description = "Changes the CTA status to LIVE. The CTA must be in SCHEDULED or PAUSED status. " +
@@ -546,6 +577,7 @@ public class AdminController {
     return ResponseWrapper.fromCompletable(service.updateStatusToLive(tenantId, id), null, 200);
   }
 
+  @Tag(name = "CTA Status")
   @Operation(
       summary = "Pause CTA",
       description = "Changes the CTA status to PAUSED. The CTA must be in LIVE status. " +
@@ -586,6 +618,7 @@ public class AdminController {
     return ResponseWrapper.fromCompletable(service.updateStatusToPaused(tenantId, id), null, 200);
   }
 
+  @Tag(name = "CTA Status")
   @Operation(
       summary = "Schedule CTA",
       description = "Changes the CTA status to SCHEDULED. The CTA must be in DRAFT status. " +
@@ -627,6 +660,7 @@ public class AdminController {
         service.updateStatusToScheduled(tenantId, id), null, 200);
   }
 
+  @Tag(name = "CTA Status")
   @Operation(
       summary = "Conclude CTA",
       description = "Changes the CTA status to CONCLUDED. The CTA must be in LIVE or PAUSED status. " +
@@ -668,6 +702,7 @@ public class AdminController {
         service.updateStatusToConcluded(tenantId, id), null, 200);
   }
 
+  @Tag(name = "CTA Status")
   @Operation(
       summary = "Terminate CTA",
       description = "Changes the CTA status to TERMINATED. The CTA must be in DRAFT, SCHEDULED, LIVE, or PAUSED status. " +
