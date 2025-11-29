@@ -67,7 +67,7 @@ services:
         condition: service_healthy
     volumes:
       - ./thunder-admin/src/main/resources/seeds:/app/seeds:ro
-      - ./scripts/run-all-seeds.sh:/app/run-all-seeds.sh:ro
+      - ./scripts/docker/run-all-seeds.sh:/app/run-all-seeds.sh:ro
     environment:
       - AEROSPIKE_HOST=aerospike
       - AEROSPIKE_PORT=3000
@@ -116,6 +116,20 @@ services:
       start_period: 30s
     networks:
       - thunder-network
+
+  scalar:
+    image: scalarapi/api-reference:latest
+    container_name: thunder-scalar
+    ports:
+      - "8082:8080"
+    volumes:
+      - ./docs:/docs:ro
+    networks:
+      - thunder-network
+    restart: unless-stopped
+    depends_on:
+      - thunder-api
+      - thunder-admin
 
 networks:
   thunder-network:

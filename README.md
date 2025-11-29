@@ -55,6 +55,7 @@ Docker setup includes:
 - **thunder-api**: REST API service (port 8080) for SDK and Debug endpoints
 - **thunder-admin**: Admin panel service (port 8081) for CTA, Nudge, and Behaviour Tag management
 - **Aerospike**: Database with namespaces `thunder` and `thunder-admin`
+- **Scalar API Reference**: Interactive API documentation (port 8082)
 - **Automatic seeding**: Seed data and index creation run on startup
 - Configuration via environment variables (AEROSPIKE_HOST) and `aerospike.conf` (Aerospike server)
 
@@ -157,6 +158,42 @@ docker-compose up -d --build
 
 For persistent network issues, configure Docker daemon timeouts in `/etc/docker/daemon.json` (or Docker Desktop settings).
 
+## API Documentation
+
+Thunder provides comprehensive API documentation via OpenAPI 3.0 specification:
+
+- **OpenAPI Spec**: `docs/openapi.yaml` (auto-generated from code)
+- **Scalar API Reference**: http://localhost:8082 (Interactive API explorer)
+
+### OpenAPI in Docker
+
+The OpenAPI specification file (`docs/openapi.yaml`) should be generated before starting Docker. Use the local script:
+
+```bash
+./scripts/generate-openapi.sh
+```
+
+This will:
+1. Build `thunder-admin` module
+2. Generate OpenAPI spec from JAX-RS annotations using SmallRye OpenAPI
+3. Copy it to `docs/openapi.yaml` file
+4. Make it available to Scalar API Reference service
+
+The OpenAPI file is served by Scalar at http://localhost:8082.
+
+### Generating OpenAPI Locally
+
+To generate or update the OpenAPI specification locally (outside Docker):
+
+```bash
+./scripts/generate-openapi.sh
+```
+
+This script performs the same steps as the Docker service, useful for:
+- Previewing changes before committing
+- Generating the spec for CI/CD pipelines
+- Manual updates when needed
+
 ## Scripts
 
 Convenience scripts are available in the `scripts/` directory:
@@ -165,6 +202,7 @@ Convenience scripts are available in the `scripts/` directory:
 - `stop.sh` - Stop Thunder Docker container
 - `restart.sh` - Restart Thunder Docker container
 - `logs.sh` - View Thunder Docker logs
+- `generate-openapi.sh` - Generate OpenAPI specification from code
 
 ## Project Structure
 
@@ -175,11 +213,15 @@ thunder-oss/
 ├── thunder-admin/           # Admin panel REST APIs (port 8081)
 ├── aerospike.conf           # Aerospike server config (Docker only)
 ├── scripts/
+│   ├── docker/
+│   │   └── run-all-seeds.sh  # Executes all AQL seed files
 │   ├── start.sh
 │   ├── stop.sh
 │   ├── restart.sh
 │   ├── logs.sh
-│   └── run-all-seeds.sh     # Executes all AQL seed files
+│   └── generate-openapi.sh  # Generate OpenAPI specification
+├── docs/
+│   └── openapi.yaml          # OpenAPI specification (auto-generated, served by Scalar)
 ├── thunder-admin/src/main/resources/seeds/
 │   └── 001_seed_meta_set.aql # Seed data for meta_set
 ├── Dockerfile
