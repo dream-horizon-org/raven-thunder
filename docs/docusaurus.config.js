@@ -4,7 +4,7 @@ const config = {
   title: 'Thunder',
   tagline: 'CTAs, Nudges and Behaviour Tags platform',
   url: 'https://dream-horizon-org.github.io',
-  baseUrl: '/thunder/',
+  baseUrl: '/',
   favicon: 'img/logo.svg',
   organizationName: 'dream-horizon-org', // GitHub org/user name.
   projectName: 'thunder', // Repo name.
