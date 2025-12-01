@@ -3,11 +3,11 @@
 const config = {
   title: 'Thunder',
   tagline: 'CTAs, Nudges and Behaviour Tags platform',
-  url: 'https://your-domain.example',
-  baseUrl: '/',
+  url: 'https://dream-horizon-org.github.io',
+  baseUrl: '/thunder/',
   favicon: 'img/logo.svg',
-  organizationName: 'dream11', // GitHub org/user name.
-  projectName: 'thunder-oss', // Repo name.
+  organizationName: 'dream-horizon-org', // GitHub org/user name.
+  projectName: 'thunder', // Repo name.
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
