@@ -43,20 +43,39 @@ components:
           description: Name of the Behaviour Tag
           examples:
           - new_user_tag
+          - onboarding_eligible
         description:
           type: string
           description: Description of the Behaviour Tag
           examples:
           - Users eligible for onboarding nudges
         exposureRule:
-          description: Exposure rules defining when this behaviour tag applies to
-            users
+          description: "Exposure rules defining when this behaviour tag applies to\
+            \ users. Includes session, window, and lifespan frequency limits."
           type: object
+          examples:
+          - session:
+              limit: 2
+            window:
+              limit: 3
+              unit: days
+              value: 7
+            lifespan:
+              limit: 10
           $ref: "#/components/schemas/ExposureRule"
         ctaRelation:
-          description: CTA relation rules defining which CTAs are shown/hidden for
-            this behaviour tag
+          description: "CTA relation rules defining which CTAs are shown/hidden for\
+            \ this behaviour tag. shownCta defines which CTAs to show (rule: LIST/ANY/NONE),\
+            \ hideCta defines which CTAs to hide (rule: LIST/ANY/NONE)."
           type: object
+          examples:
+          - shownCta:
+              rule: LIST
+              ctaList:
+              - cta-101
+            hideCta:
+              rule: ANY
+              ctaList: []
           $ref: "#/components/schemas/CTARelation"
         linkedCtas:
           type: array
@@ -65,7 +84,7 @@ components:
             type: string
           description: Set of CTA IDs linked to this behaviour tag
           examples:
-          - []
+          - ""
     BehaviourTagPutRequest:
       type: object
       properties:
@@ -160,7 +179,10 @@ components:
         hideCta:
           $ref: "#/components/schemas/CtaRelationRule"
     CTARequest:
-      description: Request to create a new CTA (Call-to-Action)
+      description: "Request to create a new CTA (Call-to-Action). Note: Cohort eligibility\
+        \ must use 'all' as the cohort value. Use includes: [\"all\"] for single cohort\
+        \ or includes: [\"all\"] for list, and always keep excludes: [] empty. User-cohorts\
+        \ system is not currently supported."
       type: object
       required:
       - name
@@ -172,6 +194,7 @@ components:
           maxLength: 100
           description: Name of the CTA
           examples:
+          - Testing1
           - Welcome Bonus
         tags:
           type: array
@@ -179,8 +202,8 @@ components:
             type: string
           description: Tags associated with the CTA for categorization
           examples:
-          - - growth
-            - notifications
+          - growth
+          - notifications
         description:
           type: string
           maxLength: 500
@@ -207,7 +230,9 @@ components:
           - 1640995200000
         rule:
           description: "Rule configuration for the CTA including cohort eligibility,\
-            \ state transitions, actions, and frequency controls"
+            \ state transitions, actions, and frequency controls. IMPORTANT: cohortEligibility.includes\
+            \ must be [\"all\"] and excludes must be []. User-cohorts system is not\
+            \ currently supported."
           type: object
           $ref: "#/components/schemas/RuleRequest"
     CTAStatus:
@@ -240,6 +265,9 @@ components:
           $ref: "#/components/schemas/RuleRequest"
     CohortEligibility:
       type: object
+      description: "Cohort eligibility configuration for CTAs. IMPORTANT: User-cohorts\
+        \ system is not currently supported. Always use includes: [\"all\"] (single\
+        \ cohort) or includes: [\"all\"] (list), and keep excludes: [] empty."
       required:
       - includes
       - excludes
@@ -248,11 +276,15 @@ components:
           type: array
           items:
             type: string
+          description: "List of cohort names to include. Must be [\"all\"] since user-cohorts\
+            \ system is not currently supported."
           minItems: 1
         excludes:
           type: array
           items:
             type: string
+          description: "List of cohort names to exclude. Must always be empty [] since\
+            \ user-cohorts system is not currently supported."
     CtaRelationRule:
       type: object
       properties:
@@ -456,6 +488,9 @@ components:
           $ref: "#/components/schemas/Frequency"
     RuleRequest:
       type: object
+      description: "Rule configuration for CTA including cohort eligibility, state\
+        \ transitions, actions, and frequency. Note: cohortEligibility must use includes:\
+        \ [\"all\"] and excludes: []."
       required:
       - cohortEligibility
       - stateToAction
@@ -466,6 +501,9 @@ components:
       - frequency
       properties:
         cohortEligibility:
+          description: "Cohort eligibility. Must use includes: [\"all\"] and excludes:\
+            \ [] since user-cohorts system is not currently supported."
+          type: object
           $ref: "#/components/schemas/CohortEligibility"
         stateToAction:
           type: object
@@ -803,6 +841,26 @@ paths:
           description: List of CTAs retrieved successfully
           content:
             application/json:
+              examples:
+                CTAs List Response:
+                  summary: Paginated list of CTAs
+                  value:
+                    success: true
+                    data:
+                      ctas:
+                      - id: 12345
+                        name: Welcome Bonus
+                        tags:
+                        - growth
+                        - notifications
+                        team: marketing
+                        ctaStatus: LIVE
+                        createdBy: admin@example.com
+                        createdAt: 1609459200000
+                      totalCount: 1
+                      pageNumber: 0
+                      pageSize: 10
+                    statusCode: 200
               schema:
                 $ref: "#/components/schemas/CTAListResponse"
     post:
@@ -810,7 +868,9 @@ paths:
       description: "Creates a new Call-to-Action (CTA) with the provided details.\
         \ The CTA will be created in DRAFT status and can be activated later using\
         \ status update endpoints. Includes rule configuration, state machine setup,\
-        \ actions, and frequency controls."
+        \ actions, and frequency controls. IMPORTANT: rule.cohortEligibility must\
+        \ use includes: [\"all\"] and excludes: [] since user-cohorts system is not\
+        \ currently supported."
       operationId: createCTA
       tags:
       - CTAs
@@ -832,7 +892,9 @@ paths:
         in: header
       requestBody:
         description: "CTA creation request containing name, description, tags, team,\
-          \ rule configuration, state machine setup, actions, and frequency controls"
+          \ rule configuration, state machine setup, actions, and frequency controls.\
+          \ Note: rule.cohortEligibility must use includes: [\"all\"] and excludes:\
+          \ []."
         content:
           application/json:
             schema:
@@ -843,6 +905,13 @@ paths:
           description: CTA created successfully. Returns the new CTA ID.
           content:
             application/json:
+              examples:
+                Success Response:
+                  summary: CTA created successfully
+                  value:
+                    success: true
+                    data: 12345
+                    statusCode: 200
               schema:
                 description: New CTA ID
                 format: int64
@@ -854,7 +923,9 @@ paths:
       summary: Update CTA
       description: "Updates an existing CTA. Only the fields provided in the request\
         \ will be updated. Can update rule configuration, state machine setup, actions,\
-        \ and frequency controls."
+        \ and frequency controls. IMPORTANT: If updating rule.cohortEligibility, must\
+        \ use includes: [\"all\"] and excludes: [] since user-cohorts system is not\
+        \ currently supported."
       operationId: updateCTA
       tags:
       - CTAs
@@ -883,7 +954,8 @@ paths:
           type: string
           default: default
       requestBody:
-        description: CTA update request containing fields to update
+        description: "CTA update request containing fields to update. If updating\
+          \ rule.cohortEligibility, must use includes: [\"all\"] and excludes: []."
         content:
           application/json:
             schema:
@@ -894,8 +966,13 @@ paths:
           description: CTA updated successfully
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/ResponseObject"
+              examples:
+                Success Response:
+                  summary: CTA updated
+                  value:
+                    success: true
+                    data: null
+                    statusCode: 200
         "400":
           description: Invalid request data or validation failed
         "404":
@@ -929,6 +1006,30 @@ paths:
           description: CTA retrieved successfully
           content:
             application/json:
+              examples:
+                CTA Response:
+                  summary: Example CTA response
+                  value:
+                    success: true
+                    data:
+                      id: 12345
+                      name: Welcome Bonus
+                      description: Bottom sheet to prompt enabling notifications when
+                        lineups are out
+                      tags:
+                      - growth
+                      - notifications
+                      team: marketing
+                      ctaStatus: LIVE
+                      startTime: null
+                      endTime: null
+                      createdAt: 1609459200000
+                      createdBy: admin@example.com
+                      lastUpdatedAt: 1609459200000
+                      lastUpdatedBy: admin@example.com
+                      tenantId: tenant1
+                      behaviourTags: []
+                    statusCode: 200
               schema:
                 $ref: "#/components/schemas/CTA"
         "404":
@@ -964,8 +1065,13 @@ paths:
           description: CTA concluded successfully
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/ResponseObject"
+              examples:
+                Success Response:
+                  summary: CTA concluded
+                  value:
+                    success: true
+                    data: null
+                    statusCode: 200
         "400":
           description: CTA cannot be concluded from current status. Only LIVE or PAUSED
             CTAs can be concluded.
@@ -1002,8 +1108,13 @@ paths:
           description: CTA activated successfully
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/ResponseObject"
+              examples:
+                Success Response:
+                  summary: CTA activated
+                  value:
+                    success: true
+                    data: null
+                    statusCode: 200
         "400":
           description: CTA cannot be activated from current status. Only SCHEDULED
             or PAUSED CTAs can be activated.
@@ -1039,8 +1150,13 @@ paths:
           description: CTA paused successfully
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/ResponseObject"
+              examples:
+                Success Response:
+                  summary: CTA paused
+                  value:
+                    success: true
+                    data: null
+                    statusCode: 200
         "400":
           description: CTA cannot be paused from current status. Only LIVE CTAs can
             be paused.
@@ -1076,8 +1192,13 @@ paths:
           description: CTA scheduled successfully
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/ResponseObject"
+              examples:
+                Success Response:
+                  summary: CTA scheduled
+                  value:
+                    success: true
+                    data: null
+                    statusCode: 200
         "400":
           description: CTA cannot be scheduled from current status. Only DRAFT CTAs
             can be scheduled.
@@ -1114,8 +1235,13 @@ paths:
           description: CTA terminated successfully
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/ResponseObject"
+              examples:
+                Success Response:
+                  summary: CTA terminated
+                  value:
+                    success: true
+                    data: null
+                    statusCode: 200
         "400":
           description: "CTA cannot be terminated from current status. Only DRAFT,\
             \ SCHEDULED, LIVE, or PAUSED CTAs can be terminated."
@@ -1144,6 +1270,33 @@ paths:
           description: Filter values retrieved successfully
           content:
             application/json:
+              examples:
+                Filters Response:
+                  summary: Available filter values
+                  value:
+                    success: true
+                    data:
+                      names:
+                      - Welcome Bonus
+                      - Testing1
+                      tags:
+                      - growth
+                      - notifications
+                      - promotion
+                      teams:
+                      - marketing
+                      - growth
+                      - default
+                      createdBy:
+                      - admin@example.com
+                      statuses:
+                      - DRAFT
+                      - SCHEDULED
+                      - LIVE
+                      - PAUSED
+                      - CONCLUDED
+                      - TERMINATED
+                    statusCode: 200
               schema:
                 $ref: "#/components/schemas/FilterResponse"
   /thunder/nudge/preview:
@@ -1175,6 +1328,16 @@ paths:
           description: Nudge Preview retrieved successfully
           content:
             application/json:
+              examples:
+                Nudge Preview Response:
+                  summary: Nudge Preview with template and TTL
+                  value:
+                    success: true
+                    data:
+                      id: preview_001
+                      template: "{\"type\":\"BottomSheet\"}"
+                      ttl: 9999999
+                    statusCode: 200
               schema:
                 $ref: "#/components/schemas/NudgePreview"
         "404":
@@ -1209,8 +1372,13 @@ paths:
           description: Nudge Preview created or updated successfully
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/ResponseObject"
+              examples:
+                Success Response:
+                  summary: Nudge Preview created/updated
+                  value:
+                    success: true
+                    data: null
+                    statusCode: 200
         "400":
           description: Invalid request data or validation failed
   /thunder/nudges:
@@ -1244,8 +1412,13 @@ paths:
           description: Nudge updated successfully
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/ResponseObject"
+              examples:
+                Success Response:
+                  summary: Nudge updated
+                  value:
+                    success: true
+                    data: null
+                    statusCode: 200
         "400":
           description: Invalid request data or validation failed
         "404":
@@ -1280,8 +1453,13 @@ paths:
           description: Nudge created successfully
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/ResponseObject"
+              examples:
+                Success Response:
+                  summary: Nudge created
+                  value:
+                    success: true
+                    data: null
+                    statusCode: 200
         "400":
           description: Invalid request data or validation failed
 info:

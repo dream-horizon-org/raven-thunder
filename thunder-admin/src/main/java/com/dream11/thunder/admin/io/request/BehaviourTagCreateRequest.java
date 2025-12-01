@@ -17,20 +17,44 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BehaviourTagCreateRequest {
-  @Schema(description = "Name of the Behaviour Tag", examples = {"new_user_tag"}, required = true)
+  @Schema(
+      description = "Name of the Behaviour Tag",
+      examples = {"new_user_tag", "onboarding_eligible"},
+      required = true
+  )
   private String behaviourTagName;
   
-  @Schema(description = "Description of the Behaviour Tag", 
-         examples = {"Users eligible for onboarding nudges"})
+  @Schema(
+      description = "Description of the Behaviour Tag",
+      examples = {"Users eligible for onboarding nudges"}
+  )
   private String description;
   
-  @Schema(description = "Exposure rules defining when this behaviour tag applies to users", required = true)
+  @Schema(
+      description = "Exposure rules defining when this behaviour tag applies to users. " +
+                   "Includes session, window, and lifespan frequency limits.",
+      required = true,
+      examples = {
+          "{\"session\": {\"limit\": 2}, \"window\": {\"limit\": 3, \"unit\": \"days\", \"value\": 7}, \"lifespan\": {\"limit\": 10}}"
+      }
+  )
   private ExposureRule exposureRule;
   
-  @Schema(description = "CTA relation rules defining which CTAs are shown/hidden for this behaviour tag", required = true)
+  @Schema(
+      description = "CTA relation rules defining which CTAs are shown/hidden for this behaviour tag. " +
+                   "shownCta defines which CTAs to show (rule: LIST/ANY/NONE), " +
+                   "hideCta defines which CTAs to hide (rule: LIST/ANY/NONE).",
+      required = true,
+      examples = {
+          "{\"shownCta\": {\"rule\": \"LIST\", \"ctaList\": [\"cta-101\"]}, \"hideCta\": {\"rule\": \"ANY\", \"ctaList\": []}}"
+      }
+  )
   private CTARelation ctaRelation;
   
-  @Schema(description = "Set of CTA IDs linked to this behaviour tag", examples = {"[]"})
+  @Schema(
+      description = "Set of CTA IDs linked to this behaviour tag",
+      examples = {""}
+  )
   private Set<String> linkedCtas;
 
   public void validate() {

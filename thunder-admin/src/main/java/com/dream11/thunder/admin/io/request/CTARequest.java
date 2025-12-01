@@ -14,16 +14,21 @@ import lombok.NoArgsConstructor;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 
-@Schema(description = "Request to create a new CTA (Call-to-Action)")
+@Schema(
+    description = "Request to create a new CTA (Call-to-Action). " +
+                  "Note: Cohort eligibility must use 'all' as the cohort value. " +
+                  "Use includes: [\"all\"] for single cohort or includes: [\"all\"] for list, " +
+                  "and always keep excludes: [] empty. User-cohorts system is not currently supported."
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class CTARequest {
-  @Schema(description = "Name of the CTA", examples = {"Welcome Bonus"}, required = true, maxLength = 100)
+  @Schema(description = "Name of the CTA", examples = {"Testing1", "Welcome Bonus"}, required = true, maxLength = 100)
   private String name;
   
   @Schema(description = "Tags associated with the CTA for categorization", 
-         examples = {"[\"growth\", \"notifications\"]"})
+         examples = {"growth", "notifications"})
   private List<String> tags;
   
   @Schema(description = "Detailed description of the CTA", 
@@ -42,8 +47,13 @@ public class CTARequest {
          examples = {"1640995200000"}, type = SchemaType.INTEGER, format = "int64")
   @Nullable private Long endTime;
   
-  @Schema(description = "Rule configuration for the CTA including cohort eligibility, state transitions, " +
-                       "actions, and frequency controls", required = true)
+  @Schema(
+      description = "Rule configuration for the CTA including cohort eligibility, state transitions, " +
+                   "actions, and frequency controls. " +
+                   "IMPORTANT: cohortEligibility.includes must be [\"all\"] and excludes must be []. " +
+                   "User-cohorts system is not currently supported.",
+      required = true
+  )
   private RuleRequest rule;
 
   public void validate() {

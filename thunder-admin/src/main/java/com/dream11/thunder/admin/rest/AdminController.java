@@ -29,6 +29,7 @@ import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 
 @Slf4j
@@ -60,7 +61,21 @@ public class AdminController {
   )
   @APIResponse(
       responseCode = "200",
-      description = "Nudge created successfully"
+      description = "Nudge created successfully",
+      content = @Content(
+          mediaType = MediaType.APPLICATION_JSON,
+          examples = {
+              @ExampleObject(
+                  name = "Success Response",
+                  summary = "Nudge created",
+                  value = "{\n" +
+                          "  \"success\": true,\n" +
+                          "  \"data\": null,\n" +
+                          "  \"statusCode\": 200\n" +
+                          "}"
+              )
+          }
+      )
   )
   @APIResponse(
       responseCode = "400",
@@ -101,7 +116,21 @@ public class AdminController {
   )
   @APIResponse(
       responseCode = "200",
-      description = "Nudge updated successfully"
+      description = "Nudge updated successfully",
+      content = @Content(
+          mediaType = MediaType.APPLICATION_JSON,
+          examples = {
+              @ExampleObject(
+                  name = "Success Response",
+                  summary = "Nudge updated",
+                  value = "{\n" +
+                          "  \"success\": true,\n" +
+                          "  \"data\": null,\n" +
+                          "  \"statusCode\": 200\n" +
+                          "}"
+              )
+          }
+      )
   )
   @APIResponse(
       responseCode = "400",
@@ -150,7 +179,21 @@ public class AdminController {
   )
   @APIResponse(
       responseCode = "200",
-      description = "Nudge Preview created or updated successfully"
+      description = "Nudge Preview created or updated successfully",
+      content = @Content(
+          mediaType = MediaType.APPLICATION_JSON,
+          examples = {
+              @ExampleObject(
+                  name = "Success Response",
+                  summary = "Nudge Preview created/updated",
+                  value = "{\n" +
+                          "  \"success\": true,\n" +
+                          "  \"data\": null,\n" +
+                          "  \"statusCode\": 200\n" +
+                          "}"
+              )
+          }
+      )
   )
   @APIResponse(
       responseCode = "400",
@@ -193,7 +236,22 @@ public class AdminController {
       description = "Nudge Preview retrieved successfully",
       content = @Content(
           mediaType = MediaType.APPLICATION_JSON,
-          schema = @Schema(implementation = NudgePreview.class)
+          schema = @Schema(implementation = NudgePreview.class),
+          examples = {
+              @ExampleObject(
+                  name = "Nudge Preview Response",
+                  summary = "Nudge Preview with template and TTL",
+                  value = "{\n" +
+                          "  \"success\": true,\n" +
+                          "  \"data\": {\n" +
+                          "    \"id\": \"preview_001\",\n" +
+                          "    \"template\": \"{\\\"type\\\":\\\"BottomSheet\\\"}\",\n" +
+                          "    \"ttl\": 9999999\n" +
+                          "  },\n" +
+                          "  \"statusCode\": 200\n" +
+                          "}"
+              )
+          }
       )
   )
   @APIResponse(
@@ -231,7 +289,9 @@ public class AdminController {
       summary = "Create CTA",
       description = "Creates a new Call-to-Action (CTA) with the provided details. " +
                     "The CTA will be created in DRAFT status and can be activated later using status update endpoints. " +
-                    "Includes rule configuration, state machine setup, actions, and frequency controls.",
+                    "Includes rule configuration, state machine setup, actions, and frequency controls. " +
+                    "IMPORTANT: rule.cohortEligibility must use includes: [\"all\"] and excludes: [] " +
+                    "since user-cohorts system is not currently supported.",
       operationId = "createCTA"
   )
   @APIResponse(
@@ -239,7 +299,18 @@ public class AdminController {
       description = "CTA created successfully. Returns the new CTA ID.",
       content = @Content(
           mediaType = MediaType.APPLICATION_JSON,
-          schema = @Schema(type = SchemaType.INTEGER, format = "int64", description = "New CTA ID")
+          schema = @Schema(type = SchemaType.INTEGER, format = "int64", description = "New CTA ID"),
+          examples = {
+              @ExampleObject(
+                  name = "Success Response",
+                  summary = "CTA created successfully",
+                  value = "{\n" +
+                          "  \"success\": true,\n" +
+                          "  \"data\": 12345,\n" +
+                          "  \"statusCode\": 200\n" +
+                          "}"
+              )
+          }
       )
   )
   @APIResponse(
@@ -261,7 +332,8 @@ public class AdminController {
       @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
       @RequestBody(
           description = "CTA creation request containing name, description, tags, team, rule configuration, " +
-                       "state machine setup, actions, and frequency controls",
+                       "state machine setup, actions, and frequency controls. " +
+                       "Note: rule.cohortEligibility must use includes: [\"all\"] and excludes: [].",
           required = true,
           content = @Content(
               mediaType = MediaType.APPLICATION_JSON,
@@ -285,12 +357,28 @@ public class AdminController {
   @Operation(
       summary = "Update CTA",
       description = "Updates an existing CTA. Only the fields provided in the request will be updated. " +
-                    "Can update rule configuration, state machine setup, actions, and frequency controls.",
+                    "Can update rule configuration, state machine setup, actions, and frequency controls. " +
+                    "IMPORTANT: If updating rule.cohortEligibility, must use includes: [\"all\"] and excludes: [] " +
+                    "since user-cohorts system is not currently supported.",
       operationId = "updateCTA"
   )
   @APIResponse(
       responseCode = "200",
-      description = "CTA updated successfully"
+      description = "CTA updated successfully",
+      content = @Content(
+          mediaType = MediaType.APPLICATION_JSON,
+          examples = {
+              @ExampleObject(
+                  name = "Success Response",
+                  summary = "CTA updated",
+                  value = "{\n" +
+                          "  \"success\": true,\n" +
+                          "  \"data\": null,\n" +
+                          "  \"statusCode\": 200\n" +
+                          "}"
+              )
+          }
+      )
   )
   @APIResponse(
       responseCode = "400",
@@ -313,7 +401,8 @@ public class AdminController {
       )
       @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
       @RequestBody(
-          description = "CTA update request containing fields to update",
+          description = "CTA update request containing fields to update. " +
+                       "If updating rule.cohortEligibility, must use includes: [\"all\"] and excludes: [].",
           required = true,
           content = @Content(
               mediaType = MediaType.APPLICATION_JSON,
@@ -353,7 +442,33 @@ public class AdminController {
       description = "CTA retrieved successfully",
       content = @Content(
           mediaType = MediaType.APPLICATION_JSON,
-          schema = @Schema(implementation = CTA.class)
+          schema = @Schema(implementation = CTA.class),
+          examples = {
+              @ExampleObject(
+                  name = "CTA Response",
+                  summary = "Example CTA response",
+                  value = "{\n" +
+                          "  \"success\": true,\n" +
+                          "  \"data\": {\n" +
+                          "    \"id\": 12345,\n" +
+                          "    \"name\": \"Welcome Bonus\",\n" +
+                          "    \"description\": \"Bottom sheet to prompt enabling notifications when lineups are out\",\n" +
+                          "    \"tags\": [\"growth\", \"notifications\"],\n" +
+                          "    \"team\": \"marketing\",\n" +
+                          "    \"ctaStatus\": \"LIVE\",\n" +
+                          "    \"startTime\": null,\n" +
+                          "    \"endTime\": null,\n" +
+                          "    \"createdAt\": 1609459200000,\n" +
+                          "    \"createdBy\": \"admin@example.com\",\n" +
+                          "    \"lastUpdatedAt\": 1609459200000,\n" +
+                          "    \"lastUpdatedBy\": \"admin@example.com\",\n" +
+                          "    \"tenantId\": \"tenant1\",\n" +
+                          "    \"behaviourTags\": []\n" +
+                          "  },\n" +
+                          "  \"statusCode\": 200\n" +
+                          "}"
+              )
+          }
       )
   )
   @APIResponse(
@@ -395,7 +510,33 @@ public class AdminController {
       description = "List of CTAs retrieved successfully",
       content = @Content(
           mediaType = MediaType.APPLICATION_JSON,
-          schema = @Schema(implementation = CTAListResponse.class)
+          schema = @Schema(implementation = CTAListResponse.class),
+          examples = {
+              @ExampleObject(
+                  name = "CTAs List Response",
+                  summary = "Paginated list of CTAs",
+                  value = "{\n" +
+                          "  \"success\": true,\n" +
+                          "  \"data\": {\n" +
+                          "    \"ctas\": [\n" +
+                          "      {\n" +
+                          "        \"id\": 12345,\n" +
+                          "        \"name\": \"Welcome Bonus\",\n" +
+                          "        \"tags\": [\"growth\", \"notifications\"],\n" +
+                          "        \"team\": \"marketing\",\n" +
+                          "        \"ctaStatus\": \"LIVE\",\n" +
+                          "        \"createdBy\": \"admin@example.com\",\n" +
+                          "        \"createdAt\": 1609459200000\n" +
+                          "      }\n" +
+                          "    ],\n" +
+                          "    \"totalCount\": 1,\n" +
+                          "    \"pageNumber\": 0,\n" +
+                          "    \"pageSize\": 10\n" +
+                          "  },\n" +
+                          "  \"statusCode\": 200\n" +
+                          "}"
+              )
+          }
       )
   )
   @GET
@@ -515,7 +656,24 @@ public class AdminController {
       description = "Filter values retrieved successfully",
       content = @Content(
           mediaType = MediaType.APPLICATION_JSON,
-          schema = @Schema(implementation = FilterResponse.class)
+          schema = @Schema(implementation = FilterResponse.class),
+          examples = {
+              @ExampleObject(
+                  name = "Filters Response",
+                  summary = "Available filter values",
+                  value = "{\n" +
+                          "  \"success\": true,\n" +
+                          "  \"data\": {\n" +
+                          "    \"names\": [\"Welcome Bonus\", \"Testing1\"],\n" +
+                          "    \"tags\": [\"growth\", \"notifications\", \"promotion\"],\n" +
+                          "    \"teams\": [\"marketing\", \"growth\", \"default\"],\n" +
+                          "    \"createdBy\": [\"admin@example.com\"],\n" +
+                          "    \"statuses\": [\"DRAFT\", \"SCHEDULED\", \"LIVE\", \"PAUSED\", \"CONCLUDED\", \"TERMINATED\"]\n" +
+                          "  },\n" +
+                          "  \"statusCode\": 200\n" +
+                          "}"
+              )
+          }
       )
   )
   @GET
@@ -545,7 +703,21 @@ public class AdminController {
   )
   @APIResponse(
       responseCode = "200",
-      description = "CTA activated successfully"
+      description = "CTA activated successfully",
+      content = @Content(
+          mediaType = MediaType.APPLICATION_JSON,
+          examples = {
+              @ExampleObject(
+                  name = "Success Response",
+                  summary = "CTA activated",
+                  value = "{\n" +
+                          "  \"success\": true,\n" +
+                          "  \"data\": null,\n" +
+                          "  \"statusCode\": 200\n" +
+                          "}"
+              )
+          }
+      )
   )
   @APIResponse(
       responseCode = "400",
@@ -586,7 +758,21 @@ public class AdminController {
   )
   @APIResponse(
       responseCode = "200",
-      description = "CTA paused successfully"
+      description = "CTA paused successfully",
+      content = @Content(
+          mediaType = MediaType.APPLICATION_JSON,
+          examples = {
+              @ExampleObject(
+                  name = "Success Response",
+                  summary = "CTA paused",
+                  value = "{\n" +
+                          "  \"success\": true,\n" +
+                          "  \"data\": null,\n" +
+                          "  \"statusCode\": 200\n" +
+                          "}"
+              )
+          }
+      )
   )
   @APIResponse(
       responseCode = "400",
@@ -627,7 +813,21 @@ public class AdminController {
   )
   @APIResponse(
       responseCode = "200",
-      description = "CTA scheduled successfully"
+      description = "CTA scheduled successfully",
+      content = @Content(
+          mediaType = MediaType.APPLICATION_JSON,
+          examples = {
+              @ExampleObject(
+                  name = "Success Response",
+                  summary = "CTA scheduled",
+                  value = "{\n" +
+                          "  \"success\": true,\n" +
+                          "  \"data\": null,\n" +
+                          "  \"statusCode\": 200\n" +
+                          "}"
+              )
+          }
+      )
   )
   @APIResponse(
       responseCode = "400",
@@ -669,7 +869,21 @@ public class AdminController {
   )
   @APIResponse(
       responseCode = "200",
-      description = "CTA concluded successfully"
+      description = "CTA concluded successfully",
+      content = @Content(
+          mediaType = MediaType.APPLICATION_JSON,
+          examples = {
+              @ExampleObject(
+                  name = "Success Response",
+                  summary = "CTA concluded",
+                  value = "{\n" +
+                          "  \"success\": true,\n" +
+                          "  \"data\": null,\n" +
+                          "  \"statusCode\": 200\n" +
+                          "}"
+              )
+          }
+      )
   )
   @APIResponse(
       responseCode = "400",
@@ -711,7 +925,21 @@ public class AdminController {
   )
   @APIResponse(
       responseCode = "200",
-      description = "CTA terminated successfully"
+      description = "CTA terminated successfully",
+      content = @Content(
+          mediaType = MediaType.APPLICATION_JSON,
+          examples = {
+              @ExampleObject(
+                  name = "Success Response",
+                  summary = "CTA terminated",
+                  value = "{\n" +
+                          "  \"success\": true,\n" +
+                          "  \"data\": null,\n" +
+                          "  \"statusCode\": 200\n" +
+                          "}"
+              )
+          }
+      )
   )
   @APIResponse(
       responseCode = "400",
