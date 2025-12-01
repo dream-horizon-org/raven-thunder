@@ -53,11 +53,11 @@ echo "📋 Copying OpenAPI specifications..."
 
 # Copy thunder-api OpenAPI spec
 cp "$API_OPENAPI" "$API_OUTPUT"
-echo "  ✅ thunder-api: $API_OUTPUT"
+echo "  ✅ thunder-api: $API_OPENAPI -> $API_OUTPUT"
 
 # Copy thunder-admin OpenAPI spec
 cp "$ADMIN_OPENAPI" "$ADMIN_OUTPUT"
-echo "  ✅ thunder-admin: $ADMIN_OUTPUT"
+echo "  ✅ thunder-admin: $ADMIN_OPENAPI -> $ADMIN_OUTPUT"
 
 echo ""
 echo "✅ OpenAPI specifications generated successfully!"

@@ -1,5 +1,12 @@
 ---
 openapi: 3.1.0
+info:
+  description: Thunder Admin - Management endpoints
+  title: Thunder Admin
+  version: 1.0.0
+servers:
+- url: http://localhost:8081
+  description: Thunder Admin Server (Management endpoints)
 components:
   schemas:
     BehaviourTag:
@@ -1462,6 +1469,3 @@ paths:
                     statusCode: 200
         "400":
           description: Invalid request data or validation failed
-info:
-  title: Generated API
-  version: "1.0"
