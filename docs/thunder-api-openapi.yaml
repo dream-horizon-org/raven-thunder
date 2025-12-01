@@ -261,106 +261,6 @@ components:
         ttl:
           type: integer
           format: int32
-    ResponseBoolean:
-      type: object
-      properties:
-        success:
-          type: boolean
-        data:
-          type: boolean
-        error:
-          type: string
-        message:
-          type: string
-        statusCode:
-          type: integer
-          format: int32
-    ResponseCTA:
-      type: object
-      properties:
-        success:
-          type: boolean
-        data:
-          $ref: "#/components/schemas/CTA"
-        error:
-          type: string
-        message:
-          type: string
-        statusCode:
-          type: integer
-          format: int32
-    ResponseCTAResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-        data:
-          $ref: "#/components/schemas/CTAResponse"
-        error:
-          type: string
-        message:
-          type: string
-        statusCode:
-          type: integer
-          format: int32
-    ResponseMapLongCTA:
-      type: object
-      properties:
-        success:
-          type: boolean
-        data:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/CTA"
-        error:
-          type: string
-        message:
-          type: string
-        statusCode:
-          type: integer
-          format: int32
-    ResponseNudge:
-      type: object
-      properties:
-        success:
-          type: boolean
-        data:
-          $ref: "#/components/schemas/Nudge"
-        error:
-          type: string
-        message:
-          type: string
-        statusCode:
-          type: integer
-          format: int32
-    ResponseNudgePreview:
-      type: object
-      properties:
-        success:
-          type: boolean
-        data:
-          $ref: "#/components/schemas/NudgePreview"
-        error:
-          type: string
-        message:
-          type: string
-        statusCode:
-          type: integer
-          format: int32
-    ResponseUserDataSnapshot:
-      type: object
-      properties:
-        success:
-          type: boolean
-        data:
-          $ref: "#/components/schemas/UserDataSnapshot"
-        error:
-          type: string
-        message:
-          type: string
-        statusCode:
-          type: integer
-          format: int32
     Rule:
       type: object
       required:
@@ -577,236 +477,752 @@ components:
       - hours
       - minutes
       - seconds
+tags:
+- name: Debug
+  description: "Debug APIs for inspecting CTA rules, active CTAs, and user state machines.\
+    \ These endpoints are useful for debugging and troubleshooting CTA behavior in\
+    \ development and staging environments."
+- name: SDK
+  description: "APIs for SDK clients to interact with Thunder. These endpoints handle\
+    \ app launch, state machine synchronization, and nudge preview retrieval for mobile\
+    \ and web clients."
 paths:
   /cta/active/state-machines:
     post:
+      summary: App Launch - Active State Machines
+      description: "Called by the client app on launch to synchronize state machines\
+        \ and retrieve active CTAs. The client sends its current state snapshot (CTAs\
+        \ and behaviour tags), and the server returns the updated state with active\
+        \ CTAs that should be shown to the user. Requires api_version header >= 1,\
+        \ otherwise returns empty response."
+      operationId: appLaunch
+      tags:
+      - SDK
       parameters:
-      - name: api_version
-        in: header
+      - description: "API version. Must be >= 1 for the endpoint to process the request.\
+          \ If null or < 1, returns empty response."
+        example: 1
+        name: api_version
+        required: false
         schema:
-          type: integer
           format: int64
-      - name: app_version
+          type: integer
+        in: header
+      - description: Client app version
+        example: 1.2.3
+        name: app_version
+        required: false
         in: header
         schema:
           type: string
-      - name: auth-userid
-        in: header
-        schema:
-          type: integer
-          format: int64
+      - description: User ID of the authenticated user
+        example: 12345
+        name: auth-userid
         required: true
-      - name: codepush_version
+        schema:
+          format: int64
+          type: integer
+        in: header
+      - description: CodePush version (for React Native apps)
+        example: 1.0.0
+        name: codepush_version
+        required: false
         in: header
         schema:
           type: string
-      - name: package_name
+      - description: App package name
+        example: com.example.app
+        name: package_name
+        required: false
         in: header
         schema:
           type: string
-      - name: x-tenant-id
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
         in: header
         schema:
           type: string
           default: default
       requestBody:
+        description: Current state snapshot from client including CTAs and behaviour
+          tags
         content:
-          '*/*':
+          application/json:
+            examples:
+              App Launch Request:
+                summary: Example request with CTAs and behaviour tags
+                value:
+                  ctas:
+                  - ctaId: "101"
+                    activeStateMachines:
+                      "5":
+                        currentState: "2"
+                        lastTransitionAt: 1720166608502
+                        context: {}
+                        createdAt: 1720166608502
+                        reset: true
+                    resetAt:
+                    - 1701603029000
+                    actionDoneAt:
+                    - 1756099199923
+                  behaviourTags:
+                  - behaviourTagName: onboarding_eligible
+                    exposureRule:
+                      session:
+                        limit: 1
+                      window:
+                        limit: 1
+                        unit: days
+                        value: 7
+                    ctaRelation:
+                      activeCtas:
+                      - 1
             schema:
               $ref: "#/components/schemas/CTASnapshotRequest"
         required: true
       responses:
         "200":
-          description: OK
+          description: Active CTAs and state machines retrieved successfully
           content:
             application/json:
+              examples:
+                Success Response:
+                  summary: Example app launch response
+                  value:
+                    success: true
+                    data:
+                      ctas:
+                      - ctaId: "101"
+                        rule:
+                          stateToAction:
+                            "1": actionId1
+                          resetStates: []
+                          resetCTAonFirstLaunch: false
+                          contextParams:
+                          - mode
+                          - contestId
+                          stateTransition:
+                            ContestJoinedClient:
+                              "0":
+                              - transitionTo: 1
+                                filters:
+                                  operator: AND
+                                  filter:
+                                  - propertyName: mode
+                                    propertyType: string
+                                    comparisonType: =
+                                    comparisonValue: normal
+                          groupByConfig:
+                            groupBy:
+                            - roundId
+                          priority: 1
+                          stateMachineTTL: 1812517298168
+                          ctaValidTill: 1812517298168
+                          actions:
+                          - actionId1:
+                              type: BottomSheet
+                              nudgeId: "5"
+                              nudgeTemplate:
+                                testId: nudge_container_bottom_sheet
+                          frequency:
+                            session:
+                              limit: 1
+                            window:
+                              limit: 1
+                              unit: days
+                              value: 2
+                            lifespan:
+                              limit: 10
+                        activeStateMachines:
+                          "5":
+                            currentState: "2"
+                            lastTransitionAt: 1720166608502
+                            context: {}
+                            createdAt: 1720166608502
+                            reset: true
+                        resetAt:
+                        - 1701603029000
+                        actionDoneAt:
+                        - 1756099199923
+                        behaviourTagName: onboarding_eligible
+                      behaviourTags:
+                      - behaviourTagName: onboarding_eligible
+                        exposureRule:
+                          session:
+                            limit: 1
+                          window:
+                            limit: 1
+                            unit: days
+                            value: 7
+                        ctaRelation:
+                          activeCtas:
+                          - 1
+                    statusCode: 200
+                    error: null
+                    message: null
               schema:
-                $ref: "#/components/schemas/ResponseCTAResponse"
+                $ref: "#/components/schemas/CTAResponse"
+        "400":
+          description: Invalid request data or missing required headers
   /cta/nudge/preview/{id}:
     get:
+      summary: Get Nudge Preview
+      description: Retrieves a Nudge Preview by its ID. Nudge Previews contain the
+        UI template and configuration that will be displayed to users. This is the
+        recommended endpoint for retrieving nudge templates.
+      operationId: getNudgePreview
+      tags:
+      - SDK
       parameters:
-      - name: id
-        in: path
+      - description: Nudge Preview ID
+        example: 5
+        name: id
         required: true
         schema:
           type: string
-      - name: x-tenant-id
+        in: path
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
         in: header
         schema:
           type: string
           default: default
       responses:
         "200":
-          description: OK
+          description: Nudge Preview retrieved successfully
           content:
             application/json:
+              examples:
+                Success Response:
+                  summary: Example nudge preview response
+                  value:
+                    success: true
+                    data:
+                      id: "5"
+                      template: "{\"type\":\"BottomSheet\",\"testId\":\"nudge_container_bottom_sheet\"\
+                        }"
+                      ttl: 9999999
+                    statusCode: 200
+                    error: null
+                    message: null
               schema:
-                $ref: "#/components/schemas/ResponseNudgePreview"
+                $ref: "#/components/schemas/NudgePreview"
+        "404":
+          description: Nudge Preview not found
   /cta/nudges/{id}:
     get:
+      summary: Get Nudge by ID (Deprecated)
+      description: "Retrieves a Nudge template by its ID. ⚠️ This endpoint is deprecated.\
+        \ Use GET /cta/nudge/preview/{id} instead."
+      operationId: findNudge
       deprecated: true
+      tags:
+      - SDK
       parameters:
-      - name: id
-        in: path
+      - description: Nudge ID
+        example: 5
+        name: id
         required: true
         schema:
           type: string
+        in: path
       responses:
         "200":
-          description: OK
+          description: Nudge retrieved successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ResponseNudge"
+                $ref: "#/components/schemas/Nudge"
+        "404":
+          description: Nudge not found
   /cta/rules/active:
     get:
+      summary: Get All Active CTA Rules
+      description: Retrieves all active CTA rules for the specified tenant. Active
+        CTAs are those that are currently enabled and available for display. Use the
+        cache parameter to control whether to use cached data or fetch fresh data.
+      operationId: findAllActiveCTA
+      tags:
+      - Debug
       parameters:
-      - name: cache
-        in: query
+      - description: Whether to use cached data (true) or fetch fresh data (false)
+        example: true
+        name: cache
+        required: true
         schema:
           type: boolean
-        required: true
-      - name: x-tenant-id
+        in: query
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
         in: header
         schema:
           type: string
           default: default
       responses:
         "200":
-          description: OK
+          description: Active CTA rules retrieved successfully
           content:
             application/json:
+              examples:
+                Success Response:
+                  summary: Example active CTAs response
+                  value:
+                    success: true
+                    data:
+                      "101":
+                        id: 101
+                        name: Welcome Nudge
+                        status: ACTIVE
+                        rule:
+                          stateToAction:
+                            "1": actionId1
+                          resetStates: []
+                          resetCTAonFirstLaunch: false
+                          contextParams:
+                          - mode
+                          - contestId
+                          stateTransition: {}
+                          groupByConfig:
+                            groupBy:
+                            - roundId
+                          priority: 1
+                          actions:
+                          - actionId1:
+                              type: BottomSheet
+                              nudgeId: "5"
+                          frequency:
+                            session:
+                              limit: 1
+                            window:
+                              limit: 1
+                              unit: days
+                              value: 2
+                            lifespan:
+                              limit: 10
+                        cohortEligibility:
+                          includedCohorts:
+                          - all
+                          excludedCohorts: []
+                        behaviourTags:
+                        - onboarding_eligible
+                        tenantId: tenant1
+                      "202":
+                        id: 202
+                        name: Feature Announcement
+                        status: ACTIVE
+                        rule: {}
+                        cohortEligibility:
+                          includedCohorts:
+                          - all
+                          excludedCohorts: []
+                        behaviourTags: []
+                        tenantId: tenant1
+                    statusCode: 200
+                    error: null
+                    message: null
               schema:
-                $ref: "#/components/schemas/ResponseMapLongCTA"
+                description: Map of CTA ID (Long) to CTA object
+                type: object
   /cta/rules/{id}:
     get:
+      summary: Get CTA Rule
+      description: "Retrieves a specific CTA rule by its ID. Returns the complete\
+        \ CTA object including rule configuration, cohort eligibility, behaviour tags,\
+        \ and status."
+      operationId: findCTA
+      tags:
+      - Debug
       parameters:
-      - name: id
-        in: path
+      - description: CTA ID
+        example: 101
+        name: id
         required: true
         schema:
           type: string
-      - name: x-tenant-id
+        in: path
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
         in: header
         schema:
           type: string
           default: default
       responses:
         "200":
-          description: OK
+          description: CTA rule retrieved successfully
           content:
             application/json:
+              examples:
+                Success Response:
+                  summary: Example CTA rule response
+                  value:
+                    success: true
+                    data:
+                      id: 101
+                      name: Welcome Nudge
+                      status: ACTIVE
+                      rule:
+                        stateToAction:
+                          "1": actionId1
+                        resetStates: []
+                        resetCTAonFirstLaunch: false
+                        contextParams:
+                        - mode
+                        - contestId
+                        stateTransition:
+                          ContestJoinedClient:
+                            "0":
+                            - transitionTo: 1
+                              filters:
+                                operator: AND
+                                filter:
+                                - propertyName: mode
+                                  propertyType: string
+                                  comparisonType: =
+                                  comparisonValue: normal
+                        groupByConfig:
+                          groupBy:
+                          - roundId
+                        priority: 1
+                        stateMachineTTL: 1812517298168
+                        ctaValidTill: 1812517298168
+                        actions:
+                        - actionId1:
+                            type: BottomSheet
+                            nudgeId: "5"
+                            nudgeTemplate:
+                              testId: nudge_container_bottom_sheet
+                        frequency:
+                          session:
+                            limit: 1
+                          window:
+                            limit: 1
+                            unit: days
+                            value: 2
+                          lifespan:
+                            limit: 10
+                      cohortEligibility:
+                        includedCohorts:
+                        - all
+                        excludedCohorts: []
+                      behaviourTags:
+                      - onboarding_eligible
+                      tenantId: tenant1
+                      createdAt: 1609459200000
+                      createdBy: admin@example.com
+                      lastUpdatedAt: 1609459200000
+                      lastUpdatedBy: admin@example.com
+                    statusCode: 200
+                    error: null
+                    message: null
               schema:
-                $ref: "#/components/schemas/ResponseCTA"
+                $ref: "#/components/schemas/CTA"
+        "404":
+          description: CTA rule not found
   /cta/state-machines:
     get:
+      summary: Get State Machine by User
+      description: Retrieves the complete state machine snapshot for a specific user.
+        This includes all active state machines for CTAs and behaviour tags. Useful
+        for debugging user-specific state and understanding why certain CTAs are or
+        aren't being shown to a user.
+      operationId: findStateMachine
+      tags:
+      - Debug
       parameters:
-      - name: auth-userid
-        in: header
-        schema:
-          type: integer
-          format: int64
+      - description: User ID to retrieve state machine for
+        example: 12345
+        name: auth-userid
         required: true
-      - name: x-tenant-id
+        schema:
+          format: int64
+          type: integer
+        in: header
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
         in: header
         schema:
           type: string
           default: default
       responses:
         "200":
-          description: OK
+          description: User state machine snapshot retrieved successfully
           content:
             application/json:
+              examples:
+                Success Response:
+                  summary: Example user state machine snapshot
+                  value:
+                    success: true
+                    data:
+                      stateMachines:
+                        "101":
+                          ctaId: "101"
+                          activeStateMachines:
+                            "5":
+                              currentState: "2"
+                              lastTransitionAt: 1720166608502
+                              context:
+                                cohort: new_user
+                                appVersion: 1.2.3
+                              createdAt: 1720166608502
+                              reset: true
+                          resetAt:
+                          - 1701603029000
+                          actionDoneAt:
+                          - 1756099199923
+                        "202":
+                          ctaId: "202"
+                          activeStateMachines: {}
+                          resetAt: []
+                          actionDoneAt: []
+                      behaviourTags:
+                        onboarding_eligible:
+                          behaviourTagName: onboarding_eligible
+                          exposureRule:
+                            session:
+                              limit: 2
+                            window:
+                              limit: 3
+                              unit: days
+                              value: 7
+                            lifespan:
+                              limit: 10
+                          ctaRelation:
+                            shownCta:
+                              rule: LIST
+                              ctaList:
+                              - "101"
+                            hideCta:
+                              rule: ANY
+                              ctaList: []
+                            activeCtas:
+                            - "101"
+                    statusCode: 200
+                    error: null
+                    message: null
               schema:
-                $ref: "#/components/schemas/ResponseUserDataSnapshot"
+                $ref: "#/components/schemas/UserDataSnapshot"
+        "404":
+          description: User state machine not found
   /cta/state-machines/snapshot/delta:
     post:
+      summary: Merge Snapshot Delta
+      description: "Merges a delta snapshot from the client with the server state.\
+        \ This endpoint is used to synchronize incremental state changes (CTAs and\
+        \ behaviour tags) between the client and server. The server merges the delta\
+        \ and updates the user's state. Requires api_version header >= 1, otherwise\
+        \ returns false."
+      operationId: mergeSnapshotDelta
+      tags:
+      - SDK
       parameters:
-      - name: api_version
-        in: header
+      - description: "API version. Must be >= 1 for the endpoint to process the request.\
+          \ If null or < 1, returns false."
+        example: 1
+        name: api_version
+        required: false
         schema:
-          type: integer
           format: int64
-      - name: app_version
+          type: integer
+        in: header
+      - description: Client app version
+        example: 1.2.3
+        name: app_version
+        required: false
         in: header
         schema:
           type: string
-      - name: auth-userid
-        in: header
-        schema:
-          type: integer
-          format: int64
+      - description: User ID of the authenticated user
+        example: 12345
+        name: auth-userid
         required: true
-      - name: codepush_version
+        schema:
+          format: int64
+          type: integer
+        in: header
+      - description: CodePush version (for React Native apps)
+        example: 1.0.0
+        name: codepush_version
+        required: false
         in: header
         schema:
           type: string
-      - name: package_name
+      - description: App package name
+        example: com.example.app
+        name: package_name
+        required: false
         in: header
         schema:
           type: string
-      - name: x-tenant-id
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
         in: header
         schema:
           type: string
           default: default
       requestBody:
+        description: Delta snapshot containing updated CTAs and behaviour tags to
+          merge with server state
         content:
-          '*/*':
+          application/json:
+            examples:
+              Merge Delta Request:
+                summary: Example request to merge snapshot delta
+                value:
+                  ctas:
+                  - ctaId: "101"
+                    activeStateMachines:
+                      default:
+                        currentState: "1"
+                        lastTransitionAt: 1699999999000
+                        context:
+                          cohort: new_user
+                          appVersion: 1.2.3
+                        createdAt: 1699900000000
+                        reset: false
+                    resetAt:
+                    - 1699800000000
+                    actionDoneAt:
+                    - 1699850000000
+                  - ctaId: "202"
+                    activeStateMachines: {}
+                    resetAt: []
+                    actionDoneAt: []
+                  behaviourTags:
+                  - behaviourTagName: onboarding_eligible
+                    exposureRule:
+                      session:
+                        limit: 2
+                      lifespan:
+                        limit: 10
+                      window:
+                        limit: 3
+                        unit: days
+                        value: 7
+                      ctasResetAt:
+                      - ctaId: "101"
+                        resetAt: 1699700000000
+                    ctaRelation:
+                      shownCta:
+                        rule: LIST
+                        ctaList:
+                        - "101"
+                      hideCta:
+                        rule: ANY
+                        ctaList: []
+                      activeCtas:
+                      - "101"
             schema:
               $ref: "#/components/schemas/CTASnapshotRequest"
         required: true
       responses:
         "200":
-          description: OK
+          description: Snapshot delta merged successfully
           content:
             application/json:
+              examples:
+                Success Response:
+                  summary: Merge successful
+                  value:
+                    success: true
+                    data: true
+                    statusCode: 200
+                    error: null
+                    message: null
               schema:
-                $ref: "#/components/schemas/ResponseBoolean"
+                type: boolean
+        "400":
+          description: Invalid request data or missing required headers
   /cta/v1/active/state-machines:
     post:
+      summary: App Launch v1 - Active State Machines
+      description: "Version 1 endpoint for app launch. This is an alias for POST /cta/active/state-machines/.\
+        \ Called by the client app on launch to synchronize state machines and retrieve\
+        \ active CTAs. The client sends its current state snapshot, and the server\
+        \ returns updated state with active CTAs."
+      operationId: appLaunchV1
+      tags:
+      - SDK
       parameters:
-      - name: api_version
-        in: header
+      - description: API version. Must be >= 1 for the endpoint to process the request.
+        example: 1
+        name: api_version
+        required: false
         schema:
-          type: integer
           format: int64
-      - name: app_version
+          type: integer
+        in: header
+      - description: Client app version
+        example: 1.2.3
+        name: app_version
+        required: false
         in: header
         schema:
           type: string
-      - name: auth-userid
-        in: header
-        schema:
-          type: integer
-          format: int64
+      - description: User ID of the authenticated user
+        example: 12345
+        name: auth-userid
         required: true
-      - name: codepush_version
+        schema:
+          format: int64
+          type: integer
+        in: header
+      - description: CodePush version (for React Native apps)
+        example: 1.0.0
+        name: codepush_version
+        required: false
         in: header
         schema:
           type: string
-      - name: package_name
+      - description: App package name
+        example: com.example.app
+        name: package_name
+        required: false
         in: header
         schema:
           type: string
-      - name: x-tenant-id
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
         in: header
         schema:
           type: string
           default: default
       requestBody:
+        description: Current state snapshot from client including CTAs and behaviour
+          tags
         content:
-          '*/*':
+          application/json:
+            examples:
+              App Launch v1 Request:
+                summary: Example request with empty CTAs
+                value:
+                  ctas: []
             schema:
               $ref: "#/components/schemas/CTASnapshotRequest"
         required: true
       responses:
         "200":
-          description: OK
+          description: Active CTAs and state machines retrieved successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ResponseCTAResponse"
+                $ref: "#/components/schemas/CTAResponse"
+        "400":
+          description: Invalid request data or missing required headers
   /healthcheck:
     get:
       responses:
