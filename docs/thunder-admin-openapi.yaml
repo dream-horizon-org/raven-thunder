@@ -93,19 +93,48 @@ components:
           examples:
           - ""
     BehaviourTagPutRequest:
+      description: Request to update an existing Behaviour Tag. All fields are optional
+        - only provided fields will be updated.
       type: object
       properties:
         description:
           type: string
+          description: Updated description of the Behaviour Tag
+          examples:
+          - Updated description for onboarding eligible users
         exposureRule:
+          description: "Updated exposure rules defining when this behaviour tag applies\
+            \ to users. Includes session, window, and lifespan frequency limits."
+          type: object
+          examples:
+          - session:
+              limit: 1
+            window:
+              limit: 1
+              unit: days
+              value: 7
+            lifespan:
+              limit: 5
           $ref: "#/components/schemas/ExposureRule"
         ctaRelation:
+          description: "Updated CTA relation rules defining which CTAs are shown/hidden\
+            \ for this behaviour tag. shownCta defines which CTAs to show (rule: LIST/ANY/NONE),\
+            \ hideCta defines which CTAs to hide (rule: LIST/ANY/NONE)."
+          type: object
+          examples:
+          - shownCta:
+              rule: ANY
+            hideCta:
+              rule: NONE
           $ref: "#/components/schemas/CTARelation"
         linkedCtas:
           type: array
           uniqueItems: true
           items:
             type: string
+          description: Updated set of CTA IDs linked to this behaviour tag
+          examples:
+          - []
     BehaviourTagsResponse:
       type: object
       properties:
@@ -399,47 +428,6 @@ components:
         ttl:
           type: integer
           format: int32
-    ResponseBehaviourTag:
-      type: object
-      properties:
-        success:
-          type: boolean
-        data:
-          $ref: "#/components/schemas/BehaviourTag"
-        error:
-          type: string
-        message:
-          type: string
-        statusCode:
-          type: integer
-          format: int32
-    ResponseBehaviourTagsResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-        data:
-          $ref: "#/components/schemas/BehaviourTagsResponse"
-        error:
-          type: string
-        message:
-          type: string
-        statusCode:
-          type: integer
-          format: int32
-    ResponseObject:
-      type: object
-      properties:
-        success:
-          type: boolean
-        data: {}
-        error:
-          type: string
-        message:
-          type: string
-        statusCode:
-          type: integer
-          format: int32
     Rule:
       type: object
       required:
@@ -606,6 +594,10 @@ components:
       - minutes
       - seconds
 tags:
+- name: Behaviour Tags
+  description: "APIs for managing Behaviour Tags. Behaviour Tags define user segments\
+    \ and their exposure rules for CTAs. They control which CTAs are shown or hidden\
+    \ to specific user groups based on session limits, time windows, and CTA relationships."
 - name: CTA Status
   description: "APIs for managing CTA lifecycle status transitions. CTAs move through\
     \ states: DRAFT → SCHEDULED → LIVE → PAUSED → CONCLUDED/TERMINATED."
@@ -662,94 +654,283 @@ paths:
           description: OK
   /thunder/behaviour-tags:
     get:
+      summary: List all Behaviour Tags
+      description: Retrieves a list of all Behaviour Tags for the specified tenant.
+        Behaviour Tags define user segments and their exposure rules for CTAs.
+      operationId: listBehaviourTags
+      tags:
+      - Behaviour Tags
       parameters:
-      - name: x-tenant-id
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
         in: header
         schema:
           type: string
           default: default
       responses:
         "200":
-          description: OK
+          description: List of Behaviour Tags retrieved successfully
           content:
             application/json:
+              examples:
+                Success Response:
+                  summary: Example list of behaviour tags
+                  value:
+                    success: true
+                    data:
+                      behaviourTags:
+                      - name: onboarding_eligible
+                        description: Users eligible for onboarding nudges
+                        exposureRule:
+                          session:
+                            limit: 2
+                          window:
+                            limit: 3
+                            unit: days
+                            value: 7
+                          lifespan:
+                            limit: 10
+                        ctaRelation:
+                          shownCta:
+                            rule: LIST
+                            ctaList:
+                            - cta-101
+                          hideCta:
+                            rule: ANY
+                            ctaList: []
+                        linkedCtas:
+                        - cta-101
+                        createdAt: 1609459200000
+                        createdBy: admin@example.com
+                        lastUpdatedAt: 1609459200000
+                        lastUpdatedBy: admin@example.com
+                        tenantId: tenant1
+                    statusCode: 200
+                    error: null
+                    message: null
               schema:
-                $ref: "#/components/schemas/ResponseBehaviourTagsResponse"
+                $ref: "#/components/schemas/BehaviourTagsResponse"
     post:
+      summary: Create a new Behaviour Tag
+      description: "Creates a new Behaviour Tag with exposure rules and CTA relations.\
+        \ Behaviour Tags define user segments and control which CTAs are shown or\
+        \ hidden. The exposureRule defines frequency limits (session, window, lifespan).\
+        \ The ctaRelation defines which CTAs to show (shownCta) and hide (hideCta)."
+      operationId: createBehaviourTag
+      tags:
+      - Behaviour Tags
       parameters:
-      - name: user
+      - description: User ID of the admin creating the Behaviour Tag
+        example: admin@example.com
+        name: user
+        required: true
         in: header
         schema:
           type: string
-        required: true
-      - name: x-tenant-id
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
         in: header
         schema:
           type: string
           default: default
       requestBody:
+        description: "Behaviour Tag creation request with name, description, exposure\
+          \ rules, and CTA relations"
         content:
-          '*/*':
+          application/json:
+            examples:
+              Create Request:
+                summary: Example request to create a behaviour tag
+                value:
+                  behaviourTagName: onboarding_eligible
+                  description: Users eligible for onboarding nudges
+                  linkedCtas: []
+                  exposureRule:
+                    session:
+                      limit: 2
+                    window:
+                      limit: 3
+                      unit: days
+                      value: 7
+                    lifespan:
+                      limit: 10
+                  ctaRelation:
+                    shownCta:
+                      rule: LIST
+                      ctaList:
+                      - cta-101
+                    hideCta:
+                      rule: ANY
+                      ctaList: []
             schema:
               $ref: "#/components/schemas/BehaviourTagCreateRequest"
         required: true
       responses:
         "200":
-          description: OK
+          description: Behaviour Tag created successfully
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/ResponseObject"
+              examples:
+                Success Response:
+                  summary: Behaviour tag created
+                  value:
+                    success: true
+                    data: null
+                    statusCode: 200
+                    error: null
+                    message: null
+        "400":
+          description: Invalid request data or validation failed
   /thunder/behaviour-tags/{behaviourTagName}:
     put:
+      summary: Update an existing Behaviour Tag
+      description: "Updates an existing Behaviour Tag's description, exposure rules,\
+        \ and CTA relations. Only the fields provided in the request will be updated.\
+        \ The behaviourTagName in the path must match the tag being updated."
+      operationId: updateBehaviourTag
+      tags:
+      - Behaviour Tags
       parameters:
-      - name: behaviourTagName
-        in: path
+      - description: Name of the Behaviour Tag to update
+        example: onboarding_eligible
+        name: behaviourTagName
         required: true
         schema:
           type: string
-      - name: user
+        in: path
+      - description: User ID of the admin updating the Behaviour Tag
+        example: admin@example.com
+        name: user
+        required: true
         in: header
         schema:
           type: string
-        required: true
-      - name: x-tenant-id
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
         in: header
         schema:
           type: string
           default: default
       requestBody:
+        description: "Behaviour Tag update request with description, exposure rules,\
+          \ and CTA relations"
         content:
-          '*/*':
+          application/json:
+            examples:
+              Update Request:
+                summary: Example request to update a behaviour tag
+                value:
+                  description: Updated description for onboarding eligible users
+                  exposureRule:
+                    session:
+                      limit: 1
+                    window:
+                      limit: 1
+                      unit: days
+                      value: 7
+                    lifespan:
+                      limit: 5
+                  ctaRelation:
+                    shownCta:
+                      rule: ANY
+                    hideCta:
+                      rule: NONE
+                  linkedCtas: []
             schema:
               $ref: "#/components/schemas/BehaviourTagPutRequest"
         required: true
       responses:
         "200":
-          description: OK
+          description: Behaviour Tag updated successfully
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/ResponseObject"
+              examples:
+                Success Response:
+                  summary: Behaviour tag updated
+                  value:
+                    success: true
+                    data: null
+                    statusCode: 200
+                    error: null
+                    message: null
+        "400":
+          description: Invalid request data or validation failed
+        "404":
+          description: Behaviour Tag not found
     get:
+      summary: Get Behaviour Tag by name
+      description: "Retrieves a specific Behaviour Tag by its name. Returns the complete\
+        \ Behaviour Tag object including all metadata, exposure rules, CTA relations,\
+        \ and linked CTAs."
+      operationId: getBehaviourTag
+      tags:
+      - Behaviour Tags
       parameters:
-      - name: behaviourTagName
-        in: path
+      - description: Name of the Behaviour Tag to retrieve
+        example: onboarding_eligible
+        name: behaviourTagName
         required: true
         schema:
           type: string
-      - name: x-tenant-id
+        in: path
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
         in: header
         schema:
           type: string
           default: default
       responses:
         "200":
-          description: OK
+          description: Behaviour Tag retrieved successfully
           content:
             application/json:
+              examples:
+                Success Response:
+                  summary: Example behaviour tag response
+                  value:
+                    success: true
+                    data:
+                      name: onboarding_eligible
+                      description: Users eligible for onboarding nudges
+                      exposureRule:
+                        session:
+                          limit: 2
+                        window:
+                          limit: 3
+                          unit: days
+                          value: 7
+                        lifespan:
+                          limit: 10
+                      ctaRelation:
+                        shownCta:
+                          rule: LIST
+                          ctaList:
+                          - cta-101
+                        hideCta:
+                          rule: ANY
+                          ctaList: []
+                      linkedCtas:
+                      - cta-101
+                      createdAt: 1609459200000
+                      createdBy: admin@example.com
+                      lastUpdatedAt: 1609459200000
+                      lastUpdatedBy: admin@example.com
+                      tenantId: tenant1
+                    statusCode: 200
+                    error: null
+                    message: null
               schema:
-                $ref: "#/components/schemas/ResponseBehaviourTag"
+                $ref: "#/components/schemas/BehaviourTag"
+        "404":
+          description: Behaviour Tag not found
   /thunder/ctas:
     get:
       summary: List CTAs
