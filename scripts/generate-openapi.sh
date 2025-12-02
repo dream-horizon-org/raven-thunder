@@ -26,11 +26,11 @@ API_OPENAPI="$PROJECT_ROOT/thunder-api/target/openapi/openapi.yaml"
 ADMIN_OPENAPI="$PROJECT_ROOT/thunder-admin/target/openapi/openapi.yaml"
 
 # Output files
-API_OUTPUT="$PROJECT_ROOT/docs/thunder-api-openapi.yaml"
-ADMIN_OUTPUT="$PROJECT_ROOT/docs/thunder-admin-openapi.yaml"
+API_OUTPUT="$PROJECT_ROOT/openapi/thunder-api-openapi.yaml"
+ADMIN_OUTPUT="$PROJECT_ROOT/openapi/thunder-admin-openapi.yaml"
 
-# Create docs directory if it doesn't exist
-mkdir -p "$PROJECT_ROOT/docs"
+# Create openapi directory if it doesn't exist
+mkdir -p "$PROJECT_ROOT/openapi"
 
 if [ ! -f "$API_OPENAPI" ]; then
     echo "❌ Error: thunder-api OpenAPI file not found at $API_OPENAPI"

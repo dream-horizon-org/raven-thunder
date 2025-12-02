@@ -140,7 +140,7 @@ services:
     ports:
       - "8082:8080"
     volumes:
-      - ./docs:/docs:ro
+      - ./openapi:/docs:ro
     environment:
       # Scalar configuration - names are automatically taken from OpenAPI spec info.title
       - 'API_REFERENCE_CONFIG={"theme": "purple", "specs": [{"url": "/docs/thunder-api-openapi.yaml"}, {"url": "/docs/thunder-admin-openapi.yaml"}]}'
