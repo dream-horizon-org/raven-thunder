@@ -1,0 +1,6 @@
+SET KEY_SEND TRUE
+
+-- Seed Nudge Preview ID 5 (matches documentation examples)
+DELETE FROM thunder-admin.nudgePreview WHERE PK = '5'
+INSERT INTO thunder-admin.nudgePreview (PK, template, tenantId) VALUES ('5', '{"type":"BottomSheet","testId":"nudge_container_bottom_sheet"}', 'tenant1')
+
