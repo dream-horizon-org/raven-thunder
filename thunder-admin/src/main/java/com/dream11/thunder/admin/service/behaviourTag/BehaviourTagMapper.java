@@ -5,6 +5,14 @@ import com.dream11.thunder.core.model.BehaviourTag;
 
 public class BehaviourTagMapper {
 
+  /**
+   * Maps a create request to a BehaviourTag model with createdBy/createdAt set.
+   *
+   * @param tenantId tenant identifier
+   * @param behaviourTag request payload
+   * @param user user creating the tag
+   * @return BehaviourTag model ready to persist
+   */
   public BehaviourTag apply(String tenantId, BehaviourTagCreateRequest behaviourTag, String user) {
     return new BehaviourTag(
         behaviourTag.getBehaviourTagName(),

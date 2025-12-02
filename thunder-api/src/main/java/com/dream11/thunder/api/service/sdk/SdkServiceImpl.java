@@ -3,41 +3,48 @@ package com.dream11.thunder.api.service.sdk;
 import com.dream11.thunder.api.dao.StateMachineRepository;
 import com.dream11.thunder.api.io.request.CTASnapshotRequest;
 import com.dream11.thunder.api.io.response.CTAResponse;
-import com.dream11.thunder.api.io.response.UserCTAAndStateMachineResponse;
-import com.dream11.thunder.api.model.BehaviourExposureRule;
-import com.dream11.thunder.api.model.BehaviourTagSnapshot;
-import com.dream11.thunder.api.model.CTARelationSnapshot;
-import com.dream11.thunder.api.model.StateMachine;
-import com.dream11.thunder.api.model.StateMachineSnapshot;
-import com.dream11.thunder.api.model.UserDataSnapshot;
 import com.dream11.thunder.api.service.SdkService;
 import com.dream11.thunder.api.service.StaticDataCache;
 import com.dream11.thunder.api.service.UserCohortsClient;
+import com.dream11.thunder.api.util.CTAFilterUtil;
+import com.dream11.thunder.api.util.CTASnapshotMerger;
+import com.dream11.thunder.api.util.StateMachineUtil;
 import com.dream11.thunder.core.dao.NudgePreviewRepository;
-import com.dream11.thunder.core.model.*;
-import com.dream11.thunder.core.model.rule.LifespanFrequency;
-import com.dream11.thunder.core.model.rule.SessionFrequency;
-import com.dream11.thunder.core.model.rule.WindowFrequency;
+import com.dream11.thunder.core.model.BehaviourTag;
+import com.dream11.thunder.core.model.CTA;
+import com.dream11.thunder.core.model.NudgePreview;
 import com.google.inject.Inject;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
 
+/**
+ * SDK service implementation responsible for resolving eligible CTAs for a user,
+ * merging client delta snapshots, and persisting user state machine snapshots.
+ *
+ * It relies on:
+ * - UserCohortsClient to fetch user cohorts
+ * - StaticDataCache for active/paused CTAs and behaviour tags
+ * - StateMachineRepository for reading/upserting user snapshots
+ * - Utilities (CTAFilterUtil, StateMachineUtil, CTASnapshotMerger) for clean logic separation
+ */
 @Slf4j
 public class SdkServiceImpl implements SdkService {
 
   private final UserCohortsClient userCohortsClient;
   private final StateMachineRepository stateMachineRepository;
   private final StaticDataCache cache;
+  private final NudgePreviewRepository nudgePreviewRepository;
 
   private final RuleMapper ruleMapper = new RuleMapper();
   private final BehaviourExposureRuleMapper behaviourExposureRuleMapper =
       new BehaviourExposureRuleMapper();
   private final CTARelationMapper ctaRelationMapper = new CTARelationMapper();
-  private final NudgePreviewRepository nudgePreviewRepository;
+  private final CTASnapshotMerger ctaSnapshotMerger =
+      new CTASnapshotMerger(ruleMapper, behaviourExposureRuleMapper, ctaRelationMapper);
 
   @Inject
   public SdkServiceImpl(
@@ -52,60 +59,24 @@ public class SdkServiceImpl implements SdkService {
   }
 
   @Override
-  @Deprecated
-  public Maybe<Nudge> findNudge(String id) {
-    return Maybe.empty();
-  }
-
-  @Override
   public Maybe<CTAResponse> appLaunch(
       String tenantId, Long userId, CTASnapshotRequest deltaSnapshot) {
     return userCohortsClient
         .findAllCohorts(userId)
         .map(
             cohorts ->
-                this.eligibleCTA(
-                    tenantId,
-                    cohorts,
-                    cache.findAllActiveCTA().entrySet().stream()
-                        .filter(e -> Objects.equals(tenantId, e.getValue().getTenantId()))
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))))
+                CTAFilterUtil.filterEligibleCTAs(
+                    tenantId, cohorts, CTAFilterUtil.filterByTenant(cache.findAllActiveCTA(), tenantId)))
         .filter(activeCTAs -> !activeCTAs.isEmpty())
         .flatMapSingle(
             activeCTAs ->
-                stateMachineRepository
-                    .find(tenantId, userId)
-                    .switchIfEmpty(
-                        Single.defer(
-                            () ->
-                                Single.just(
-                                    new UserDataSnapshot(new HashMap<>(), new HashMap<>()))))
-                    .map(
-                        snapshot ->
-                            Pair.of(
-                                snapshot,
-                                archiveStaleData(
-                                    activeCTAs,
-                                    cache.findAllPausedCTA().entrySet().stream()
-                                        .filter(
-                                            e ->
-                                                Objects.equals(
-                                                    tenantId, e.getValue().getTenantId()))
-                                        .collect(
-                                            Collectors.toMap(
-                                                Map.Entry::getKey, Map.Entry::getValue)),
-                                    snapshot)))
+                loadOrCreateSnapshot(tenantId, userId)
                     .flatMap(
-                        pair -> {
-                          final UserDataSnapshot snapshot = pair.getLeft();
-                          boolean update = pair.getRight();
-                          if (deltaSnapshot != null
-                              && deltaSnapshot.getCtas() != null
-                              && !deltaSnapshot.getCtas().isEmpty()) {
-                            mergeDeltaSnapshot(snapshot, deltaSnapshot);
-                            update = true;
-                          }
-                          if (update) {
+                        snapshot -> {
+                          boolean updated = updateSnapshotWithStaleData(tenantId, activeCTAs, snapshot);
+                          updated |= mergeDeltaSnapshotIfPresent(snapshot, deltaSnapshot);
+
+                          if (updated) {
                             return stateMachineRepository
                                 .upsert(tenantId, userId, snapshot)
                                 .map(ignored -> snapshot);
@@ -113,27 +84,16 @@ public class SdkServiceImpl implements SdkService {
                           return Single.just(snapshot);
                         })
                     .map(
-                        snapshot -> {
-                          // filter behaviour tags by tenantId, keep as Map<String, BehaviourTag>
-                          Map<String, BehaviourTag> tenantBehaviourTags =
-                              cache.findAllBehaviourTags().entrySet().stream()
-                                  .filter(e -> Objects.equals(tenantId, e.getValue().getTenantId()))
-                                  .collect(
-                                      Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-                          return mergeCTAWithSnapshot(tenantBehaviourTags, activeCTAs, snapshot);
-                        }));
+                        snapshot ->
+                            buildCTAResponse(tenantId, activeCTAs, snapshot)));
   }
 
   @Override
   public Single<Boolean> merge(String tenantId, Long userId, CTASnapshotRequest deltaSnapshot) {
-    return stateMachineRepository
-        .find(tenantId, userId)
-        .switchIfEmpty(
-            Single.defer(() -> Single.just(new UserDataSnapshot(new HashMap<>(), new HashMap<>()))))
+    return loadOrCreateSnapshot(tenantId, userId)
         .map(
             snapshot -> {
-              mergeDeltaSnapshot(snapshot, deltaSnapshot);
+              StateMachineUtil.mergeDeltaSnapshot(snapshot, deltaSnapshot);
               return snapshot;
             })
         .flatMap(snapshot -> stateMachineRepository.upsert(tenantId, userId, snapshot));
@@ -144,262 +104,47 @@ public class SdkServiceImpl implements SdkService {
     return nudgePreviewRepository.find(tenantId, id);
   }
 
-  private Map<Long, CTA> eligibleCTA(
-      String tenantId, Set<String> cohorts, Map<Long, CTA> activeCTAs) {
-    return activeCTAs.entrySet().stream()
-        .filter(
-            e ->
-                tenantId.equals(
-                    e.getValue().getTenantId())) // safety net: drop CTAs from other tenants
-        .filter(
-            cta -> {
-              for (String cohort : cta.getValue().getRule().getCohortEligibility().getIncludes()) {
-                if (cohorts.contains(cohort)) {
-                  return true;
-                }
-              }
-              return false;
-            })
-        .filter(
-            cta -> {
-              for (String cohort : cta.getValue().getRule().getCohortEligibility().getExcludes()) {
-                if (cohorts.contains(cohort)) {
-                  return false;
-                }
-              }
-              return true;
-            })
-        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+  private Single<com.dream11.thunder.api.model.UserDataSnapshot> loadOrCreateSnapshot(
+      String tenantId, Long userId) {
+    return stateMachineRepository
+        .find(tenantId, userId)
+        .switchIfEmpty(
+            Single.defer(
+                () ->
+                    Single.just(
+                        new com.dream11.thunder.api.model.UserDataSnapshot(
+                            new HashMap<>(), new HashMap<>()))));
   }
 
-  private boolean archiveStaleData(
-      Map<Long, CTA> activeCTAs, Map<Long, CTA> pausedCTAs, UserDataSnapshot snapshot) {
-    boolean update = false;
-
-    if (snapshot.getStateMachines() != null) {
-      Map<Long, StateMachineSnapshot> stateMachineSnapshot = snapshot.getStateMachines();
-
-      Set<String> activeBehaviourTags = new HashSet<>();
-
-      List<Long> ctaIds = new ArrayList<>(stateMachineSnapshot.keySet());
-      for (Long ctaId : ctaIds) {
-        if (!(activeCTAs.containsKey(ctaId) || pausedCTAs.containsKey(ctaId))) {
-          stateMachineSnapshot.remove(ctaId);
-          update = true;
-          continue;
-        }
-
-        if (activeCTAs.get(ctaId) != null) {
-          activeBehaviourTags.addAll(activeCTAs.get(ctaId).getBehaviourTags());
-          if (activeCTAs.get(ctaId).getRule().getStateMachineTTL() != null) {
-            List<String> groupIds =
-                new ArrayList<>(stateMachineSnapshot.get(ctaId).getActiveStateMachines().keySet());
-            for (String groupId : groupIds) {
-              if ((System.currentTimeMillis()
-                      - stateMachineSnapshot
-                          .get(ctaId)
-                          .getActiveStateMachines()
-                          .get(groupId)
-                          .getCreatedAt())
-                  > activeCTAs.get(ctaId).getRule().getStateMachineTTL()) {
-                stateMachineSnapshot.get(ctaId).getActiveStateMachines().remove(groupId);
-                update = true;
-              }
-            }
-          }
-        } else {
-          activeBehaviourTags.addAll(pausedCTAs.get(ctaId).getBehaviourTags());
-        }
-      }
-      List<String> removeTags = new ArrayList<>(Collections.emptyList());
-      Set<String> existingBehaviourTags = snapshot.getBehaviourTags().keySet();
-      for (String tag : existingBehaviourTags) {
-        if (!activeBehaviourTags.contains(tag)) {
-          removeTags.add(tag);
-        }
-      }
-      removeTags.forEach(it -> snapshot.getBehaviourTags().remove(it));
-    }
-
-    return update;
-  }
-
-  private void mergeDeltaSnapshot(UserDataSnapshot snapshot, CTASnapshotRequest deltaSnapshot) {
-    if (snapshot.getStateMachines() == null) {
-      snapshot.setStateMachines(new HashMap<>());
-    }
-
-    if (snapshot.getBehaviourTags() == null) {
-      snapshot.setBehaviourTags(new HashMap<>());
-    }
-
-    for (StateMachineSnapshot ctaDelta : deltaSnapshot.getCtas()) {
-      if (!snapshot.getStateMachines().containsKey(Long.parseLong(ctaDelta.getCtaId()))) {
-        snapshot.getStateMachines().put(Long.parseLong(ctaDelta.getCtaId()), ctaDelta);
-        continue;
-      }
-
-      Map<String, StateMachine> existingSMs =
-          snapshot
-              .getStateMachines()
-              .get(Long.parseLong(ctaDelta.getCtaId()))
-              .getActiveStateMachines();
-
-      for (Map.Entry<String, StateMachine> smDelta : ctaDelta.getActiveStateMachines().entrySet()) {
-        if (!existingSMs.containsKey(smDelta.getKey())) {
-          existingSMs.put(smDelta.getKey(), smDelta.getValue());
-          continue;
-        }
-        if (existingSMs.get(smDelta.getKey()).getLastTransitionAt()
-            <= smDelta.getValue().getLastTransitionAt()) {
-          existingSMs.put(smDelta.getKey(), smDelta.getValue());
-        }
-      }
-
-      snapshot
-          .getStateMachines()
-          .get(Long.parseLong(ctaDelta.getCtaId()))
-          .setResetAt(ctaDelta.getResetAt());
-      snapshot
-          .getStateMachines()
-          .get(Long.parseLong(ctaDelta.getCtaId()))
-          .setActionDoneAt(ctaDelta.getActionDoneAt()); // TODO : check this
-    }
-
-    resetStateMachine(snapshot.getStateMachines(), deltaSnapshot.getCtas());
-
-    if (deltaSnapshot.getBehaviourTags() != null) {
-      if (snapshot.getBehaviourTags() == null) {
-        snapshot.setBehaviourTags(new HashMap<>());
-      }
-
-      for (BehaviourTagSnapshot behaviourTagSnapshot : deltaSnapshot.getBehaviourTags()) {
-        snapshot
-            .getBehaviourTags()
-            .put(behaviourTagSnapshot.getBehaviourTagName(), behaviourTagSnapshot);
-      }
-    }
-  }
-
-  private void resetStateMachine(
-      Map<Long, StateMachineSnapshot> snapshot, List<StateMachineSnapshot> deltaSnapshot) {
-    for (StateMachineSnapshot ctaDelta : deltaSnapshot) {
-      for (Map.Entry<String, StateMachine> smDelta : ctaDelta.getActiveStateMachines().entrySet()) {
-        String groupId = smDelta.getKey();
-        StateMachine stateMachine = smDelta.getValue();
-        Map<String, StateMachine> existingSMs =
-            snapshot.get(Long.parseLong(ctaDelta.getCtaId())).getActiveStateMachines();
-        if (existingSMs.containsKey(groupId)
-            && (existingSMs.get(groupId).getLastTransitionAt()
-                <= stateMachine.getLastTransitionAt())
-            && (stateMachine.getReset() != null && stateMachine.getReset())) {
-          snapshot
-              .get(Long.parseLong(ctaDelta.getCtaId()))
-              .getActiveStateMachines()
-              .remove(groupId);
-        }
-      }
-    }
-  }
-
-  // FIXME
-  private CTAResponse mergeCTAWithSnapshot(
-      Map<String, BehaviourTag> behaviourTagMap,
+  private boolean updateSnapshotWithStaleData(
+      String tenantId,
       Map<Long, CTA> activeCTAs,
-      UserDataSnapshot snapshot) {
+      com.dream11.thunder.api.model.UserDataSnapshot snapshot) {
+    Map<Long, CTA> pausedCTAs =
+        CTAFilterUtil.filterByTenant(cache.findAllPausedCTA(), tenantId);
+    return StateMachineUtil.archiveStaleData(activeCTAs, pausedCTAs, snapshot);
+  }
 
-    List<UserCTAAndStateMachineResponse> userCTAAndStateMachineList = new ArrayList<>();
-    List<BehaviourTagSnapshot> behaviourTagSnapshots = new ArrayList<>();
-    Set<String> behaviourTagNames = new HashSet<>();
+  private boolean mergeDeltaSnapshotIfPresent(
+      com.dream11.thunder.api.model.UserDataSnapshot snapshot, CTASnapshotRequest deltaSnapshot) {
+    if (deltaSnapshot != null
+        && deltaSnapshot.getCtas() != null
+        && !deltaSnapshot.getCtas().isEmpty()) {
+      StateMachineUtil.mergeDeltaSnapshot(snapshot, deltaSnapshot);
+      return true;
+    }
+    return false;
+  }
 
-    activeCTAs
-        .entrySet()
-        .forEach(
-            it -> {
-              CTA v = it.getValue();
-              String behaviourTagName = "";
-              if (v.getBehaviourTags() != null && !v.getBehaviourTags().isEmpty()) {
-                behaviourTagName = v.getBehaviourTags().get(0);
-              }
-              if (snapshot.getStateMachines() != null
-                  && snapshot.getStateMachines().containsKey(v.getId())) {
-                userCTAAndStateMachineList.add(
-                    new UserCTAAndStateMachineResponse(
-                        v.getId().toString(),
-                        ruleMapper.apply(v.getRule()),
-                        snapshot.getStateMachines().get(v.getId()).getActiveStateMachines(),
-                        snapshot.getStateMachines().get(v.getId()).getResetAt(),
-                        snapshot.getStateMachines().get(v.getId()).getActionDoneAt(),
-                        behaviourTagName));
-              } else {
-                userCTAAndStateMachineList.add(
-                    new UserCTAAndStateMachineResponse(
-                        v.getId().toString(),
-                        ruleMapper.apply(v.getRule()),
-                        Collections.emptyMap(),
-                        Collections.emptyList(),
-                        Collections.emptyList(),
-                        behaviourTagName));
-              }
-              if (!behaviourTagName.isEmpty()) {
-                behaviourTagNames.add(behaviourTagName);
-              }
-            });
+  private CTAResponse buildCTAResponse(
+      String tenantId,
+      Map<Long, CTA> activeCTAs,
+      com.dream11.thunder.api.model.UserDataSnapshot snapshot) {
+    Map<String, BehaviourTag> tenantBehaviourTags =
+        cache.findAllBehaviourTags().entrySet().stream()
+            .filter(e -> tenantId.equals(e.getValue().getTenantId()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-    behaviourTagNames.forEach(
-        name -> {
-          if (snapshot.getBehaviourTags() != null
-              && snapshot.getBehaviourTags().containsKey(name)) {
-            behaviourTagSnapshots.add(
-                new BehaviourTagSnapshot(
-                    name,
-                    new BehaviourExposureRule(
-                        behaviourTagMap.get(name).getExposureRule() != null
-                            ? behaviourTagMap.get(name).getExposureRule().getSession()
-                            : new SessionFrequency(),
-                        behaviourTagMap.get(name).getExposureRule() != null
-                            ? behaviourTagMap.get(name).getExposureRule().getLifespan()
-                            : new LifespanFrequency(),
-                        behaviourTagMap.get(name).getExposureRule() != null
-                            ? behaviourTagMap.get(name).getExposureRule().getWindow()
-                            : new WindowFrequency(),
-                        snapshot.getBehaviourTags().get(name).getExposureRule() != null
-                            ? snapshot
-                                .getBehaviourTags()
-                                .get(name)
-                                .getExposureRule()
-                                .getCtasResetAt()
-                            : Collections.emptyList()),
-                    new CTARelationSnapshot(
-                        behaviourTagMap.get(name).getCtaRelation() != null
-                            ? behaviourTagMap.get(name).getCtaRelation().getShownCta()
-                            : new CtaRelationRule(),
-                        behaviourTagMap.get(name).getCtaRelation() != null
-                            ? behaviourTagMap.get(name).getCtaRelation().getHideCta()
-                            : new CtaRelationRule(),
-                        snapshot.getBehaviourTags().get(name).getCtaRelation().getActiveCtas())));
-          } else {
-            try {
-              behaviourTagSnapshots.add(
-                  new BehaviourTagSnapshot(
-                      name,
-                      behaviourExposureRuleMapper.apply(
-                          behaviourTagMap.get(name).getExposureRule()),
-                      ctaRelationMapper.apply(behaviourTagMap.get(name).getCtaRelation())));
-            } catch (Exception e) {
-              behaviourTagSnapshots.add(
-                  new BehaviourTagSnapshot(
-                      name,
-                      new BehaviourExposureRule(
-                          new SessionFrequency(),
-                          new LifespanFrequency(),
-                          new WindowFrequency(),
-                          Collections.emptyList()),
-                      new CTARelationSnapshot(
-                          new CtaRelationRule(), new CtaRelationRule(), Collections.emptyList())));
-            }
-          }
-        });
-    return new CTAResponse(userCTAAndStateMachineList, behaviourTagSnapshots);
+    return ctaSnapshotMerger.mergeCTAWithSnapshot(tenantBehaviourTags, activeCTAs, snapshot);
   }
 }

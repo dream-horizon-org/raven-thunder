@@ -6,16 +6,17 @@ import com.dream11.thunder.admin.io.request.BehaviourTagCreateRequest;
 import com.dream11.thunder.admin.io.request.BehaviourTagPutRequest;
 import com.dream11.thunder.admin.io.response.BehaviourTagsResponse;
 import com.dream11.thunder.admin.service.BehaviourTagService;
+import com.dream11.thunder.admin.util.CTALinkingHelper;
+import com.dream11.thunder.admin.util.CTAValidationHelper;
 import com.dream11.thunder.core.dao.BehaviourTagsRepository;
 import com.dream11.thunder.core.dao.CTARepository;
 import com.dream11.thunder.core.model.BehaviourTag;
-import com.dream11.thunder.core.model.CTA;
-import com.dream11.thunder.core.model.CTAStatus;
 import com.google.inject.Inject;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -42,35 +43,11 @@ public class BehaviourTagServiceImpl implements BehaviourTagService {
     return ctaRepository
         .findAll(tenantId)
         .doOnSuccess(
-            it -> {
-              List<String> invalidCTAList = new ArrayList<>();
-              AtomicBoolean invalid = new AtomicBoolean(false);
-              it.values()
-                  .forEach(
-                      item -> {
-                        if (behaviourTag.getLinkedCtas().contains(item.getId().toString())) {
-                          if (item.getCtaStatus().equals(CTAStatus.LIVE)
-                              || item.getCtaStatus().equals(CTAStatus.SCHEDULED)
-                              || item.getCtaStatus().equals(CTAStatus.CONCLUDED)
-                              || item.getCtaStatus().equals(CTAStatus.TERMINATED)) {
-                            invalid.set(true);
-                            invalidCTAList.add(item.getName());
-                          }
-                        }
-                      });
-              if (invalid.get()) {
-                log.info(
-                    "Error in Behaviour tags linking for BT : {} , ctas {}",
-                    behaviourTag.getBehaviourTagName(),
-                    invalidCTAList);
-                throw new DefinedException(
-                    ErrorEntity.INVALID_BEHAVIOUR_TAG_CREATION,
-                    "Only Draft/Paused CTAs can be attached to new Behaviour tags. CTAs with invalid statuses: "
-                        + invalidCTAList);
-              }
-            })
+            allCTAs ->
+                CTAValidationHelper.validateCTAsForNewBehaviourTag(
+                    allCTAs, behaviourTag.getLinkedCtas(), behaviourTag.getBehaviourTagName()))
         .flatMapCompletable(
-            result ->
+            allCTAs ->
                 behaviourTagRepository
                     .create(tenantId, behaviourTagMapper.apply(tenantId, behaviourTag, userId))
                     .doOnComplete(
@@ -79,69 +56,7 @@ public class BehaviourTagServiceImpl implements BehaviourTagService {
                               "Behaviour tag BT : {} created with ctas {}",
                               behaviourTag.getBehaviourTagName(),
                               behaviourTag.getLinkedCtas());
-                          List<Long> ctaIdList = new ArrayList<>();
-                          behaviourTag.getLinkedCtas().stream()
-                              .map(
-                                  cta -> {
-                                    ctaIdList.add(Long.parseLong(cta));
-                                    return ctaIdList;
-                                  })
-                              .forEach(
-                                  ctaIds ->
-                                      ctaRepository
-                                          .findAll(tenantId)
-                                          .map(
-                                              ctaMap ->
-                                                  ctaMap.entrySet().stream()
-                                                      .filter(
-                                                          entry ->
-                                                              ctaIds.contains(
-                                                                  entry.getValue().getId()))
-                                                      .filter(
-                                                          entry ->
-                                                              entry
-                                                                      .getValue()
-                                                                      .getCtaStatus()
-                                                                      .equals(CTAStatus.DRAFT)
-                                                                  || entry
-                                                                      .getValue()
-                                                                      .getCtaStatus()
-                                                                      .equals(CTAStatus.PAUSED))
-                                                      .collect(
-                                                          Collectors.toMap(
-                                                              Map.Entry::getKey,
-                                                              Map.Entry::getValue)))
-                                          .map(
-                                              ctaMap -> {
-                                                for (CTA cta : ctaMap.values()) {
-                                                  ctaRepository
-                                                      .update(
-                                                          cta.getId(),
-                                                          List.of(
-                                                              behaviourTag.getBehaviourTagName()))
-                                                      .doOnComplete(
-                                                          () ->
-                                                              log.info(
-                                                                  "linked BT info updated for ctaId :"
-                                                                      + cta.getId()
-                                                                      + " ..."))
-                                                      .doOnError(
-                                                          error -> {
-                                                            log.error(
-                                                                "error while updating linked BT info for CTA id {}",
-                                                                cta.getId(),
-                                                                error);
-                                                          })
-                                                      .doOnSubscribe(
-                                                          disposable ->
-                                                              log.info(
-                                                                  "updating linked cta info..."))
-                                                      .subscribe();
-                                                }
-
-                                                return Completable.complete();
-                                              })
-                                          .subscribe());
+                          linkCTAsToNewBehaviourTag(tenantId, behaviourTag);
                         }));
   }
 
@@ -155,104 +70,23 @@ public class BehaviourTagServiceImpl implements BehaviourTagService {
     return ctaRepository
         .findAll(tenantId)
         .doOnSuccess(
-            it -> {
-              List<String> invalidCTAList = new ArrayList<>();
-              AtomicBoolean invalid = new AtomicBoolean(false);
-              it.values()
-                  .forEach(
-                      item -> {
-                        if (behaviourTag.getLinkedCtas().contains(item.getId().toString())) {
-                          if (item.getCtaStatus().equals(CTAStatus.LIVE)
-                              || item.getCtaStatus().equals(CTAStatus.SCHEDULED)) {
-                            invalid.set(true);
-                            invalidCTAList.add(item.getName());
-                          }
-                        }
-                      });
-              if (invalid.get()) {
-                log.info(
-                    "Error in Behaviour tags linking for BT : {} , ctas {}",
-                    behaviourTagName,
-                    invalidCTAList);
-                throw new DefinedException(
-                    ErrorEntity.INVALID_BEHAVIOUR_TAG_UPDATION,
-                    "Only Draft/Paused CTAs can be attached to new Behaviour tags. CTAs with invalid statuses: "
-                        + invalidCTAList);
-              }
-            })
+            allCTAs ->
+                CTAValidationHelper.validateCTAsForBehaviourTagUpdate(
+                    allCTAs, behaviourTag.getLinkedCtas(), behaviourTagName))
         .flatMapCompletable(
-            result ->
+            allCTAs ->
                 behaviourTagRepository
                     .find(tenantId, behaviourTagName)
                     .switchIfEmpty(
                         Single.error(new DefinedException(ErrorEntity.NO_SUCH_BEHAVIOUR_TAG)))
                     .flatMapCompletable(
-                        it -> {
-                          Set<String> linkedCtas = it.getLinkedCtas();
-                          List<String> unlinkedCtas = new ArrayList<>(linkedCtas);
-                          List<String> newLinkedCtas = new ArrayList<>();
-                          Set<String> incomingCtas = behaviourTag.getLinkedCtas();
-
-                          linkedCtas.forEach(
-                              cta -> {
-                                if (incomingCtas.contains(cta)) {
-                                  unlinkedCtas.remove(cta);
-                                }
-                              });
-                          incomingCtas.forEach(
-                              cta -> {
-                                if (!linkedCtas.contains(cta)) {
-                                  newLinkedCtas.add(cta);
-                                }
-                              });
-                          for (String ctaId : unlinkedCtas) {
-                            ctaRepository
-                                .update(Long.parseLong(ctaId), Collections.emptyList())
-                                .doOnComplete(
-                                    () -> log.info("Behaviour tags unlinked for cta id {}", ctaId))
-                                .doOnError(
-                                    error ->
-                                        log.info(
-                                            "Error unlinking behaviour tags for cta id {}",
-                                            ctaId,
-                                            error))
-                                .subscribe();
-                          }
-
-                          for (String ctaId : incomingCtas) {
-                            ctaRepository
-                                .update(Long.parseLong(ctaId), List.of(behaviourTagName))
-                                .doOnComplete(
-                                    () -> log.info("Behaviour tags unlinked for cta id {}", ctaId))
-                                .doOnError(
-                                    error ->
-                                        log.info(
-                                            "Error unlinking behaviour tags for cta id {}",
-                                            ctaId,
-                                            error))
-                                .subscribe();
-                          }
-                          behaviourTagRepository
-                              .update(
-                                  tenantId,
-                                  behaviourTagName,
-                                  behaviourTagUpdateMapper.apply(
-                                      tenantId, behaviourTag, behaviourTagName, userId))
-                              .doOnComplete(
-                                  () -> {
-                                    log.info(
-                                        "Behaviour tag BT : {} updated with ctas {}",
-                                        behaviourTagName,
-                                        behaviourTag.getLinkedCtas());
-                                    for (String ctaId : newLinkedCtas) {
-                                      ctaRepository
-                                          .update(Long.parseLong(ctaId), List.of(behaviourTagName))
-                                          .subscribe();
-                                    }
-                                  })
-                              .subscribe();
-                          return Completable.complete();
-                        }));
+                        existingTag ->
+                            updateBehaviourTagWithCTALinks(
+                                tenantId,
+                                behaviourTagName,
+                                behaviourTag,
+                                existingTag.getLinkedCtas(),
+                                userId)));
   }
 
   @Override
@@ -274,6 +108,71 @@ public class BehaviourTagServiceImpl implements BehaviourTagService {
         .switchIfEmpty(
             Single.defer(
                 () -> Single.error(new DefinedException(ErrorEntity.NO_SUCH_BEHAVIOUR_TAG))));
+  }
+
+  private void linkCTAsToNewBehaviourTag(
+      String tenantId, BehaviourTagCreateRequest behaviourTag) {
+    List<Long> ctaIds =
+        behaviourTag.getLinkedCtas().stream()
+            .map(Long::parseLong)
+            .collect(Collectors.toList());
+
+    CTALinkingHelper.linkCTAsToBehaviourTag(
+            ctaRepository, tenantId, ctaIds, behaviourTag.getBehaviourTagName())
+        .subscribe(
+            () -> log.debug("CTAs linked to behaviour tag: {}", behaviourTag.getBehaviourTagName()),
+            error ->
+                log.error(
+                    "Error linking CTAs to behaviour tag: {}",
+                    behaviourTag.getBehaviourTagName(),
+                    error));
+  }
+
+  private Completable updateBehaviourTagWithCTALinks(
+      String tenantId,
+      String behaviourTagName,
+      BehaviourTagPutRequest behaviourTag,
+      Set<String> existingLinkedCtas,
+      String userId) {
+    CTALinkingHelper.CTALinkDiff linkDiff =
+        CTALinkingHelper.calculateLinkDiff(existingLinkedCtas, behaviourTag.getLinkedCtas());
+
+    // Unlink removed CTAs
+    CTALinkingHelper.unlinkCTAsFromBehaviourTag(ctaRepository, linkDiff.getUnlinkedCtas())
+        .subscribe(
+            () -> log.debug("Unlinked CTAs from behaviour tag: {}", behaviourTagName),
+            error -> log.error("Error unlinking CTAs from behaviour tag: {}", behaviourTagName, error));
+
+    // Update the behaviour tag
+    return behaviourTagRepository
+        .update(
+            tenantId,
+            behaviourTagName,
+            behaviourTagUpdateMapper.apply(tenantId, behaviourTag, behaviourTagName, userId))
+        .doOnComplete(
+            () -> {
+              log.info(
+                  "Behaviour tag BT : {} updated with ctas {}",
+                  behaviourTagName,
+                  behaviourTag.getLinkedCtas());
+              // Link new CTAs
+              linkNewCTAsToBehaviourTag(tenantId, behaviourTagName, linkDiff.getNewlyLinkedCtas());
+            });
+  }
+
+  private void linkNewCTAsToBehaviourTag(
+      String tenantId, String behaviourTagName, List<String> newCtaIds) {
+    if (newCtaIds.isEmpty()) {
+      return;
+    }
+
+    List<Long> ctaIds = newCtaIds.stream().map(Long::parseLong).collect(Collectors.toList());
+    CTALinkingHelper.linkCTAsToBehaviourTag(ctaRepository, tenantId, ctaIds, behaviourTagName)
+        .subscribe(
+            () -> log.debug("New CTAs linked to behaviour tag: {}", behaviourTagName),
+            error ->
+                log.error(
+                    "Error linking new CTAs to behaviour tag: {}", behaviourTagName, error));
   }
 }
 

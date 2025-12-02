@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Maps a list of BehaviourTagSnapshot into a Map keyed by behaviourTagName.
+ */
 public class BehaviourTagMapper
     implements Function<List<BehaviourTagSnapshot>, Map<String, BehaviourTagSnapshot>> {
   @Override

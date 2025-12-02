@@ -9,10 +9,15 @@ import java.util.Map;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Schema(
     description = "Rule configuration for CTA including cohort eligibility, state transitions, actions, and frequency. " +
                   "Note: cohortEligibility must use includes: [\"all\"] and excludes: []."

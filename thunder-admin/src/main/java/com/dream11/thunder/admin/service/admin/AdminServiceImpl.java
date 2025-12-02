@@ -5,27 +5,29 @@ import com.dream11.thunder.admin.exception.ErrorEntity;
 import com.dream11.thunder.admin.io.request.CTARequest;
 import com.dream11.thunder.admin.io.request.CTAUpdateRequest;
 import com.dream11.thunder.admin.io.response.CTAListResponse;
-import com.dream11.thunder.admin.io.response.StatusWiseCount;
 import com.dream11.thunder.admin.model.FilterProps;
 import com.dream11.thunder.admin.service.AdminService;
 import com.dream11.thunder.admin.service.filters.CTAFilters;
+import com.dream11.thunder.admin.util.CTAPaginationHelper;
+import com.dream11.thunder.admin.util.CTAStatusValidator;
+import com.dream11.thunder.admin.util.Constants;
 import com.dream11.thunder.core.dao.CTARepository;
 import com.dream11.thunder.core.dao.NudgePreviewRepository;
-import com.dream11.thunder.core.dao.NudgeRepository;
 import com.dream11.thunder.core.dao.cta.ActiveCTA;
+import com.dream11.thunder.core.dao.cta.ScheduledCTA;
 import com.dream11.thunder.core.error.ServiceError;
 import com.dream11.thunder.core.exception.ThunderException;
 import com.dream11.thunder.core.io.response.FilterResponse;
 import com.dream11.thunder.core.model.CTA;
 import com.dream11.thunder.core.model.CTAStatus;
-import com.dream11.thunder.core.model.Nudge;
 import com.dream11.thunder.core.model.NudgePreview;
 import com.google.inject.Inject;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -35,17 +37,14 @@ import lombok.extern.slf4j.Slf4j;
 public class AdminServiceImpl implements AdminService {
 
   private final CTARepository ctaRepository;
-  private final NudgeRepository nudgeRepository;
   private final NudgePreviewRepository nudgePreviewRepository;
   private final CreateCTAMapper createCtaMapper = new CreateCTAMapper();
   private final CTAUpdateValidator ctaUpdateValidator = new CTAUpdateValidator();
 
   @Inject
   public AdminServiceImpl(
-      NudgeRepository nudgeRepository,
       CTARepository ctaRepository,
       NudgePreviewRepository nudgePreviewRepository) {
-    this.nudgeRepository = nudgeRepository;
     this.ctaRepository = ctaRepository;
     this.nudgePreviewRepository = nudgePreviewRepository;
   }
@@ -151,106 +150,41 @@ public class AdminServiceImpl implements AdminService {
                       .filter(CTAFilters.filter(filterProps))
                       .collect(Collectors.toList());
               CTAListResponse ctaListResponse = new CTAListResponse();
-              ctaListResponse.setStatusWiseCount(statusFinder(ctas));
-              ctas = statusFilter(ctas, filterProps.getStatus());
+              ctaListResponse.setStatusWiseCount(CTAPaginationHelper.countByStatus(ctas));
+              ctas = CTAPaginationHelper.filterByStatus(ctas, filterProps.getStatus());
               int totalEntries = ctas.size();
-              ctas = paginate(ctas, pageNumber, pageSize);
+              ctas = CTAPaginationHelper.paginate(ctas, pageNumber, pageSize);
               ctaListResponse.setCtas(ctas);
               ctaListResponse.setPageNumber(pageNumber);
               ctaListResponse.setPageSize(pageSize);
-              ctaListResponse.setTotalPages(totalEntries / pageSize + 1);
+              ctaListResponse.setTotalPages(
+                  CTAPaginationHelper.calculateTotalPages(totalEntries, pageSize));
               ctaListResponse.setTotalEntries(totalEntries);
               return ctaListResponse;
             });
   }
 
-  private List<CTA> paginate(List<CTA> ctas, int pageNumber, int pageSize) {
-    int ctaSize = ctas.size();
-    int maxPages = ctaSize / pageSize;
-    if (pageNumber > maxPages || pageNumber < 0) {
-      ctas.clear();
-    } else {
-      int startIndex = Math.max(0, Math.min(pageNumber * pageSize, ctaSize - 1));
-      int numberOfItems = Math.max(0, Math.min(pageSize, ctaSize - startIndex));
-      ctas = ctas.subList(startIndex, startIndex + numberOfItems);
-    }
-    return ctas;
-  }
-
-  private StatusWiseCount statusFinder(List<CTA> ctas) {
-    Map<CTAStatus, AtomicInteger> statuses = new HashMap<>();
-    statuses.put(CTAStatus.DRAFT, new AtomicInteger(0));
-    statuses.put(CTAStatus.PAUSED, new AtomicInteger(0));
-    statuses.put(CTAStatus.LIVE, new AtomicInteger(0));
-    statuses.put(CTAStatus.SCHEDULED, new AtomicInteger(0));
-    statuses.put(CTAStatus.CONCLUDED, new AtomicInteger(0));
-    statuses.put(CTAStatus.TERMINATED, new AtomicInteger(0));
-    ctas.forEach(
-        cta ->
-            statuses
-                .computeIfAbsent(cta.getCtaStatus(), k -> new AtomicInteger())
-                .incrementAndGet());
-    return new StatusWiseCount(
-        statuses.get(CTAStatus.DRAFT),
-        statuses.get(CTAStatus.PAUSED),
-        statuses.get(CTAStatus.LIVE),
-        statuses.get(CTAStatus.SCHEDULED),
-        statuses.get(CTAStatus.CONCLUDED),
-        statuses.get(CTAStatus.TERMINATED));
-  }
-
-  private List<CTA> statusFilter(List<CTA> ctas, String ctaStatus) {
-    try {
-      CTAStatus st = CTAStatus.valueOf(ctaStatus.toUpperCase());
-      return ctas.stream()
-          .filter(cta -> cta.getCtaStatus().equals(st))
-          .collect(Collectors.toList());
-    } catch (Exception e) {
-      return ctas;
-    }
-  }
-
   @Override
   public Completable updateStatusToPaused(String tenantId, Long id) {
-    return ctaRepository
-        .find(tenantId, id)
-        .switchIfEmpty(
-            Single.defer(() -> Single.error(new DefinedException(ErrorEntity.NO_SUCH_CTA))))
-        .filter(
-            cta ->
-                (cta.getCtaStatus().equals(CTAStatus.LIVE)
-                    || cta.getCtaStatus().equals(CTAStatus.SCHEDULED)))
-        .switchIfEmpty(
-            Single.defer(
-                () -> Single.error(new DefinedException(ErrorEntity.INVALID_STATUS_UPDATE))))
-        .flatMapCompletable(it -> ctaRepository.update(id, CTAStatus.PAUSED));
+    return findAndValidateCTA(tenantId, id, CTAStatusValidator::canPause)
+        .flatMapCompletable(cta -> ctaRepository.update(id, CTAStatus.PAUSED));
   }
 
   @Override
   public Completable updateStatusToLive(String tenantId, Long id) {
-    return ctaRepository
-        .find(tenantId, id)
-        .switchIfEmpty(
-            Single.defer(() -> Single.error(new DefinedException(ErrorEntity.NO_SUCH_CTA))))
-        .filter(
-            cta ->
-                cta.getCtaStatus().equals(CTAStatus.DRAFT)
-                    || cta.getCtaStatus().equals(CTAStatus.PAUSED))
-        .switchIfEmpty(
-            Single.defer(
-                () -> Single.error(new DefinedException(ErrorEntity.INVALID_STATUS_UPDATE))))
+    return findAndValidateCTA(tenantId, id, CTAStatusValidator::canMakeLive)
         .flatMapCompletable(
-            cta ->
-                ctaRepository
-                    .update(
-                        id,
-                        CTAStatus.LIVE,
-                        System.currentTimeMillis(),
-                        cta.getEndTime() == null
-                            ? System.currentTimeMillis() + com.dream11.thunder.admin.util.Constants.THREE_YEARS
-                            : cta.getEndTime())
-                    .doOnComplete(() -> log.info("CTA {} made live", id))
-                    .doOnError(error -> log.error("Error making CTA {} live ", id, error)));
+            cta -> {
+              long startTime = System.currentTimeMillis();
+              long endTime =
+                  cta.getEndTime() == null
+                      ? startTime + Constants.THREE_YEARS
+                      : cta.getEndTime();
+              return ctaRepository
+                  .update(id, CTAStatus.LIVE, startTime, endTime)
+                  .doOnComplete(() -> log.info("CTA {} made live", id))
+                  .doOnError(error -> log.error("Error making CTA {} live ", id, error));
+            });
   }
 
   @Override
@@ -260,93 +194,43 @@ public class AdminServiceImpl implements AdminService {
         .switchIfEmpty(
             Single.defer(() -> Single.error(new DefinedException(ErrorEntity.NO_SUCH_CTA))))
         .filter(
-            cta ->
-                (cta.getCtaStatus().equals(CTAStatus.DRAFT)
-                    || cta.getCtaStatus().equals(CTAStatus.PAUSED)))
+            ctaDetails ->
+                ctaDetails.getCtaStatus() == CTAStatus.DRAFT
+                    || ctaDetails.getCtaStatus() == CTAStatus.PAUSED)
         .switchIfEmpty(
             Single.defer(
                 () -> Single.error(new DefinedException(ErrorEntity.INVALID_STATUS_UPDATE))))
         .filter(
             ctaDetails ->
-                (ctaDetails.getStartTime() != null
-                    && ctaDetails.getStartTime() >= System.currentTimeMillis()))
+                CTAStatusValidator.isValidStartTimeForScheduling(ctaDetails.getStartTime()))
         .switchIfEmpty(
             Single.defer(() -> Single.error(new DefinedException(ErrorEntity.INVALID_START_TIME))))
         .flatMapCompletable(
-            it -> ctaRepository.update(it.getId(), it.getGenerationId(), CTAStatus.SCHEDULED))
-        .doOnComplete(() -> log.info("CTA {} scheduled", id))
-        .doOnError(error -> log.error("Error scheduling CTA {} ", id, error));
+            ctaDetails ->
+                ctaRepository
+                    .update(ctaDetails.getId(), ctaDetails.getGenerationId(), CTAStatus.SCHEDULED)
+                    .doOnComplete(() -> log.info("CTA {} scheduled", id))
+                    .doOnError(error -> log.error("Error scheduling CTA {} ", id, error)));
   }
 
   @Override
   public Completable updateStatusToConcluded(String tenantId, Long id) {
-    return ctaRepository
-        .find(tenantId, id)
-        .switchIfEmpty(
-            Single.defer(() -> Single.error(new DefinedException(ErrorEntity.NO_SUCH_CTA))))
-        .filter(
-            cta ->
-                cta.getCtaStatus().equals(CTAStatus.PAUSED)
-                    || cta.getCtaStatus().equals(CTAStatus.LIVE))
-        .switchIfEmpty(
-            Single.defer(
-                () -> Single.error(new DefinedException(ErrorEntity.INVALID_STATUS_UPDATE))))
+    return findAndValidateCTA(tenantId, id, CTAStatusValidator::canConclude)
         .flatMapCompletable(
-            it -> {
-              if (it.getStartTime() != null) {
-                return ctaRepository
-                    .terminateOrConclude(
-                        id, CTAStatus.CONCLUDED, it.getStartTime(), System.currentTimeMillis())
+            cta ->
+                concludeCTA(id, cta)
                     .doOnComplete(() -> log.info("CTA {} concluded", id))
-                    .doOnError(error -> log.error("Error concluding CTA {} ", id, error));
-              } else {
-                return ctaRepository
-                    .terminateOrConclude(id, CTAStatus.CONCLUDED, System.currentTimeMillis())
-                    .doOnComplete(() -> log.info("CTA {} concluded", id))
-                    .doOnError(error -> log.error("Error concluding CTA {} ", id, error));
-              }
-            });
+                    .doOnError(error -> log.error("Error concluding CTA {} ", id, error)));
   }
 
   @Override
   public Completable updateStatusToTerminated(String tenantId, Long id) {
-    return ctaRepository
-        .find(tenantId, id)
-        .switchIfEmpty(
-            Single.defer(() -> Single.error(new DefinedException(ErrorEntity.NO_SUCH_CTA))))
-        .filter(
-            cta ->
-                cta.getCtaStatus().equals(CTAStatus.PAUSED)
-                    || cta.getCtaStatus().equals(CTAStatus.LIVE)
-                    || cta.getCtaStatus().equals(CTAStatus.DRAFT))
-        .switchIfEmpty(
-            Single.defer(
-                () -> Single.error(new DefinedException(ErrorEntity.INVALID_STATUS_UPDATE))))
+    return findAndValidateCTA(tenantId, id, CTAStatusValidator::canTerminate)
         .flatMapCompletable(
-            it -> {
-              if (it.getStartTime() != null) {
-                return ctaRepository
-                    .terminateOrConclude(
-                        id, CTAStatus.TERMINATED, it.getStartTime(), System.currentTimeMillis())
+            cta ->
+                terminateCTA(id, cta)
                     .doOnComplete(() -> log.info("CTA {} terminated", id))
-                    .doOnError(error -> log.error("Error terminating CTA {} ", id, error));
-              } else {
-                return ctaRepository
-                    .terminateOrConclude(id, CTAStatus.TERMINATED, System.currentTimeMillis())
-                    .doOnComplete(() -> log.info("CTA {} terminated", id))
-                    .doOnError(error -> log.error("Error terminating CTA {} ", id, error));
-              }
-            });
-  }
-
-  @Override
-  public Completable createNudge(String tenantId, Nudge template) {
-    return nudgeRepository.create(tenantId, template);
-  }
-
-  @Override
-  public Completable updateNudge(String tenantId, Nudge template) {
-    return nudgeRepository.update(tenantId, template);
+                    .doOnError(error -> log.error("Error terminating CTA {} ", id, error)));
   }
 
   @Override
@@ -356,86 +240,104 @@ public class AdminServiceImpl implements AdminService {
 
   @Override
   public void activateScheduledCTA() {
-    // TODO add logs, add dd metrics
+    log.info("Activating Scheduled CTAs...");
     ctaRepository
         .findAllWithStatusScheduled()
         .flatMapObservable(map -> Observable.fromIterable(map.entrySet()))
-        .filter(
-            entry ->
-                (entry.getValue().getStartTime() != null
-                    && entry.getValue().getStartTime() < System.currentTimeMillis()))
-        .doOnNext(
-            entry ->
-                ctaRepository
-                    .update(
-                        Long.parseLong(((Object) entry.getKey()).toString()),
-                        entry.getValue().getGenerationId(),
-                        CTAStatus.LIVE)
-                    .subscribe(
-                        () -> {
-                          log.info("CTA activated: {}", entry.getKey());
-                        },
-                        error -> {
-                          log.error("Error activating CTA: {}", entry.getKey(), error);
-                        }))
-        .doOnSubscribe(
-            ignored -> {
-              log.info("Activating Scheduled CTAs...");
-            })
+        .filter(this::isReadyToActivate)
+        .doOnNext(this::activateCTA)
         .subscribe(
             ignored -> {},
-            error -> {
-              log.error("Error activating CTAs", error);
-            },
-            () -> {
-              log.info("Scheduled CTAs activated...");
-            });
+            error -> log.error("Error activating CTAs", error),
+            () -> log.info("Scheduled CTAs activation completed"));
   }
 
   @Override
   public void terminateExpiredCTA() {
-    // TODO add logs, add dd metrics
+    log.info("Terminating Expired CTAs...");
     Single.zip(
             ctaRepository.findAllIdsWithStatusLive(),
             ctaRepository.findAllIdsWithStatusPaused(),
-            (live, paused) ->
-                new HashMap<Long, ActiveCTA>() {
-                  {
-                    putAll(live);
-                    putAll(paused);
-                  }
-                })
+            this::mergeActiveCTAs)
         .flatMapObservable(map -> Observable.fromIterable(map.entrySet()))
-        .filter(
-            entry ->
-                (entry.getValue().getEndTime() != null
-                    && entry.getValue().getEndTime() < System.currentTimeMillis()))
-        .doOnNext(
-            entry ->
-                ctaRepository
-                    .update(
-                        Long.parseLong(((Object) entry.getKey()).toString()),
-                        entry.getValue().getGenerationId(),
-                        CTAStatus.CONCLUDED)
-                    .subscribe(
-                        () -> {
-                          log.info("CTA terminated: {}", entry.getKey());
-                        },
-                        error -> {
-                          log.error("Error terminating CTA: {}", entry.getKey(), error);
-                        }))
-        .doOnSubscribe(
-            ignored -> {
-              log.info("Terminating Expired CTAs...");
-            })
+        .filter(this::isExpired)
+        .doOnNext(this::terminateExpiredCTA)
         .subscribe(
             ignored -> {},
-            error -> {
-              log.error("Error terminating CTAs", error);
-            },
-            () -> {
-              log.info("Expired CTAs terminated...");
-            });
+            error -> log.error("Error terminating CTAs", error),
+            () -> log.info("Expired CTAs termination completed"));
+  }
+
+  private Single<CTA> findAndValidateCTA(
+      String tenantId, Long id, java.util.function.Predicate<CTA> validator) {
+    return ctaRepository
+        .find(tenantId, id)
+        .toSingle()
+        .onErrorResumeNext(
+            throwable ->
+                Single.error(new DefinedException(ErrorEntity.NO_SUCH_CTA)))
+        .flatMap(
+            cta ->
+                validator.test(cta)
+                    ? Single.just(cta)
+                    : Single.error(new DefinedException(ErrorEntity.INVALID_STATUS_UPDATE)));
+  }
+
+  private Completable concludeCTA(Long id, CTA cta) {
+    long endTime = System.currentTimeMillis();
+    if (cta.getStartTime() != null) {
+      return ctaRepository.terminateOrConclude(
+          id, CTAStatus.CONCLUDED, cta.getStartTime(), endTime);
+    } else {
+      return ctaRepository.terminateOrConclude(id, CTAStatus.CONCLUDED, endTime);
+    }
+  }
+
+  private Completable terminateCTA(Long id, CTA cta) {
+    long endTime = System.currentTimeMillis();
+    if (cta.getStartTime() != null) {
+      return ctaRepository.terminateOrConclude(
+          id, CTAStatus.TERMINATED, cta.getStartTime(), endTime);
+    } else {
+      return ctaRepository.terminateOrConclude(id, CTAStatus.TERMINATED, endTime);
+    }
+  }
+
+  private boolean isReadyToActivate(Map.Entry<Long, ScheduledCTA> entry) {
+    Long startTime = entry.getValue().getStartTime();
+    return startTime != null && startTime < System.currentTimeMillis();
+  }
+
+  private void activateCTA(Map.Entry<Long, ScheduledCTA> entry) {
+    Long ctaId = entry.getKey();
+    ScheduledCTA scheduledCTA = entry.getValue();
+    ctaRepository
+        .update(ctaId, scheduledCTA.getGenerationId(), CTAStatus.LIVE)
+        .subscribe(
+            () -> log.info("CTA activated: {}", ctaId),
+            error -> log.error("Error activating CTA: {}", ctaId, error));
+  }
+
+  private Map<Long, ActiveCTA> mergeActiveCTAs(
+      Map<Long, ActiveCTA> live, Map<Long, ActiveCTA> paused) {
+    Map<Long, ActiveCTA> merged = new HashMap<>(live);
+    merged.putAll(paused);
+    return merged;
+  }
+
+  private boolean isExpired(Map.Entry<Long, ActiveCTA> entry) {
+    Long endTime = entry.getValue().getEndTime();
+    return endTime != null && endTime < System.currentTimeMillis();
+  }
+
+  private void terminateExpiredCTA(Map.Entry<Long, ActiveCTA> entry) {
+    Long ctaId = entry.getKey();
+    ActiveCTA activeCTA = entry.getValue();
+    ctaRepository
+        .update(ctaId, activeCTA.getGenerationId(), CTAStatus.CONCLUDED)
+        .subscribe(
+            () -> log.info("CTA terminated: {}", ctaId),
+            error -> log.error("Error terminating CTA: {}", ctaId, error));
   }
 }
 

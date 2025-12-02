@@ -9,6 +9,15 @@ public class CreateCTAMapper {
 
   RuleMapper ruleMapper = new RuleMapper();
 
+  /**
+   * Maps a CTARequest to a new CTA entity in DRAFT status.
+   *
+   * @param tenantId tenant identifier
+   * @param ctaRequest incoming create request
+   * @param user user creating the CTA
+   * @param ctaId generated CTA id
+   * @return CTA model ready for persistence
+   */
   public CTA apply(String tenantId, CTARequest ctaRequest, String user, Long ctaId) {
     return new CTA(
         ctaId,

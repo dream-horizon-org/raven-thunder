@@ -3,7 +3,10 @@ package com.dream11.thunder.api.io.request;
 import com.dream11.thunder.api.model.BehaviourTagSnapshot;
 import com.dream11.thunder.api.model.StateMachineSnapshot;
 import java.util.List;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 @Schema(
@@ -12,6 +15,8 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
                   "This is sent by the client to synchronize state with the server."
 )
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class CTASnapshotRequest {
   @Schema(
       description = "List of CTA state machine snapshots. Each snapshot contains: " +

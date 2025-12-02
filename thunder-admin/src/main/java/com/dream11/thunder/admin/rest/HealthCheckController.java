@@ -19,6 +19,11 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.CompletionStage;
 
+/**
+ * Health endpoints for thunder-admin service.
+ * - GET /healthcheck: returns service and Aerospike connectivity status
+ * - GET /healthcheck/ping: simple liveness probe
+ */
 @Slf4j
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 @Path("/healthcheck")

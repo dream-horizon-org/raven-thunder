@@ -1,3 +1,11 @@
+# Docusaurus app (docs/)
+docs/node_modules/
+docs/build/
+docs/.docusaurus/
+
+# Generic Node
+node_modules/
+
 # Maven
 target/
 pom.xml.tag

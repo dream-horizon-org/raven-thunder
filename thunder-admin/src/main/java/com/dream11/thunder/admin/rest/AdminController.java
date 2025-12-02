@@ -11,7 +11,6 @@ import com.dream11.thunder.core.dao.NudgePreviewRepository;
 import com.dream11.thunder.core.io.Response;
 import com.dream11.thunder.core.io.response.FilterResponse;
 import com.dream11.thunder.core.model.CTA;
-import com.dream11.thunder.core.model.Nudge;
 import com.dream11.thunder.core.model.NudgePreview;
 import com.dream11.thunder.core.util.FormatUtil;
 import com.dream11.thunder.core.util.ResponseWrapper;
@@ -32,6 +31,10 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 
+/**
+ * Admin REST controller for managing CTAs, filters and nudge previews.
+ * Exposes endpoints under "/thunder" for create/update/list/status transitions.
+ */
 @Slf4j
 @Path("/thunder")
 public class AdminController {
@@ -43,125 +46,6 @@ public class AdminController {
   public AdminController(AdminService service, NudgePreviewRepository nudgePreviewRepository) {
     this.service = service;
     this.nudgePreviewRepository = nudgePreviewRepository;
-  }
-
-  @Tag(
-      name = "Nudges",
-      description = "APIs for managing Nudge templates and Nudge Previews. " +
-                    "Nudges define the UI components and actions displayed to users in CTAs. " +
-                    "Note: Nudge routes are deprecated. Use Nudge Preview routes instead."
-  )
-  @Operation(
-      summary = "Create a new Nudge (Deprecated)",
-      description = "Creates a new Nudge template that can be used in CTAs. " +
-                    "Nudges define the UI components and actions that will be displayed to users. " +
-                    "⚠️ This endpoint is deprecated. Use Nudge Preview endpoints instead.",
-      operationId = "createNudge",
-      deprecated = true
-  )
-  @APIResponse(
-      responseCode = "200",
-      description = "Nudge created successfully",
-      content = @Content(
-          mediaType = MediaType.APPLICATION_JSON,
-          examples = {
-              @ExampleObject(
-                  name = "Success Response",
-                  summary = "Nudge created",
-                  value = "{\n" +
-                          "  \"success\": true,\n" +
-                          "  \"data\": null,\n" +
-                          "  \"statusCode\": 200\n" +
-                          "}"
-              )
-          }
-      )
-  )
-  @APIResponse(
-      responseCode = "400",
-      description = "Invalid request data or validation failed"
-  )
-  @POST
-  @Path("/nudges/")
-  @Consumes(MediaType.APPLICATION_JSON)
-  @Produces(MediaType.APPLICATION_JSON)
-  public CompletionStage<Response<Object>> createNudge(
-      @Parameter(
-          name = "x-tenant-id",
-          description = "Tenant identifier for multi-tenancy support",
-          required = false,
-          example = "default",
-          schema = @Schema(type = SchemaType.STRING)
-      )
-      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
-      @RequestBody(
-          description = "Nudge template definition",
-          required = true,
-          content = @Content(
-              mediaType = MediaType.APPLICATION_JSON,
-              schema = @Schema(implementation = Nudge.class)
-          )
-      )
-      @NotNull @Valid Nudge template) {
-    return ResponseWrapper.fromCompletable(service.createNudge(tenantId, template), null, 200);
-  }
-
-  @Tag(name = "Nudges")
-  @Operation(
-      summary = "Update an existing Nudge (Deprecated)",
-      description = "Updates an existing Nudge template. All fields in the request will update the corresponding fields in the Nudge. " +
-                    "⚠️ This endpoint is deprecated. Use Nudge Preview endpoints instead.",
-      operationId = "updateNudge",
-      deprecated = true
-  )
-  @APIResponse(
-      responseCode = "200",
-      description = "Nudge updated successfully",
-      content = @Content(
-          mediaType = MediaType.APPLICATION_JSON,
-          examples = {
-              @ExampleObject(
-                  name = "Success Response",
-                  summary = "Nudge updated",
-                  value = "{\n" +
-                          "  \"success\": true,\n" +
-                          "  \"data\": null,\n" +
-                          "  \"statusCode\": 200\n" +
-                          "}"
-              )
-          }
-      )
-  )
-  @APIResponse(
-      responseCode = "400",
-      description = "Invalid request data or validation failed"
-  )
-  @APIResponse(
-      responseCode = "404",
-      description = "Nudge not found"
-  )
-  @PUT
-  @Path("/nudges/")
-  @Consumes(MediaType.APPLICATION_JSON)
-  @Produces(MediaType.APPLICATION_JSON)
-  public CompletionStage<Response<Object>> updateNudge(
-      @Parameter(
-          name = "x-tenant-id",
-          description = "Tenant identifier",
-          required = false,
-          example = "default"
-      )
-      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
-      @RequestBody(
-          description = "Updated Nudge template definition",
-          required = true,
-          content = @Content(
-              mediaType = MediaType.APPLICATION_JSON,
-              schema = @Schema(implementation = Nudge.class)
-          )
-      )
-      @NotNull @Valid Nudge template) {
-    return ResponseWrapper.fromCompletable(service.updateNudge(tenantId, template), null, 200);
   }
 
   @Tag(

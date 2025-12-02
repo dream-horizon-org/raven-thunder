@@ -16,6 +16,12 @@ public class CTAUpdateValidator {
   private final DraftCTAUpdateValidator draftCTAUpdateValidator = new DraftCTAUpdateValidator();
   private final PausedCTAUpdateValidator pausedCTAUpdateValidator = new PausedCTAUpdateValidator();
 
+  /**
+   * Validates update eligibility based on current CTA status and delegates
+   * to the appropriate validator (DRAFT or PAUSED).
+   *
+   * @throws DefinedException when updates are not allowed for current status
+   */
   public CTA apply(CTAUpdateRequest ctaRequest, CTADetails ctaDetails, String user, Long ctaId) {
     if (nonEditableStates.contains(ctaDetails.getCtaStatus())) {
       throw new DefinedException(ErrorEntity.CTA_UPDATE_NOT_ALLOWED);

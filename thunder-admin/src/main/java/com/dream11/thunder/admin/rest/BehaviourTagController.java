@@ -26,6 +26,9 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 
+/**
+ * REST controller for behaviour tag management (list, detail, create, update).
+ */
 @Slf4j
 @Tag(
     name = "Behaviour Tags",

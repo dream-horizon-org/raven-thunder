@@ -5,7 +5,6 @@ import com.dream11.thunder.core.io.Response;
 import com.dream11.thunder.api.io.request.CTASnapshotRequest;
 import com.dream11.thunder.api.io.response.CTAResponse;
 import com.dream11.thunder.api.service.SdkService;
-import com.dream11.thunder.core.model.Nudge;
 import com.dream11.thunder.core.model.NudgePreview;
 import com.dream11.thunder.core.util.ResponseWrapper;
 import io.reactivex.rxjava3.core.Maybe;
@@ -28,6 +27,10 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 
+/**
+ * SDK API controller exposing endpoints for CTA activation and snapshot merge.
+ * Base path: /cta
+ */
 @Slf4j
 @Tag(
     name = "SDK",
@@ -45,43 +48,6 @@ public class SdkApiController {
   @Inject
   public SdkApiController(SdkService service) {
     this.service = service;
-  }
-
-  @Tag(name = "SDK")
-  @Operation(
-      summary = "Get Nudge by ID (Deprecated)",
-      description = "Retrieves a Nudge template by its ID. " +
-                    "⚠️ This endpoint is deprecated. Use GET /cta/nudge/preview/{id} instead.",
-      operationId = "findNudge",
-      deprecated = true
-  )
-  @APIResponse(
-      responseCode = "200",
-      description = "Nudge retrieved successfully",
-      content = @Content(
-          mediaType = MediaType.APPLICATION_JSON,
-          schema = @Schema(implementation = Nudge.class)
-      )
-  )
-  @APIResponse(
-      responseCode = "404",
-      description = "Nudge not found"
-  )
-  @GET
-  @Deprecated
-  @Path("/nudges/{id}")
-  @Consumes(MediaType.WILDCARD)
-  @Produces(MediaType.APPLICATION_JSON)
-  public CompletionStage<Response<Nudge>> findNudge(
-      @Parameter(
-          name = "id",
-          description = "Nudge ID",
-          required = true,
-          example = "5",
-          schema = @Schema(type = SchemaType.STRING)
-      )
-      @PathParam("id") String id) {
-    return ResponseWrapper.fromMaybe(service.findNudge(id), null, 200);
   }
 
   @Tag(name = "SDK")
@@ -320,97 +286,6 @@ public class SdkApiController {
       return ResponseWrapper.fromMaybe(Maybe.just(emptyCTAResponse), emptyCTAResponse, 200);
     return ResponseWrapper.fromMaybe(
         service.appLaunch(tenantId, userId, deltaSnapshot), emptyCTAResponse, 200);
-  }
-
-  @Tag(name = "SDK")
-  @Operation(
-      summary = "App Launch v1 - Active State Machines",
-      description = "Version 1 endpoint for app launch. This is an alias for POST /cta/active/state-machines/. " +
-                    "Called by the client app on launch to synchronize state machines and retrieve active CTAs. " +
-                    "The client sends its current state snapshot, and the server returns updated state with active CTAs.",
-      operationId = "appLaunchV1"
-  )
-  @APIResponse(
-      responseCode = "200",
-      description = "Active CTAs and state machines retrieved successfully",
-      content = @Content(
-          mediaType = MediaType.APPLICATION_JSON,
-          schema = @Schema(implementation = CTAResponse.class)
-      )
-  )
-  @APIResponse(
-      responseCode = "400",
-      description = "Invalid request data or missing required headers"
-  )
-  @POST
-  @Path("/v1/active/state-machines/")
-  @Consumes(MediaType.WILDCARD)
-  @Produces(MediaType.APPLICATION_JSON)
-  public CompletionStage<Response<CTAResponse>> appLaunchV1(
-      @Parameter(
-          name = "x-tenant-id",
-          description = "Tenant identifier",
-          required = false,
-          example = "tenant1"
-      )
-      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
-      @Parameter(
-          name = "auth-userid",
-          description = "User ID of the authenticated user",
-          required = true,
-          example = "12345",
-          schema = @Schema(type = SchemaType.INTEGER, format = "int64")
-      )
-      @NotNull(message = "auth-userid cannot be null") @HeaderParam("auth-userid") Long userId,
-      @Parameter(
-          name = "app_version",
-          description = "Client app version",
-          required = false,
-          example = "1.2.3"
-      )
-      @Nullable @HeaderParam("app_version") String appVersion,
-      @Parameter(
-          name = "codepush_version",
-          description = "CodePush version (for React Native apps)",
-          required = false,
-          example = "1.0.0"
-      )
-      @Nullable @HeaderParam("codepush_version") String cpVersion,
-      @Parameter(
-          name = "package_name",
-          description = "App package name",
-          required = false,
-          example = "com.example.app"
-      )
-      @Nullable @HeaderParam("package_name") String packageName,
-      @Parameter(
-          name = "api_version",
-          description = "API version. Must be >= 1 for the endpoint to process the request.",
-          required = false,
-          example = "1",
-          schema = @Schema(type = SchemaType.INTEGER, format = "int64")
-      )
-      @Nullable @HeaderParam("api_version") Long apiVersion,
-      @RequestBody(
-          description = "Current state snapshot from client including CTAs and behaviour tags",
-          required = true,
-          content = @Content(
-              mediaType = MediaType.APPLICATION_JSON,
-              schema = @Schema(implementation = CTASnapshotRequest.class),
-              examples = {
-                  @ExampleObject(
-                      name = "App Launch v1 Request",
-                      summary = "Example request with empty CTAs",
-                      value = "{\n" +
-                              "  \"ctas\": []\n" +
-                              "}"
-                  )
-              }
-          )
-      )
-      @Valid CTASnapshotRequest deltaSnapshot) {
-    // v1 endpoint is just an alias for the main endpoint
-    return appLaunch(tenantId, userId, appVersion, cpVersion, packageName, apiVersion, deltaSnapshot);
   }
 
   @Tag(name = "SDK")

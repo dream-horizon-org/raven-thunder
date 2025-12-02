@@ -69,18 +69,46 @@ public final class ConfigUtil {
                 .rxGetConfig()
                 .map(jsonConfig -> {
                     try {
-                        // Override aerospike.host from environment variable if present (for Docker)
-                        String aerospikeHost = System.getenv("AEROSPIKE_HOST");
-                        if (aerospikeHost != null && !aerospikeHost.isEmpty()) {
+                        // Override aerospike.host/port from env or system properties for tests/containers
+                        String aerospikeHost = firstNonEmpty(System.getProperty("AEROSPIKE_HOST"), System.getenv("AEROSPIKE_HOST"));
+                        String aerospikePortStr = firstNonEmpty(System.getProperty("AEROSPIKE_PORT"), System.getenv("AEROSPIKE_PORT"));
+                        String serverPortStr = firstNonEmpty(System.getProperty("THUNDER_PORT"), System.getenv("THUNDER_PORT"));
+
+                        if (aerospikeHost != null || aerospikePortStr != null) {
                             JsonObject aerospike = jsonConfig.getJsonObject("aerospike");
                             if (aerospike == null) {
                                 aerospike = new JsonObject();
                                 jsonConfig.put("aerospike", aerospike);
                             }
-                            aerospike.put("host", aerospikeHost);
-                            log.info("Overriding aerospike.host with environment variable: {}", aerospikeHost);
+                            if (aerospikeHost != null && !aerospikeHost.isEmpty()) {
+                                aerospike.put("host", aerospikeHost);
+                                log.info("Overriding aerospike.host from system/env: {}", aerospikeHost);
+                            }
+                            if (aerospikePortStr != null && !aerospikePortStr.isEmpty()) {
+                                try {
+                                    int port = Integer.parseInt(aerospikePortStr);
+                                    aerospike.put("port", port);
+                                    log.info("Overriding aerospike.port from system/env: {}", port);
+                                } catch (NumberFormatException nfe) {
+                                    log.warn("Invalid AEROSPIKE_PORT '{}', ignoring override", aerospikePortStr);
+                                }
+                            }
                         }
-                        
+                        if (serverPortStr != null && !serverPortStr.isEmpty()) {
+                            try {
+                                int port = Integer.parseInt(serverPortStr);
+                                JsonObject server = jsonConfig.getJsonObject("server");
+                                if (server == null) {
+                                    server = new JsonObject();
+                                    jsonConfig.put("server", server);
+                                }
+                                server.put("port", port);
+                                log.info("Overriding server.port from system/env: {}", port);
+                            } catch (NumberFormatException nfe) {
+                                log.warn("Invalid THUNDER_PORT '{}', ignoring override", serverPortStr);
+                            }
+                        }
+
                         return objectMapper.readValue(jsonConfig.encode(), Config.class);
                     } catch (Exception e) {
                         log.error("Failed to parse configuration", e);
@@ -89,6 +117,12 @@ public final class ConfigUtil {
                 })
                 .doOnSuccess(config -> log.info("Configuration loaded successfully"))
                 .doOnError(error -> log.error("Failed to load configuration", error));
+    }
+
+    private static String firstNonEmpty(String a, String b) {
+        if (a != null && !a.isEmpty()) return a;
+        if (b != null && !b.isEmpty()) return b;
+        return null;
     }
 
     /**
