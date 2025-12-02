@@ -142,8 +142,8 @@ services:
     volumes:
       - ./docs:/docs:ro
     environment:
-      # Optional: Add theme configuration (JSON must be properly escaped)
-      - 'API_REFERENCE_CONFIG={"theme": "purple"}'
+      # Scalar configuration - names are automatically taken from OpenAPI spec info.title
+      - 'API_REFERENCE_CONFIG={"theme": "purple", "specs": [{"url": "/docs/thunder-api-openapi.yaml"}, {"url": "/docs/thunder-admin-openapi.yaml"}]}'
     networks:
       - thunder-network
     restart: unless-stopped
