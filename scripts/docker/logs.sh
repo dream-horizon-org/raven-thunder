@@ -3,7 +3,7 @@
 # View Thunder Docker logs
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR/.." || exit 1
+cd "$SCRIPT_DIR/../.." || exit 1
 
 # Check if Docker is running
 if ! docker info > /dev/null 2>&1; then
