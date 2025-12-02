@@ -468,3 +468,44 @@ or
 }
 ```
 
+### Create or Update Nudge Preview
+- **Path**: `/thunder/nudge/preview/`
+- **Method**: POST
+- **Headers**:
+  - `Content-Type: application/json`
+  - `x-tenant-id: <string>` (optional, defaults to "default")
+- **Request Body**:
+```json
+{
+  "id": "string (required) - Unique identifier for the nudge preview",
+  "template": "string (required) - Nudge template/content (HTML, JSON, or template format)",
+  "ttl": "integer (optional) - Time-to-live in seconds (defaults to 3600 if not provided)"
+}
+```
+- **Responses**:
+  - **200**: Success response with empty object
+```json
+{
+  "data": null
+}
+```
+  - **400**: Error response
+```json
+{
+  "error": {
+    "message": "id cannot be null or empty",
+    "code": "NUDGE_PREVIEW_TEMPLATE_NOT_FOUND_EXCEPTION"
+  }
+}
+```
+or
+```json
+{
+  "error": {
+    "message": "template cannot be null or empty",
+    "code": "NUDGE_PREVIEW_TEMPLATE_NOT_FOUND_EXCEPTION"
+  }
+}
+```
+
+

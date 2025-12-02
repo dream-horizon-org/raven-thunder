@@ -205,8 +205,12 @@ or
 ```json
 {
   "data": {
-    /* NudgePreview object */
+    "id": "string - Nudge preview identifier",
+    "template": "string - Nudge template/content (HTML, JSON, or template format)",
+    "tenantId": "string - Tenant identifier",
+    "ttl": "integer (nullable) - Time-to-live in seconds"
   }
 }
 ```
+- **Note**: If the nudge preview is not found, returns a 200 response with null data (no error thrown).
 
