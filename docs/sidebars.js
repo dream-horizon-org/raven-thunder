@@ -8,6 +8,7 @@ const sidebars = {
       collapsible: false,
       items: [
         'getting-started/overview',
+        'getting-started/core-entities',
         'getting-started/quickstart',
         'getting-started/running',
       ],
