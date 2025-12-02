@@ -314,8 +314,8 @@ Nudge
 
 ## Next Steps
 
-- Learn how to [create your first CTA](/thunder/admin/admin-contracts#create-cta)
-- Understand [Behaviour Tag creation](/thunder/admin/admin-contracts#create-behaviour-tags)
+- Learn how to create your first CTA (to be added)
+- Understand Behaviour Tag creation (to be added)
 - Explore the [API contracts](/thunder/api/overview) for integration
 - Review [architecture details](/thunder/architecture/modules) for deeper understanding
 
