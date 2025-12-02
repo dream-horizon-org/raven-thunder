@@ -32,17 +32,14 @@ This will create a fat JAR at `target/thunder-1.0.0-SNAPSHOT-fat.jar`.
 The easiest way to run Thunder is using Docker:
 
 ```bash
-# Start the application
-./scripts/start.sh
+# Quick Start (recommended)
+./quick-start.sh
 
-# View logs
-./scripts/logs.sh
-
-# Stop the application
-./scripts/stop.sh
-
-# Restart the application
-./scripts/restart.sh
+# Or use individual scripts
+./scripts/docker/start.sh    # Start the application
+./scripts/docker/logs.sh     # View logs
+./scripts/docker/stop.sh     # Stop the application
+./scripts/docker/restart.sh  # Restart the application
 ```
 
 Or using docker-compose directly:
@@ -56,7 +53,10 @@ Docker setup includes:
 - **thunder-admin**: Admin panel service (port 8081) for CTA, Nudge, and Behaviour Tag management
 - **Aerospike**: Database with namespaces `thunder` and `thunder-admin`
 - **Scalar API Reference**: Interactive API documentation (port 8082)
+- **CORS Proxy**: Nginx proxy for CORS headers (ports 8080, 8081)
 - **Automatic seeding**: Seed data and index creation run on startup
+  - Seed data includes: CTAs (101, 202), Behaviour Tags (onboarding_eligible), Nudge Preview (5), User State Machine (12345)
+  - All seed data uses `tenant1` and matches API documentation examples
 - Configuration via environment variables (AEROSPIKE_HOST) and `aerospike.conf` (Aerospike server)
 
 ### Running Locally
@@ -164,13 +164,14 @@ Thunder provides comprehensive API documentation via OpenAPI 3.0 specification:
 
 - **Thunder API Spec**: `docs/thunder-api-openapi.yaml` (auto-generated from code)
 - **Thunder Admin Spec**: `docs/thunder-admin-openapi.yaml` (auto-generated from code)
-- **Scalar API Reference**: 
-  - Thunder API: http://localhost:8082 (SDK & Debug endpoints)
-  - Thunder Admin: http://localhost:8083 (Management endpoints)
+- **Scalar API Reference**: http://localhost:8082
+  - Switch between Thunder API and Thunder Admin using the dropdown
+  - Thunder API: SDK & Debug endpoints
+  - Thunder Admin: Management endpoints (CTAs, Nudges, Behaviour Tags)
 
 ### OpenAPI in Docker
 
-The OpenAPI specification files should be generated before starting Docker. Use the local script:
+The OpenAPI specification files are automatically generated during Docker build. You can also generate them manually:
 
 ```bash
 ./scripts/generate-openapi.sh
@@ -180,11 +181,9 @@ This will:
 1. Build both `thunder-api` and `thunder-admin` modules
 2. Generate OpenAPI specs from JAX-RS annotations using SmallRye OpenAPI
 3. Copy them to `docs/thunder-api-openapi.yaml` and `docs/thunder-admin-openapi.yaml`
-4. Make them available to separate Scalar API Reference services
+4. Make them available to Scalar API Reference service
 
-Each service has its own Scalar instance:
-- Thunder API docs: http://localhost:8082
-- Thunder Admin docs: http://localhost:8083
+The Scalar service (http://localhost:8082) provides a unified interface to both API specs with a dropdown to switch between them.
 
 ### Generating OpenAPI Locally
 
@@ -201,13 +200,34 @@ This script performs the same steps as the Docker service, useful for:
 
 ## Scripts
 
-Convenience scripts are available in the `scripts/` directory:
+### Quick Start
 
-- `start.sh` - Build and start Thunder in Docker
-- `stop.sh` - Stop Thunder Docker container
-- `restart.sh` - Restart Thunder Docker container
-- `logs.sh` - View Thunder Docker logs
-- `generate-openapi.sh` - Generate OpenAPI specification from code
+The easiest way to get started:
+
+```bash
+./quick-start.sh
+```
+
+This will start all Thunder services in Docker with seed data.
+
+### Docker Scripts
+
+Docker-related scripts are in `scripts/docker/`:
+
+- `scripts/docker/start.sh` - Build and start Thunder in Docker (includes seed data and indexes)
+- `scripts/docker/stop.sh` - Stop Thunder Docker containers and clean up
+- `scripts/docker/restart.sh` - Restart Thunder Docker containers
+- `scripts/docker/logs.sh` - View Thunder Docker logs
+  - Usage: `./scripts/docker/logs.sh [api|admin|aerospike|seed|indexes|scalar|cors|all]`
+  - Default: Shows API and Admin logs
+  - Examples:
+    - `./scripts/docker/logs.sh api` - View only API logs
+    - `./scripts/docker/logs.sh seed` - View seed data execution logs
+    - `./scripts/docker/logs.sh all` - View all service logs
+
+### Development Scripts
+
+- `scripts/generate-openapi.sh` - Generate OpenAPI specification from code
 
 ## Project Structure
 
@@ -219,17 +239,22 @@ thunder-oss/
 ├── aerospike.conf           # Aerospike server config (Docker only)
 ├── scripts/
 │   ├── docker/
-│   │   └── run-all-seeds.sh  # Executes all AQL seed files
-│   ├── start.sh
-│   ├── stop.sh
-│   ├── restart.sh
-│   ├── logs.sh
-│   └── generate-openapi.sh  # Generate OpenAPI specification
+│   │   ├── run-all-seeds.sh  # Executes all AQL seed files
+│   │   ├── start.sh          # Start Docker services
+│   │   ├── stop.sh            # Stop Docker services
+│   │   ├── restart.sh         # Restart Docker services
+│   │   └── logs.sh            # View Docker logs
+│   └── generate-openapi.sh    # Generate OpenAPI specification
+├── quick-start.sh             # Quick start script (recommended entry point)
 ├── docs/
 │   ├── thunder-api-openapi.yaml    # Thunder API OpenAPI spec (auto-generated)
 │   └── thunder-admin-openapi.yaml  # Thunder Admin OpenAPI spec (auto-generated)
 ├── thunder-admin/src/main/resources/seeds/
-│   └── 001_seed_meta_set.aql # Seed data for meta_set
+│   ├── 001_seed_meta_set.aql          # Seed data for meta_set
+│   ├── 002_seed_cta.aql               # Seed data for CTAs (101, 202)
+│   ├── 003_seed_behaviour_tag.aql     # Seed data for Behaviour Tags (onboarding_eligible)
+│   ├── 004_seed_nudge_preview.aql     # Seed data for Nudge Preview (5)
+│   └── 005_seed_user_state_machine.aql # Seed data for User State Machine (12345)
 ├── Dockerfile
 ├── docker-compose.yml
 └── pom.xml
