@@ -14,10 +14,10 @@ import TabItem from '@theme/TabItem';
       A powerful Java 17 + Vert.x platform for managing CTAs (Call-to-Actions), Nudges, and Behaviour Tags
     </p>
     <div className="hero__buttons">
-      <a className="button button--primary button--lg" href="/raven/thunder/getting-started/quickstart">
+      <a className="button button--primary button--lg" href="/raven-thunder/getting-started/quickstart">
         Get Started
       </a>
-      <a className="button button--secondary button--lg" href="/raven/thunder/getting-started/overview">
+      <a className="button button--secondary button--lg" href="/raven-thunder/getting-started/overview">
         Learn More
       </a>
     </div>
@@ -137,12 +137,12 @@ import TabItem from '@theme/TabItem';
 
 ## Documentation Sections
 
-- **[Getting Started](/raven/thunder/getting-started/overview)** - Setup and quickstart guides
-- **[Core Entities](/raven/thunder/getting-started/core-entities)** - Understanding CTAs, Behaviour Tags, and Nudges
-- **[Architecture](/raven/thunder/architecture/modules)** - System architecture and design
-- **[API Documentation](/raven/thunder/api/overview)** - SDK API endpoints and contracts
-- **[Admin Documentation](/raven/thunder/admin/overview)** - Admin API endpoints and contracts
-- **[Operations](/raven/thunder/operations/docker)** - Docker, testing, CI/CD, and releases
+- **[Getting Started](/raven-thunder/getting-started/overview)** - Setup and quickstart guides
+- **[Core Entities](/raven-thunder/getting-started/core-entities)** - Understanding CTAs, Behaviour Tags, and Nudges
+- **[Architecture](/raven-thunder/architecture/modules)** - System architecture and design
+- **[API Documentation](/raven-thunder/api/overview)** - SDK API endpoints and contracts
+- **[Admin Documentation](/raven-thunder/admin/overview)** - Admin API endpoints and contracts
+- **[Operations](/raven-thunder/operations/docker)** - Docker, testing, CI/CD, and releases
 
 ## Requirements
 
@@ -155,6 +155,6 @@ import TabItem from '@theme/TabItem';
 
 <div className="margin-top--lg">
   <p>
-    <strong>New to Thunder?</strong> Start with understanding the <a href="/raven/thunder/getting-started/core-entities">Core Entities</a> (CTAs, Behaviour Tags, and Nudges), then check out the <a href="/raven/thunder/getting-started/quickstart">Quickstart</a> guide.
+    <strong>New to Thunder?</strong> Start with understanding the <a href="/raven-thunder/getting-started/core-entities">Core Entities</a> (CTAs, Behaviour Tags, and Nudges), then check out the <a href="/raven-thunder/getting-started/quickstart">Quickstart</a> guide.
   </p>
 </div>
