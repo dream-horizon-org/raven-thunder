@@ -4,7 +4,7 @@ const config = {
   title: '⚡ Thunder',
   tagline: 'CTAs, Nudges and Behaviour Tags platform',
   url: 'https://dream-horizon-org.github.io',
-  baseUrl: '/thunder/',
+  baseUrl: '/raven/thunder/',
   favicon: 'img/logo.svg',
   organizationName: 'dream-horizon-org',
   projectName: 'thunder',
@@ -70,15 +70,15 @@ const config = {
             items: [
               {
                 label: 'Getting Started',
-                to: '/thunder/getting-started/overview',
+                to: '/raven/thunder/getting-started/overview',
               },
               {
                 label: 'Architecture',
-                to: '/thunder/architecture/modules',
+                to: '/raven/thunder/architecture/modules',
               },
               {
                 label: 'API Reference',
-                to: '/thunder/api/overview',
+                to: '/raven/thunder/api/overview',
               },
             ],
           },
@@ -87,11 +87,11 @@ const config = {
             items: [
               {
                 label: 'Admin API',
-                to: '/thunder/admin/overview',
+                to: '/raven/thunder/admin/overview',
               },
               {
                 label: 'Operations',
-                to: '/thunder/operations/docker',
+                to: '/raven/thunder/operations/docker',
               },
             ],
           },

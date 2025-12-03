@@ -316,6 +316,6 @@ Nudge
 
 - Learn how to create your first CTA (to be added)
 - Understand Behaviour Tag creation (to be added)
-- Explore the [API contracts](/thunder/api/overview) for integration
-- Review [architecture details](/thunder/architecture/modules) for deeper understanding
+- Explore the [API contracts](/raven/thunder/api/overview) for integration
+- Review [architecture details](/raven/thunder/architecture/modules) for deeper understanding
 
