@@ -13,8 +13,7 @@ public enum ErrorEntity {
       "Request body param(s) is/are invalid", "INVALID_BEHAVIOUR_TAG_CREATION", 400),
   INVALID_BEHAVIOUR_TAG_UPDATION(
       "Request body param(s) is/are invalid", "INVALID_BEHAVIOUR_TAG_UPDATION", 400),
-  CTA_EXPIRED(
-      "CTA expired, ctaValidTill is less than current time", "UNPROCESSABLE_ENTITY", 422),
+  CTA_EXPIRED("CTA expired, ctaValidTill is less than current time", "UNPROCESSABLE_ENTITY", 422),
   INVALID_STATUS_UPDATE("This status update is invalid", "UNPROCESSABLE_ENTITY", 422),
   INVALID_START_TIME(
       "The start time of the CTA is either null or past", "UNPROCESSABLE_ENTITY", 422),
@@ -42,4 +41,3 @@ public enum ErrorEntity {
     this.httpStatusCode = httpStatusCode;
   }
 }
-

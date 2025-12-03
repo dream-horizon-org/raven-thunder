@@ -9,4 +9,3 @@ interface Schema {
 
   String TENANT_BIN = "tenantId";
 }
-

@@ -6,4 +6,3 @@ public interface Schema {
   String TEMPLATE_BIN = "template";
   String TENANT_BIN = "tenantId";
 }
-

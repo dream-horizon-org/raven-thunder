@@ -15,4 +15,3 @@ public class CohortEligibility {
   @NotEmpty private List<String> includes;
   @NotNull private List<String> excludes;
 }
-

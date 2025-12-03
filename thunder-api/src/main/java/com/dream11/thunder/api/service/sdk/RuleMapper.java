@@ -2,12 +2,9 @@ package com.dream11.thunder.api.service.sdk;
 
 import com.dream11.thunder.api.io.response.RuleResponse;
 import com.dream11.thunder.core.model.rule.Rule;
-import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.functions.Function;
 
-/**
- * Maps core Rule to API RuleResponse used in SDK responses.
- */
+/** Maps core Rule to API RuleResponse used in SDK responses. */
 public class RuleMapper implements Function<Rule, RuleResponse> {
 
   @io.reactivex.rxjava3.annotations.NonNull

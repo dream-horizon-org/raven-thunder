@@ -1,8 +1,9 @@
 package com.dream11.thunder.core.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import static org.assertj.core.api.Assertions.assertThat;
 
 class FormatUtilTest {
 
@@ -25,5 +26,3 @@ class FormatUtilTest {
     assertThat(FormatUtil.extractList(null)).isEmpty();
   }
 }
-
-

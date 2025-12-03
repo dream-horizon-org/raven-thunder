@@ -8,4 +8,3 @@ public class ScheduledCTA {
   private Long startTime;
   private int generationId;
 }
-

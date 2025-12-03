@@ -12,4 +12,3 @@ import lombok.NoArgsConstructor;
 public class BehaviourTagsResponse {
   public List<BehaviourTag> behaviourTags;
 }
-

@@ -3,12 +3,11 @@ package com.dream11.thunder.admin.exception;
 import lombok.Getter;
 
 /**
- * Custom exception for Thunder Admin service.
- * Contains error code, message and HTTP status code.
+ * Custom exception for Thunder Admin service. Contains error code, message and HTTP status code.
  */
 @Getter
 public class DefinedException extends RuntimeException {
-  
+
   private final String errorCode;
   private final int httpStatusCode;
 
@@ -30,4 +29,3 @@ public class DefinedException extends RuntimeException {
     this.httpStatusCode = errorEntity.getHttpStatusCode();
   }
 }
-

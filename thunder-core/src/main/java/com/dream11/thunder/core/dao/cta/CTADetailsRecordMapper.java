@@ -85,4 +85,3 @@ public class CTADetailsRecordMapper implements Function<Record, CTADetails> {
     return ctaDetails;
   }
 }
-

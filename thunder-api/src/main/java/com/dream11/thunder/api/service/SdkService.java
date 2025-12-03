@@ -9,8 +9,8 @@ import io.reactivex.rxjava3.core.Single;
 public interface SdkService {
 
   /**
-   * Resolves eligible CTAs for a user on app launch, merging with user's snapshot.
-   * Optionally merges a delta snapshot before computing the response.
+   * Resolves eligible CTAs for a user on app launch, merging with user's snapshot. Optionally
+   * merges a delta snapshot before computing the response.
    *
    * @param tenantId tenant identifier
    * @param userId user identifier
@@ -29,8 +29,6 @@ public interface SdkService {
    */
   Single<Boolean> merge(String tenantId, Long userId, CTASnapshotRequest deltaSnapshot);
 
-  /**
-   * Finds a nudge preview by id for the tenant.
-   */
+  /** Finds a nudge preview by id for the tenant. */
   Maybe<NudgePreview> findNudgePreview(String tenantId, String id);
 }

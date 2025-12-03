@@ -1,5 +1,7 @@
 package com.dream11.thunder.api.service.sdk;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.dream11.thunder.api.io.response.RuleResponse;
 import com.dream11.thunder.api.model.BehaviourExposureRule;
 import com.dream11.thunder.api.model.CTARelationSnapshot;
@@ -7,15 +9,13 @@ import com.dream11.thunder.core.model.CTARelation;
 import com.dream11.thunder.core.model.ExposureRule;
 import com.dream11.thunder.core.model.Frequency;
 import com.dream11.thunder.core.model.rule.LifespanFrequency;
+import com.dream11.thunder.core.model.rule.Rule;
 import com.dream11.thunder.core.model.rule.SessionFrequency;
 import com.dream11.thunder.core.model.rule.WindowFrequency;
 import com.dream11.thunder.core.model.rule.WindowFrequencyUnit;
-import com.dream11.thunder.core.model.rule.Rule;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class MappersTest {
 
@@ -59,10 +59,17 @@ class MappersTest {
   @Test
   void behaviourExposureRuleMapper_mapsCoreExposureRule() throws Exception {
     ExposureRule er = new ExposureRule();
-    SessionFrequency session = new SessionFrequency(); session.setLimit(1);
-    WindowFrequency window = new WindowFrequency(); window.setLimit(1); window.setUnit(WindowFrequencyUnit.days); window.setValue(1);
-    LifespanFrequency lifespan = new LifespanFrequency(); lifespan.setLimit(7);
-    er.setSession(session); er.setWindow(window); er.setLifespan(lifespan);
+    SessionFrequency session = new SessionFrequency();
+    session.setLimit(1);
+    WindowFrequency window = new WindowFrequency();
+    window.setLimit(1);
+    window.setUnit(WindowFrequencyUnit.days);
+    window.setValue(1);
+    LifespanFrequency lifespan = new LifespanFrequency();
+    lifespan.setLimit(7);
+    er.setSession(session);
+    er.setWindow(window);
+    er.setLifespan(lifespan);
 
     BehaviourExposureRuleMapper mapper = new BehaviourExposureRuleMapper();
     BehaviourExposureRule out = mapper.apply(er);
@@ -74,12 +81,12 @@ class MappersTest {
   @Test
   void ctaRelationMapper_mapsShownAndHideLists() {
     CTARelation relation = new CTARelation();
-    relation.setShownCta(new com.dream11.thunder.core.model.CtaRelationRule(
-        com.dream11.thunder.core.model.CtaRelationRuleTypes.LIST,
-        java.util.Set.of("a")));
-    relation.setHideCta(new com.dream11.thunder.core.model.CtaRelationRule(
-        com.dream11.thunder.core.model.CtaRelationRuleTypes.LIST,
-        java.util.Set.of("b")));
+    relation.setShownCta(
+        new com.dream11.thunder.core.model.CtaRelationRule(
+            com.dream11.thunder.core.model.CtaRelationRuleTypes.LIST, java.util.Set.of("a")));
+    relation.setHideCta(
+        new com.dream11.thunder.core.model.CtaRelationRule(
+            com.dream11.thunder.core.model.CtaRelationRuleTypes.LIST, java.util.Set.of("b")));
 
     CTARelationMapper mapper = new CTARelationMapper();
     CTARelationSnapshot snap = mapper.apply(relation);
@@ -87,5 +94,3 @@ class MappersTest {
     assertThat(snap.getHideCta().getCtaList()).containsExactlyInAnyOrder("b");
   }
 }
-
-

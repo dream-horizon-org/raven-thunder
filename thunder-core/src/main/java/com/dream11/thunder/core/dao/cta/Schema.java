@@ -30,4 +30,3 @@ public interface Schema {
   String CTA_COUNTER = "cta_counter";
   String GLOBAL_CTA_KEY = "global_cta_key";
 }
-

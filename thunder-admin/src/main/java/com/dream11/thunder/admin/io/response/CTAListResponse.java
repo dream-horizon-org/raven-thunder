@@ -17,4 +17,3 @@ public class CTAListResponse {
   private int pageSize;
   private StatusWiseCount statusWiseCount;
 }
-

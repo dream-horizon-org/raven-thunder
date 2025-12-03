@@ -22,6 +22,7 @@ import com.dream11.thunder.core.io.response.FilterResponse;
 import com.dream11.thunder.core.model.CTA;
 import com.dream11.thunder.core.model.CTAStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.inject.Inject;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
@@ -29,7 +30,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.google.inject.Inject;
 import lombok.SneakyThrows;
 
 public class CTARepositoryImpl extends AerospikeRepository implements CTARepository {
@@ -360,4 +360,3 @@ public class CTARepositoryImpl extends AerospikeRepository implements CTAReposit
     return operate(defaultWritePolicy, tagsKey, operations).ignoreElement();
   }
 }
-

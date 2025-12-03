@@ -1,10 +1,12 @@
 package com.dream11.thunder.api.service.cache;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
+
 import com.dream11.thunder.core.dao.BehaviourTagsRepository;
 import com.dream11.thunder.core.dao.CTARepository;
 import com.dream11.thunder.core.model.BehaviourTag;
 import com.dream11.thunder.core.model.CTA;
-import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -12,9 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class StaticDataCacheImplTest {
@@ -55,5 +54,3 @@ class StaticDataCacheImplTest {
     assertThat(cache.findAllActiveCTA()).containsOnlyKeys(1L);
   }
 }
-
-

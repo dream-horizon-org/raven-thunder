@@ -1,5 +1,9 @@
 package com.dream11.thunder.admin.service.behaviourTag;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
 import com.dream11.thunder.admin.exception.DefinedException;
 import com.dream11.thunder.admin.io.request.BehaviourTagCreateRequest;
 import com.dream11.thunder.admin.io.request.BehaviourTagPutRequest;
@@ -22,10 +26,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class BehaviourTagServiceImplTest {
@@ -75,11 +75,19 @@ class BehaviourTagServiceImplTest {
     put.setLinkedCtas(new HashSet<>(Set.of("2", "3")));
 
     // ctaRepository.findAll used for validation: ensure statuses are allowed
-    CTA c1 = new CTA(); c1.setId(1L); c1.setCtaStatus(CTAStatus.PAUSED);
-    CTA c2 = new CTA(); c2.setId(2L); c2.setCtaStatus(CTAStatus.DRAFT);
-    CTA c3 = new CTA(); c3.setId(3L); c3.setCtaStatus(CTAStatus.DRAFT);
+    CTA c1 = new CTA();
+    c1.setId(1L);
+    c1.setCtaStatus(CTAStatus.PAUSED);
+    CTA c2 = new CTA();
+    c2.setId(2L);
+    c2.setCtaStatus(CTAStatus.DRAFT);
+    CTA c3 = new CTA();
+    c3.setId(3L);
+    c3.setCtaStatus(CTAStatus.DRAFT);
     Map<Long, CTA> ctas = new HashMap<>();
-    ctas.put(1L, c1); ctas.put(2L, c2); ctas.put(3L, c3);
+    ctas.put(1L, c1);
+    ctas.put(2L, c2);
+    ctas.put(3L, c3);
     when(ctaRepository.findAll(tenantId)).thenReturn(Single.just(ctas));
 
     when(behaviourTagsRepository.find(tenantId, name)).thenReturn(Maybe.just(existing));
@@ -90,7 +98,8 @@ class BehaviourTagServiceImplTest {
     when(ctaRepository.update(eq(1L), eq(List.of()))).thenReturn(Completable.complete());
     when(ctaRepository.update(eq(3L), eq(List.of(name)))).thenReturn(Completable.complete());
 
-    BehaviourTagService btService = new BehaviourTagServiceImpl(behaviourTagsRepository, ctaRepository);
+    BehaviourTagService btService =
+        new BehaviourTagServiceImpl(behaviourTagsRepository, ctaRepository);
     btService.updateBehaviourTag(tenantId, name, put, user).test().assertComplete();
 
     // unlink 1
@@ -101,5 +110,3 @@ class BehaviourTagServiceImplTest {
     verify(behaviourTagsRepository, times(1)).update(eq(tenantId), eq(name), any());
   }
 }
-
-

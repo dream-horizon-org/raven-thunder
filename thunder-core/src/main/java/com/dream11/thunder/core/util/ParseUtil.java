@@ -7,13 +7,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.util.Map;
 
-/**
- * JSON parsing utilities based on Jackson ObjectMapper.
- */
+/** JSON parsing utilities based on Jackson ObjectMapper. */
 public class ParseUtil {
 
-  private static final ObjectMapper mapper = new ObjectMapper()
-          .registerModule(new JavaTimeModule());
+  private static final ObjectMapper mapper =
+      new ObjectMapper().registerModule(new JavaTimeModule());
 
   /** Parses a JsonNode into a concrete type. */
   public static <T> T parse(JsonNode content, Class<T> typeClazz) throws JsonProcessingException {
@@ -51,4 +49,3 @@ public class ParseUtil {
     return mapper.writeValueAsString(object);
   }
 }
-

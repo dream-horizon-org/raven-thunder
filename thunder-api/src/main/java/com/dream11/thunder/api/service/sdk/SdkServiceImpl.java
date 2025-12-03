@@ -22,14 +22,12 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * SDK service implementation responsible for resolving eligible CTAs for a user,
- * merging client delta snapshots, and persisting user state machine snapshots.
+ * SDK service implementation responsible for resolving eligible CTAs for a user, merging client
+ * delta snapshots, and persisting user state machine snapshots.
  *
- * It relies on:
- * - UserCohortsClient to fetch user cohorts
- * - StaticDataCache for active/paused CTAs and behaviour tags
- * - StateMachineRepository for reading/upserting user snapshots
- * - Utilities (CTAFilterUtil, StateMachineUtil, CTASnapshotMerger) for clean logic separation
+ * <p>It relies on: - UserCohortsClient to fetch user cohorts - StaticDataCache for active/paused
+ * CTAs and behaviour tags - StateMachineRepository for reading/upserting user snapshots - Utilities
+ * (CTAFilterUtil, StateMachineUtil, CTASnapshotMerger) for clean logic separation
  */
 @Slf4j
 public class SdkServiceImpl implements SdkService {
@@ -66,14 +64,17 @@ public class SdkServiceImpl implements SdkService {
         .map(
             cohorts ->
                 CTAFilterUtil.filterEligibleCTAs(
-                    tenantId, cohorts, CTAFilterUtil.filterByTenant(cache.findAllActiveCTA(), tenantId)))
+                    tenantId,
+                    cohorts,
+                    CTAFilterUtil.filterByTenant(cache.findAllActiveCTA(), tenantId)))
         .filter(activeCTAs -> !activeCTAs.isEmpty())
         .flatMapSingle(
             activeCTAs ->
                 loadOrCreateSnapshot(tenantId, userId)
                     .flatMap(
                         snapshot -> {
-                          boolean updated = updateSnapshotWithStaleData(tenantId, activeCTAs, snapshot);
+                          boolean updated =
+                              updateSnapshotWithStaleData(tenantId, activeCTAs, snapshot);
                           updated |= mergeDeltaSnapshotIfPresent(snapshot, deltaSnapshot);
 
                           if (updated) {
@@ -83,9 +84,7 @@ public class SdkServiceImpl implements SdkService {
                           }
                           return Single.just(snapshot);
                         })
-                    .map(
-                        snapshot ->
-                            buildCTAResponse(tenantId, activeCTAs, snapshot)));
+                    .map(snapshot -> buildCTAResponse(tenantId, activeCTAs, snapshot)));
   }
 
   @Override
@@ -120,8 +119,7 @@ public class SdkServiceImpl implements SdkService {
       String tenantId,
       Map<Long, CTA> activeCTAs,
       com.dream11.thunder.api.model.UserDataSnapshot snapshot) {
-    Map<Long, CTA> pausedCTAs =
-        CTAFilterUtil.filterByTenant(cache.findAllPausedCTA(), tenantId);
+    Map<Long, CTA> pausedCTAs = CTAFilterUtil.filterByTenant(cache.findAllPausedCTA(), tenantId);
     return StateMachineUtil.archiveStaleData(activeCTAs, pausedCTAs, snapshot);
   }
 

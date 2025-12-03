@@ -14,12 +14,12 @@ import com.dream11.thunder.core.dao.BehaviourTagsRepository;
 import com.dream11.thunder.core.model.BehaviourTag;
 import com.dream11.thunder.core.util.ParseUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.inject.Inject;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
 import java.util.ArrayList;
 import java.util.Map;
-import com.google.inject.Inject;
 import lombok.SneakyThrows;
 
 public class BehaviourTagRepositoryImpl extends AerospikeRepository
@@ -175,4 +175,3 @@ public class BehaviourTagRepositoryImpl extends AerospikeRepository
         .ignoreElement();
   }
 }
-

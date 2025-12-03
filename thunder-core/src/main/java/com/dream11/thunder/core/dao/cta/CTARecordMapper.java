@@ -77,4 +77,3 @@ public class CTARecordMapper implements Function<Record, CTA> {
     return cta;
   }
 }
-

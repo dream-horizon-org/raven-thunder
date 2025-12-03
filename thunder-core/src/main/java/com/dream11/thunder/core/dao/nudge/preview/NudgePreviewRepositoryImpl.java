@@ -8,14 +8,14 @@ import com.aerospike.client.Key;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
 import com.dream11.thunder.core.client.AerospikeClient;
-import com.dream11.thunder.core.exception.ThunderException;
 import com.dream11.thunder.core.config.AerospikeConfig;
 import com.dream11.thunder.core.dao.AerospikeRepository;
 import com.dream11.thunder.core.dao.NudgePreviewRepository;
+import com.dream11.thunder.core.exception.ThunderException;
 import com.dream11.thunder.core.model.NudgePreview;
+import com.google.inject.Inject;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Maybe;
-import com.google.inject.Inject;
 
 public class NudgePreviewRepositoryImpl extends AerospikeRepository
     implements NudgePreviewRepository {
@@ -78,4 +78,3 @@ public class NudgePreviewRepositoryImpl extends AerospikeRepository
                     NUDGE_PREVIEW_NOT_FOUND_EXCEPTION.getHttpStatusCode())));
   }
 }
-

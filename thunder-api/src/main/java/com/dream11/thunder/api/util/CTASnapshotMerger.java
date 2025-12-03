@@ -2,9 +2,9 @@ package com.dream11.thunder.api.util;
 
 import com.dream11.thunder.api.io.response.CTAResponse;
 import com.dream11.thunder.api.io.response.UserCTAAndStateMachineResponse;
+import com.dream11.thunder.api.model.BehaviourExposureRule;
 import com.dream11.thunder.api.model.BehaviourTagSnapshot;
 import com.dream11.thunder.api.model.CTARelationSnapshot;
-import com.dream11.thunder.api.model.BehaviourExposureRule;
 import com.dream11.thunder.api.service.sdk.BehaviourExposureRuleMapper;
 import com.dream11.thunder.api.service.sdk.CTARelationMapper;
 import com.dream11.thunder.api.service.sdk.RuleMapper;
@@ -21,9 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Utility class for merging CTAs with user snapshots to create responses.
- */
+/** Utility class for merging CTAs with user snapshots to create responses. */
 public final class CTASnapshotMerger {
 
   private final RuleMapper ruleMapper;
@@ -58,9 +56,7 @@ public final class CTASnapshotMerger {
     return new CTAResponse(userCTAList, behaviourTagSnapshots);
   }
 
-  /**
-   * Builds the list of user CTA responses from active CTAs and snapshot.
-   */
+  /** Builds the list of user CTA responses from active CTAs and snapshot. */
   private List<UserCTAAndStateMachineResponse> buildUserCTAList(
       Map<Long, CTA> activeCTAs, com.dream11.thunder.api.model.UserDataSnapshot snapshot) {
     return activeCTAs.values().stream()
@@ -68,9 +64,7 @@ public final class CTASnapshotMerger {
         .collect(Collectors.toList());
   }
 
-  /**
-   * Creates a user CTA response for a single CTA.
-   */
+  /** Creates a user CTA response for a single CTA. */
   private UserCTAAndStateMachineResponse createUserCTAResponse(
       CTA cta, com.dream11.thunder.api.model.UserDataSnapshot snapshot) {
     String behaviourTagName = extractFirstBehaviourTag(cta);
@@ -96,9 +90,7 @@ public final class CTASnapshotMerger {
     }
   }
 
-  /**
-   * Extracts the first behaviour tag from a CTA, or empty string if none.
-   */
+  /** Extracts the first behaviour tag from a CTA, or empty string if none. */
   private String extractFirstBehaviourTag(CTA cta) {
     if (cta.getBehaviourTags() != null && !cta.getBehaviourTags().isEmpty()) {
       return cta.getBehaviourTags().get(0);
@@ -106,9 +98,7 @@ public final class CTASnapshotMerger {
     return "";
   }
 
-  /**
-   * Extracts all unique behaviour tag names from active CTAs.
-   */
+  /** Extracts all unique behaviour tag names from active CTAs. */
   private Set<String> extractBehaviourTagNames(Map<Long, CTA> activeCTAs) {
     return activeCTAs.values().stream()
         .filter(cta -> cta.getBehaviourTags() != null && !cta.getBehaviourTags().isEmpty())
@@ -116,9 +106,7 @@ public final class CTASnapshotMerger {
         .collect(Collectors.toSet());
   }
 
-  /**
-   * Builds behaviour tag snapshots from behaviour tag map and user snapshot.
-   */
+  /** Builds behaviour tag snapshots from behaviour tag map and user snapshot. */
   private List<BehaviourTagSnapshot> buildBehaviourTagSnapshots(
       Map<String, BehaviourTag> behaviourTagMap,
       com.dream11.thunder.api.model.UserDataSnapshot snapshot,
@@ -136,9 +124,7 @@ public final class CTASnapshotMerger {
     return snapshots;
   }
 
-  /**
-   * Creates a behaviour tag snapshot, merging server data with user snapshot if available.
-   */
+  /** Creates a behaviour tag snapshot, merging server data with user snapshot if available. */
   private BehaviourTagSnapshot createBehaviourTagSnapshot(
       String tagName,
       Map<String, BehaviourTag> behaviourTagMap,
@@ -149,17 +135,14 @@ public final class CTASnapshotMerger {
     }
 
     // Check if user has existing snapshot for this tag
-    if (snapshot.getBehaviourTags() != null
-        && snapshot.getBehaviourTags().containsKey(tagName)) {
+    if (snapshot.getBehaviourTags() != null && snapshot.getBehaviourTags().containsKey(tagName)) {
       return createMergedBehaviourTagSnapshot(tagName, behaviourTag, snapshot);
     } else {
       return createNewBehaviourTagSnapshot(tagName, behaviourTag);
     }
   }
 
-  /**
-   * Creates a merged behaviour tag snapshot combining server data with user snapshot.
-   */
+  /** Creates a merged behaviour tag snapshot combining server data with user snapshot. */
   private BehaviourTagSnapshot createMergedBehaviourTagSnapshot(
       String tagName,
       BehaviourTag behaviourTag,
@@ -195,9 +178,7 @@ public final class CTASnapshotMerger {
     return new BehaviourTagSnapshot(tagName, exposureRule, ctaRelation);
   }
 
-  /**
-   * Creates a new behaviour tag snapshot from server data only.
-   */
+  /** Creates a new behaviour tag snapshot from server data only. */
   private BehaviourTagSnapshot createNewBehaviourTagSnapshot(
       String tagName, BehaviourTag behaviourTag) {
     try {
@@ -219,4 +200,3 @@ public final class CTASnapshotMerger {
     }
   }
 }
-

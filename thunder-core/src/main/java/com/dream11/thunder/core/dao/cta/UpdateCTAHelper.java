@@ -35,4 +35,3 @@ public class UpdateCTAHelper implements Function<CTA, Bin[]> {
     return binList.toArray(new Bin[0]);
   }
 }
-

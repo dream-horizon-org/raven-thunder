@@ -110,12 +110,9 @@ public class BehaviourTagServiceImpl implements BehaviourTagService {
                 () -> Single.error(new DefinedException(ErrorEntity.NO_SUCH_BEHAVIOUR_TAG))));
   }
 
-  private void linkCTAsToNewBehaviourTag(
-      String tenantId, BehaviourTagCreateRequest behaviourTag) {
+  private void linkCTAsToNewBehaviourTag(String tenantId, BehaviourTagCreateRequest behaviourTag) {
     List<Long> ctaIds =
-        behaviourTag.getLinkedCtas().stream()
-            .map(Long::parseLong)
-            .collect(Collectors.toList());
+        behaviourTag.getLinkedCtas().stream().map(Long::parseLong).collect(Collectors.toList());
 
     CTALinkingHelper.linkCTAsToBehaviourTag(
             ctaRepository, tenantId, ctaIds, behaviourTag.getBehaviourTagName())
@@ -141,7 +138,8 @@ public class BehaviourTagServiceImpl implements BehaviourTagService {
     CTALinkingHelper.unlinkCTAsFromBehaviourTag(ctaRepository, linkDiff.getUnlinkedCtas())
         .subscribe(
             () -> log.debug("Unlinked CTAs from behaviour tag: {}", behaviourTagName),
-            error -> log.error("Error unlinking CTAs from behaviour tag: {}", behaviourTagName, error));
+            error ->
+                log.error("Error unlinking CTAs from behaviour tag: {}", behaviourTagName, error));
 
     // Update the behaviour tag
     return behaviourTagRepository
@@ -171,8 +169,6 @@ public class BehaviourTagServiceImpl implements BehaviourTagService {
         .subscribe(
             () -> log.debug("New CTAs linked to behaviour tag: {}", behaviourTagName),
             error ->
-                log.error(
-                    "Error linking new CTAs to behaviour tag: {}", behaviourTagName, error));
+                log.error("Error linking new CTAs to behaviour tag: {}", behaviourTagName, error));
   }
 }
-

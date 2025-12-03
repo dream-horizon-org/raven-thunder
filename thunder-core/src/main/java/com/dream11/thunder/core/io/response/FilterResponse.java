@@ -14,4 +14,3 @@ public class FilterResponse {
   private List<String> teams;
   private List<String> createdBy;
 }
-

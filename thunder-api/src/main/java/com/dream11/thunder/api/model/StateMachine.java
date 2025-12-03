@@ -3,7 +3,6 @@ package com.dream11.thunder.api.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.Map;
 import javax.validation.constraints.NotNull;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

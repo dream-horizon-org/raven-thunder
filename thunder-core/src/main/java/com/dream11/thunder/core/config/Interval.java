@@ -10,4 +10,3 @@ import lombok.NoArgsConstructor;
 public class Interval {
   private Long ms;
 }
-

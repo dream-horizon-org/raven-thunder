@@ -24,8 +24,8 @@ public interface AdminService {
   Single<Long> createCTA(String tenantId, @NotNull @Valid CTARequest cta, @NotNull String user);
 
   /**
-   * Updates an existing CTA using optimistic concurrency (generation id).
-   * Also updates filter metadata.
+   * Updates an existing CTA using optimistic concurrency (generation id). Also updates filter
+   * metadata.
    *
    * @param tenantId tenant identifier
    * @param cta validated CTA update request
@@ -64,49 +64,30 @@ public interface AdminService {
   Single<CTAListResponse> fetchCTAs(
       String tenantId, FilterProps filterProps, int pageNumber, int pageSize);
 
-  /**
-   * Transitions CTA status to PAUSED from LIVE or SCHEDULED.
-   */
+  /** Transitions CTA status to PAUSED from LIVE or SCHEDULED. */
   Completable updateStatusToPaused(String tenantId, Long ctaId);
 
-  /**
-   * Transitions CTA status to LIVE from DRAFT or PAUSED, setting start/end times as needed.
-   */
+  /** Transitions CTA status to LIVE from DRAFT or PAUSED, setting start/end times as needed. */
   Completable updateStatusToLive(String tenantId, Long ctaId);
 
-  /**
-   * Transitions CTA status to CONCLUDED from LIVE or PAUSED.
-   */
+  /** Transitions CTA status to CONCLUDED from LIVE or PAUSED. */
   Completable updateStatusToConcluded(String tenantId, Long ctaId);
 
-  /**
-   * Transitions CTA status to SCHEDULED from DRAFT or PAUSED if start time is in the future.
-   */
+  /** Transitions CTA status to SCHEDULED from DRAFT or PAUSED if start time is in the future. */
   Completable updateStatusToScheduled(String tenantId, Long ctaId);
 
-  /**
-   * Transitions CTA status to TERMINATED from DRAFT, LIVE or PAUSED.
-   */
+  /** Transitions CTA status to TERMINATED from DRAFT, LIVE or PAUSED. */
   Completable updateStatusToTerminated(String tenantId, Long ctaId);
 
-  /**
-   * Creates or updates a nudge preview for the given tenant.
-   */
+  /** Creates or updates a nudge preview for the given tenant. */
   Completable createOrUpdateNudgePreview(String tenantId, NudgePreview nudgePreview);
 
-  /**
-   * Retrieves CTA filter metadata (tags, teams, names) for a tenant.
-   */
+  /** Retrieves CTA filter metadata (tags, teams, names) for a tenant. */
   Single<FilterResponse> findFilters(String tenantId);
 
-  /**
-   * Activates scheduled CTAs whose start time has passed.
-   */
+  /** Activates scheduled CTAs whose start time has passed. */
   void activateScheduledCTA();
 
-  /**
-   * Concludes CTAs whose end time has passed.
-   */
+  /** Concludes CTAs whose end time has passed. */
   void terminateExpiredCTA();
 }
-
