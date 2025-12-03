@@ -7,7 +7,7 @@ const config = {
   baseUrl: '/raven/thunder/',
   favicon: 'img/logo.svg',
   organizationName: 'dream-horizon-org',
-  projectName: 'thunder',
+  projectName: 'raven',
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
