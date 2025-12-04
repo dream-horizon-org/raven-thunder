@@ -254,6 +254,13 @@ curl http://localhost:8081/healthcheck/ping
 - **`thunder-default.conf`** - Default configuration for local development
 - **`thunder.conf`** - Optional local overrides (empty by default)
 
+## Code Style
+
+This project uses the [Spotless Maven plugin](https://github.com/diffplug/spotless/tree/main/plugin-maven) with [google-java-format](https://github.com/google/google-java-format) (v1.22.0) to enforce Google Java Style.
+
+Run `mvn spotless:apply` before committing to auto-format code and clean up unused imports / trailing whitespace.
+
+## Testing
 ### Docker Environment
 
 - **`aerospike.conf`** - Aerospike server configuration for Docker containers
