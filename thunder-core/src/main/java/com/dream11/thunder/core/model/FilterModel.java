@@ -16,4 +16,3 @@ public class FilterModel {
   private List<String> teams;
   private CTAStatus ctaStatus;
 }
-

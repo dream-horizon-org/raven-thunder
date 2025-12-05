@@ -1,5 +1,9 @@
 package com.dream11.thunder.api.service.sdk;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
 import com.dream11.thunder.api.dao.StateMachineRepository;
 import com.dream11.thunder.api.io.request.CTASnapshotRequest;
 import com.dream11.thunder.api.io.response.CTAResponse;
@@ -9,10 +13,9 @@ import com.dream11.thunder.api.model.UserDataSnapshot;
 import com.dream11.thunder.api.service.StaticDataCache;
 import com.dream11.thunder.api.service.UserCohortsClient;
 import com.dream11.thunder.core.dao.NudgePreviewRepository;
-import com.dream11.thunder.core.model.BehaviourTag;
 import com.dream11.thunder.core.model.CTA;
-import com.dream11.thunder.core.model.rule.Rule;
 import com.dream11.thunder.core.model.CohortEligibility;
+import com.dream11.thunder.core.model.rule.Rule;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
 import java.util.HashMap;
@@ -25,10 +28,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 class SdkServiceImplAppLaunchTest {
 
@@ -39,20 +38,20 @@ class SdkServiceImplAppLaunchTest {
   @InjectMocks private SdkServiceImpl sdkService;
 
   private CTA buildCTA(long id, String tenantId, Set<String> include, Set<String> exclude) {
-    Rule rule = new Rule(
-        new CohortEligibility(List.copyOf(include), List.copyOf(exclude)),
-        Map.of("stateA", "actionA"),
-        List.of(),
-        false,
-        List.of(),
-        Map.of(), // stateTransition not needed for this test
-        null,
-        1,
-        null,
-        null,
-        List.of(Map.of()),
-        new com.dream11.thunder.core.model.Frequency()
-    );
+    Rule rule =
+        new Rule(
+            new CohortEligibility(List.copyOf(include), List.copyOf(exclude)),
+            Map.of("stateA", "actionA"),
+            List.of(),
+            false,
+            List.of(),
+            Map.of(), // stateTransition not needed for this test
+            null,
+            1,
+            null,
+            null,
+            List.of(Map.of()),
+            new com.dream11.thunder.core.model.Frequency());
     CTA cta = new CTA();
     cta.setId(id);
     cta.setRule(rule);
@@ -76,8 +75,7 @@ class SdkServiceImplAppLaunchTest {
     when(stateMachineRepository.find(tenantId, userId))
         .thenReturn(Maybe.just(new UserDataSnapshot(new HashMap<>(), new HashMap<>())));
 
-    CTAResponse response =
-        sdkService.appLaunch(tenantId, userId, null).blockingGet();
+    CTAResponse response = sdkService.appLaunch(tenantId, userId, null).blockingGet();
 
     assertThat(response).isNotNull();
     assertThat(response.getCtas()).hasSize(1);
@@ -91,7 +89,8 @@ class SdkServiceImplAppLaunchTest {
     long userId = 88L;
     when(stateMachineRepository.find(tenantId, userId))
         .thenReturn(Maybe.just(new UserDataSnapshot(new HashMap<>(), new HashMap<>())));
-    when(stateMachineRepository.upsert(eq(tenantId), eq(userId), any())).thenReturn(Single.just(true));
+    when(stateMachineRepository.upsert(eq(tenantId), eq(userId), any()))
+        .thenReturn(Single.just(true));
 
     StateMachine sm = new StateMachine();
     sm.setCurrentState("S1");
@@ -109,5 +108,3 @@ class SdkServiceImplAppLaunchTest {
     verify(stateMachineRepository, times(1)).upsert(eq(tenantId), eq(userId), any());
   }
 }
-
-

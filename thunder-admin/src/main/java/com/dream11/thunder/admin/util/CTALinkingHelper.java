@@ -10,9 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Utility class for handling CTA linking and unlinking operations with behaviour tags.
- */
+/** Utility class for handling CTA linking and unlinking operations with behaviour tags. */
 @Slf4j
 public final class CTALinkingHelper {
 
@@ -21,8 +19,8 @@ public final class CTALinkingHelper {
   }
 
   /**
-   * Links CTAs to a behaviour tag by updating their behaviour tag list.
-   * Only processes CTAs with DRAFT or PAUSED status.
+   * Links CTAs to a behaviour tag by updating their behaviour tag list. Only processes CTAs with
+   * DRAFT or PAUSED status.
    *
    * @param ctaRepository the CTA repository
    * @param tenantId the tenant ID
@@ -31,10 +29,7 @@ public final class CTALinkingHelper {
    * @return Completable that completes when all CTAs are linked
    */
   public static Completable linkCTAsToBehaviourTag(
-      CTARepository ctaRepository,
-      String tenantId,
-      List<Long> ctaIds,
-      String behaviourTagName) {
+      CTARepository ctaRepository, String tenantId, List<Long> ctaIds, String behaviourTagName) {
     if (ctaIds.isEmpty()) {
       return Completable.complete();
     }
@@ -78,10 +73,7 @@ public final class CTALinkingHelper {
             .map(
                 ctaId ->
                     updateCTABehaviourTag(
-                        ctaRepository,
-                        Long.parseLong(ctaId),
-                        Collections.emptyList(),
-                        ctaId))
+                        ctaRepository, Long.parseLong(ctaId), Collections.emptyList(), ctaId))
             .toArray(Completable[]::new);
 
     return Completable.mergeArray(unlinkOperations);
@@ -97,10 +89,7 @@ public final class CTALinkingHelper {
    * @return Completable that completes when the update is done
    */
   private static Completable updateCTABehaviourTag(
-      CTARepository ctaRepository,
-      Long ctaId,
-      List<String> behaviourTags,
-      Object logIdentifier) {
+      CTARepository ctaRepository, Long ctaId, List<String> behaviourTags, Object logIdentifier) {
     return ctaRepository
         .update(ctaId, behaviourTags)
         .doOnComplete(
@@ -110,11 +99,7 @@ public final class CTALinkingHelper {
                     behaviourTags.isEmpty() ? "unlinked" : "linked",
                     logIdentifier))
         .doOnError(
-            error ->
-                log.error(
-                    "Error updating behaviour tag for CTA id {}",
-                    logIdentifier,
-                    error));
+            error -> log.error("Error updating behaviour tag for CTA id {}", logIdentifier, error));
   }
 
   /**
@@ -138,9 +123,7 @@ public final class CTALinkingHelper {
     return new CTALinkDiff(unlinkedCtas, newlyLinkedCtas);
   }
 
-  /**
-   * Data class to hold the difference between existing and incoming CTA links.
-   */
+  /** Data class to hold the difference between existing and incoming CTA links. */
   public static class CTALinkDiff {
     private final List<String> unlinkedCtas;
     private final List<String> newlyLinkedCtas;
@@ -159,4 +142,3 @@ public final class CTALinkingHelper {
     }
   }
 }
-

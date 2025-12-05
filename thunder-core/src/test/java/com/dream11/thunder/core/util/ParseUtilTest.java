@@ -1,11 +1,12 @@
 package com.dream11.thunder.core.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import static org.assertj.core.api.Assertions.assertThat;
 
 class ParseUtilTest {
 
@@ -29,9 +30,13 @@ class ParseUtilTest {
 
   public static class Dummy {
     private int x;
-    public int getX() { return x; }
-    public void setX(int x) { this.x = x; }
+
+    public int getX() {
+      return x;
+    }
+
+    public void setX(int x) {
+      this.x = x;
+    }
   }
 }
-
-

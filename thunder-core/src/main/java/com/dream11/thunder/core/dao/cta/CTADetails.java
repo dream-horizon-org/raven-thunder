@@ -26,4 +26,3 @@ public class CTADetails {
   private int generationId;
   private String tenantId;
 }
-

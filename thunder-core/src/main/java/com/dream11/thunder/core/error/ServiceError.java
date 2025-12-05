@@ -23,4 +23,3 @@ public enum ServiceError {
   private final String errorMessage;
   private final int httpStatusCode;
 }
-

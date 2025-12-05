@@ -12,4 +12,3 @@ public class CtaRelationRule {
   private CtaRelationRuleTypes rule; // FIXME why do we need to store this rule here?
   private Set<String> ctaList;
 }
-

@@ -5,4 +5,3 @@ public enum CtaRelationRuleTypes {
   LIST,
   REST
 }
-

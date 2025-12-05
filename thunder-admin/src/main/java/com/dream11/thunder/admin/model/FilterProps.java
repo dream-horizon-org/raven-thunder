@@ -17,4 +17,3 @@ public class FilterProps {
   private List<String> teams;
   private String behaviourTag;
 }
-

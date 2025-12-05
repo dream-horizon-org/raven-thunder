@@ -47,4 +47,3 @@ public interface AerospikeOperations {
 
   Single<Record> operate(WritePolicy writePolicy, Key key, Operation[] operations);
 }
-

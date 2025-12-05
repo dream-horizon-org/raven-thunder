@@ -9,9 +9,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-/**
- * Utility class for pagination and filtering operations on CTA lists.
- */
+/** Utility class for pagination and filtering operations on CTA lists. */
 public final class CTAPaginationHelper {
 
   private CTAPaginationHelper() {
@@ -62,16 +60,14 @@ public final class CTAPaginationHelper {
    */
   public static StatusWiseCount countByStatus(List<CTA> ctas) {
     Map<CTAStatus, Integer> statusCounts = new HashMap<>();
-    
+
     // Initialize all statuses to 0
     for (CTAStatus status : CTAStatus.values()) {
       statusCounts.put(status, 0);
     }
 
     // Count CTAs by status
-    ctas.forEach(
-        cta ->
-            statusCounts.merge(cta.getCtaStatus(), 1, Integer::sum));
+    ctas.forEach(cta -> statusCounts.merge(cta.getCtaStatus(), 1, Integer::sum));
 
     // Convert to AtomicInteger for StatusWiseCount (maintains compatibility)
     return new StatusWiseCount(
@@ -104,6 +100,4 @@ public final class CTAPaginationHelper {
       return ctas;
     }
   }
-
 }
-

@@ -1,5 +1,10 @@
 package com.dream11.thunder.admin.service.admin;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
 import com.dream11.thunder.admin.exception.DefinedException;
 import com.dream11.thunder.admin.io.request.CTARequest;
 import com.dream11.thunder.admin.io.request.RuleRequest;
@@ -25,11 +30,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AdminServiceImplCreateCTATest {
@@ -100,12 +100,14 @@ class AdminServiceImplCreateCTATest {
     CTARequest req = buildValidCTARequest("Welcome");
 
     // No duplicate names
-    when(ctaRepository.findFilters(tenantId)).thenReturn(Maybe.just(new FilterResponse(List.of(), List.of(), List.of(), List.of())));
+    when(ctaRepository.findFilters(tenantId))
+        .thenReturn(Maybe.just(new FilterResponse(List.of(), List.of(), List.of(), List.of())));
 
     // Id generation + create
     when(ctaRepository.generatedIncrementId(tenantId)).thenReturn(Single.just(123L));
     when(ctaRepository.create(eq(tenantId), any())).thenReturn(Completable.complete());
-    when(ctaRepository.updateFilters(eq(tenantId), anyList(), anyString(), anyString(), anyString()))
+    when(ctaRepository.updateFilters(
+            eq(tenantId), anyList(), anyString(), anyString(), anyString()))
         .thenReturn(Completable.complete());
 
     AdminService service = new AdminServiceImpl(ctaRepository, nudgePreviewRepository);
@@ -116,7 +118,8 @@ class AdminServiceImplCreateCTATest {
     verify(ctaRepository, times(1)).create(eq(tenantId), any());
     // updateFilters is triggered on success (fire-and-forget)
     verify(ctaRepository, atLeastOnce())
-        .updateFilters(eq(tenantId), eq(req.getTags()), eq(req.getTeam()), eq(req.getName()), eq(user));
+        .updateFilters(
+            eq(tenantId), eq(req.getTags()), eq(req.getTeam()), eq(req.getName()), eq(user));
   }
 
   @Test
@@ -126,15 +129,14 @@ class AdminServiceImplCreateCTATest {
     CTARequest req = buildValidCTARequest("Duplicate");
 
     when(ctaRepository.findFilters(tenantId))
-        .thenReturn(Maybe.just(new FilterResponse(List.of("Duplicate"), List.of(), List.of(), List.of())));
+        .thenReturn(
+            Maybe.just(new FilterResponse(List.of("Duplicate"), List.of(), List.of(), List.of())));
 
     AdminService service = new AdminServiceImpl(ctaRepository, nudgePreviewRepository);
 
-    assertThrows(DefinedException.class, () -> service.createCTA(tenantId, req, user).blockingGet());
+    assertThrows(
+        DefinedException.class, () -> service.createCTA(tenantId, req, user).blockingGet());
     verify(ctaRepository, never()).generatedIncrementId(anyString());
     verify(ctaRepository, never()).create(anyString(), any());
   }
 }
-
-
-

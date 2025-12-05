@@ -8,6 +8,7 @@ const sidebars = {
       collapsible: false,
       items: [
         'getting-started/overview',
+        'getting-started/core-entities',
         'getting-started/quickstart',
         'getting-started/running',
       ],
@@ -35,6 +36,7 @@ const sidebars = {
       label: 'Admin',
       items: [
         'admin/overview',
+        'api/admin-contracts',
       ],
     },
     {
@@ -44,7 +46,6 @@ const sidebars = {
         'operations/docker',
         'operations/testing',
         'operations/ci-cd',
-        'operations/releases',
       ],
     },
   ],

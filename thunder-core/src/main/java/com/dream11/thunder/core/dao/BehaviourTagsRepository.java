@@ -6,9 +6,7 @@ import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
 import java.util.Map;
 
-/**
- * Repository for behaviour tag CRUD and lookups.
- */
+/** Repository for behaviour tag CRUD and lookups. */
 public interface BehaviourTagsRepository {
 
   /** Lists all behaviour tags across tenants (for caching). */
@@ -26,4 +24,3 @@ public interface BehaviourTagsRepository {
   /** Updates a behaviour tag. */
   Completable update(String tenantId, String behaviourTagName, BehaviourTag behaviourTag);
 }
-

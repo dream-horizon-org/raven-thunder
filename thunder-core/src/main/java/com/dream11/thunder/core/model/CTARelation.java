@@ -11,4 +11,3 @@ public class CTARelation {
   private CtaRelationRule shownCta;
   private CtaRelationRule hideCta;
 }
-

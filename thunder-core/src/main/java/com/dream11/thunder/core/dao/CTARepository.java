@@ -12,9 +12,7 @@ import io.reactivex.rxjava3.core.Single;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Repository for CTA CRUD, status transitions and metadata.
- */
+/** Repository for CTA CRUD, status transitions and metadata. */
 public interface CTARepository {
 
   /** Creates a CTA for the tenant. */
@@ -75,4 +73,3 @@ public interface CTARepository {
   Completable updateFilters(
       String tenantId, List<String> tags, String team, String name, String createdBy);
 }
-

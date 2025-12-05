@@ -16,4 +16,3 @@ public class StatusWiseCount {
   private AtomicInteger concluded;
   private AtomicInteger terminated;
 }
-

@@ -33,11 +33,7 @@ public class Response<T> {
    * @return Response object
    */
   public static <T> Response<T> successfulResponse(T data, int statusCode) {
-    return Response.<T>builder()
-        .success(true)
-        .data(data)
-        .statusCode(statusCode)
-        .build();
+    return Response.<T>builder().success(true).data(data).statusCode(statusCode).build();
   }
 
   /**
@@ -49,11 +45,7 @@ public class Response<T> {
    * @return Response object
    */
   public static <T> Response<T> successfulResponse(String message, int statusCode) {
-    return Response.<T>builder()
-        .success(true)
-        .message(message)
-        .statusCode(statusCode)
-        .build();
+    return Response.<T>builder().success(true).message(message).statusCode(statusCode).build();
   }
 
   /**
@@ -65,11 +57,7 @@ public class Response<T> {
    * @return Response object
    */
   public static <T> Response<T> errorResponse(String error, int statusCode) {
-    return Response.<T>builder()
-        .success(false)
-        .error(error)
-        .statusCode(statusCode)
-        .build();
+    return Response.<T>builder().success(false).error(error).statusCode(statusCode).build();
   }
 
   /**
@@ -88,4 +76,3 @@ public class Response<T> {
         .build();
   }
 }
-

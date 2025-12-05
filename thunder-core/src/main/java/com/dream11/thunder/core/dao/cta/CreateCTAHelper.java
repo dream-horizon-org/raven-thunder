@@ -37,4 +37,3 @@ public class CreateCTAHelper {
     return binList.toArray(new Bin[0]);
   }
 }
-

@@ -139,4 +139,3 @@ public abstract class AerospikeRepository implements AerospikeOperations {
     return client.rxOperate(writePolicy, key, operations);
   }
 }
-

@@ -33,4 +33,3 @@ public class CohortEligibility {
   )
   @NotNull private List<String> excludes;
 }
-

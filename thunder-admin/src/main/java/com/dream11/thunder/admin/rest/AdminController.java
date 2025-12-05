@@ -15,11 +15,11 @@ import com.dream11.thunder.core.model.NudgePreview;
 import com.dream11.thunder.core.util.FormatUtil;
 import com.dream11.thunder.core.util.ResponseWrapper;
 import com.google.inject.Inject;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 import java.util.concurrent.CompletionStage;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
@@ -32,8 +32,8 @@ import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 
 /**
- * Admin REST controller for managing CTAs, filters and nudge previews.
- * Exposes endpoints under "/thunder" for create/update/list/status transitions.
+ * Admin REST controller for managing CTAs, filters and nudge previews. Exposes endpoints under
+ * "/thunder" for create/update/list/status transitions.
  */
 @Slf4j
 @Path("/thunder")

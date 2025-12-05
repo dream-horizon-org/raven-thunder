@@ -30,67 +30,77 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class MainModule extends AbstractModule {
 
-    private final Vertx vertx;
+  private final Vertx vertx;
 
-    @Override
-    protected void configure() {
-        // Bind Vertx instances
-        bind(Vertx.class).toInstance(vertx);
-        bind(io.vertx.rxjava3.core.Vertx.class)
-                .toInstance(io.vertx.rxjava3.core.Vertx.newInstance(vertx));
+  @Override
+  protected void configure() {
+    // Bind Vertx instances
+    bind(Vertx.class).toInstance(vertx);
+    bind(io.vertx.rxjava3.core.Vertx.class)
+        .toInstance(io.vertx.rxjava3.core.Vertx.newInstance(vertx));
 
-        // Bind Config from shared data
-        bind(Config.class).toProvider(() -> {
-            Config config = SharedDataUtils.get(vertx, Config.class);
-            if (config == null) {
+    // Bind Config from shared data
+    bind(Config.class)
+        .toProvider(
+            () -> {
+              Config config = SharedDataUtils.get(vertx, Config.class);
+              if (config == null) {
                 log.error("Config not found in SharedData!");
-                throw new IllegalStateException("Config must be initialized in MainVerticle before Guice injection");
-            }
-            log.info("Config retrieved from SharedData for injection");
-            return config;
-        });
+                throw new IllegalStateException(
+                    "Config must be initialized in MainVerticle before Guice injection");
+              }
+              log.info("Config retrieved from SharedData for injection");
+              return config;
+            });
 
-        // Bind ServerConfig from Config
-        bind(ServerConfig.class).toProvider(() -> {
-            Config config = SharedDataUtils.get(vertx, Config.class);
-            if (config == null || config.getServer() == null) {
+    // Bind ServerConfig from Config
+    bind(ServerConfig.class)
+        .toProvider(
+            () -> {
+              Config config = SharedDataUtils.get(vertx, Config.class);
+              if (config == null || config.getServer() == null) {
                 log.error("ServerConfig not available!");
                 throw new IllegalStateException("ServerConfig must be initialized");
-            }
-            return config.getServer();
-        });
+              }
+              return config.getServer();
+            });
 
-        // Bind AerospikeConfig from Config
-        bind(AerospikeConfig.class).toProvider(() -> {
-            Config config = SharedDataUtils.get(vertx, Config.class);
-            if (config == null || config.getAerospike() == null) {
+    // Bind AerospikeConfig from Config
+    bind(AerospikeConfig.class)
+        .toProvider(
+            () -> {
+              Config config = SharedDataUtils.get(vertx, Config.class);
+              if (config == null || config.getAerospike() == null) {
                 log.warn("AerospikeConfig not available, returning null");
                 return null;
-            }
-            return config.getAerospike();
-        });
+              }
+              return config.getAerospike();
+            });
 
-        // Bind Aerospike Client from AerospikeClientHolder (initialized in MainVerticle)
-        bind(AerospikeClient.class).toProvider(() -> {
-            AerospikeClient client = AerospikeClientHolder.get();
-            if (client == null) {
+    // Bind Aerospike Client from AerospikeClientHolder (initialized in MainVerticle)
+    bind(AerospikeClient.class)
+        .toProvider(
+            () -> {
+              AerospikeClient client = AerospikeClientHolder.get();
+              if (client == null) {
                 log.error("AerospikeClient not found in AerospikeClientHolder!");
-                throw new IllegalStateException("AerospikeClient must be initialized in MainVerticle before Guice injection");
-            }
-            return client;
-        });
+                throw new IllegalStateException(
+                    "AerospikeClient must be initialized in MainVerticle before Guice injection");
+              }
+              return client;
+            });
 
-        // Bind Repositories
-        bind(CTARepository.class).to(CTARepositoryImpl.class).in(Singleton.class);
-        bind(BehaviourTagsRepository.class).to(BehaviourTagRepositoryImpl.class).in(Singleton.class);
-        bind(NudgePreviewRepository.class).to(NudgePreviewRepositoryImpl.class).in(Singleton.class);
-        bind(StateMachineRepository.class).to(StateMachineRepositoryImpl.class).in(Singleton.class);
+    // Bind Repositories
+    bind(CTARepository.class).to(CTARepositoryImpl.class).in(Singleton.class);
+    bind(BehaviourTagsRepository.class).to(BehaviourTagRepositoryImpl.class).in(Singleton.class);
+    bind(NudgePreviewRepository.class).to(NudgePreviewRepositoryImpl.class).in(Singleton.class);
+    bind(StateMachineRepository.class).to(StateMachineRepositoryImpl.class).in(Singleton.class);
 
-        // Bind Services
-        bind(SdkService.class).to(SdkServiceImpl.class).in(Singleton.class);
-        bind(UserCohortsClient.class).to(UserCohortsClientImpl.class).in(Singleton.class);
-        bind(StaticDataCache.class).to(StaticDataCacheImpl.class).in(Singleton.class);
+    // Bind Services
+    bind(SdkService.class).to(SdkServiceImpl.class).in(Singleton.class);
+    bind(UserCohortsClient.class).to(UserCohortsClientImpl.class).in(Singleton.class);
+    bind(StaticDataCache.class).to(StaticDataCacheImpl.class).in(Singleton.class);
 
-        log.info("MainModule configuration complete - all services and repositories bound");
-    }
+    log.info("MainModule configuration complete - all services and repositories bound");
+  }
 }

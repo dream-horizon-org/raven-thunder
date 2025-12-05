@@ -9,7 +9,6 @@ import java.util.Map;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -40,4 +39,3 @@ public class RuleRequest {
   @NotNull @Valid private List<Map<String, Object>> actions;
   @NotNull @Valid private Frequency frequency;
 }
-

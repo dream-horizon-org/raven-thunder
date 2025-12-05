@@ -1,5 +1,7 @@
 package com.dream11.thunder.core.dao.cta;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.aerospike.client.Record;
 import com.dream11.thunder.core.model.CTA;
 import com.dream11.thunder.core.model.CTAStatus;
@@ -7,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import static org.assertj.core.api.Assertions.assertThat;
 
 class CTARecordMapperTest {
 
@@ -16,8 +17,10 @@ class CTARecordMapperTest {
     Map<String, Object> bins = new HashMap<>();
     bins.put(Schema.NAME_BIN, "Welcome");
     bins.put(Schema.ID_BIN, 99L);
-    bins.put(Schema.RULE_BIN, "{\"stateToAction\":{\"A\":\"doA\"},\"resetCTAonFirstLaunch\":false,"
-        + "\"priority\":1,\"stateTransition\":{},\"actions\":[{}],\"frequency\":{}}");
+    bins.put(
+        Schema.RULE_BIN,
+        "{\"stateToAction\":{\"A\":\"doA\"},\"resetCTAonFirstLaunch\":false,"
+            + "\"priority\":1,\"stateTransition\":{},\"actions\":[{}],\"frequency\":{}}");
     bins.put(Schema.BEHAVIOUR_TAG_BIN, List.of("bt1"));
     bins.put(Schema.TAGS_BIN, List.of("tag1"));
     bins.put(Schema.TEAM_BIN, "growth");
@@ -53,5 +56,3 @@ class CTARecordMapperTest {
     assertThat(out.getRule()).isNotNull();
   }
 }
-
-

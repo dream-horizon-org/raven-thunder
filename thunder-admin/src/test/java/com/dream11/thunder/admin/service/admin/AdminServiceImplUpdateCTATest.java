@@ -1,5 +1,8 @@
 package com.dream11.thunder.admin.service.admin;
 
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
 import com.dream11.thunder.admin.exception.DefinedException;
 import com.dream11.thunder.admin.io.request.CTAUpdateRequest;
 import com.dream11.thunder.admin.io.request.RuleRequest;
@@ -7,6 +10,7 @@ import com.dream11.thunder.admin.service.AdminService;
 import com.dream11.thunder.core.dao.CTARepository;
 import com.dream11.thunder.core.dao.NudgePreviewRepository;
 import com.dream11.thunder.core.dao.cta.CTADetails;
+import com.dream11.thunder.core.model.CTAStatus;
 import com.dream11.thunder.core.model.CohortEligibility;
 import com.dream11.thunder.core.model.Frequency;
 import com.dream11.thunder.core.model.rule.LifespanFrequency;
@@ -14,21 +18,16 @@ import com.dream11.thunder.core.model.rule.SessionFrequency;
 import com.dream11.thunder.core.model.rule.StateTransitionCondition;
 import com.dream11.thunder.core.model.rule.WindowFrequency;
 import com.dream11.thunder.core.model.rule.WindowFrequencyUnit;
-import com.dream11.thunder.core.model.CTAStatus;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Maybe;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AdminServiceImplUpdateCTATest {
@@ -108,7 +107,8 @@ class AdminServiceImplUpdateCTATest {
 
     when(ctaRepository.findWithGeneration(tenantId, ctaId)).thenReturn(Maybe.just(details));
     when(ctaRepository.update(any(), eq(gen))).thenReturn(Completable.complete());
-    when(ctaRepository.updateFilters(eq(tenantId), anyList(), anyString(), anyString(), anyString()))
+    when(ctaRepository.updateFilters(
+            eq(tenantId), anyList(), anyString(), anyString(), anyString()))
         .thenReturn(Completable.complete());
 
     AdminService svc = new AdminServiceImpl(ctaRepository, nudgePreviewRepository);
@@ -117,7 +117,8 @@ class AdminServiceImplUpdateCTATest {
     verify(ctaRepository, times(1)).findWithGeneration(tenantId, ctaId);
     verify(ctaRepository, times(1)).update(any(), eq(gen));
     verify(ctaRepository, atLeastOnce())
-        .updateFilters(eq(tenantId), eq(req.getTags()), eq(req.getTeam()), anyString(), eq("user@x"));
+        .updateFilters(
+            eq(tenantId), eq(req.getTags()), eq(req.getTeam()), anyString(), eq("user@x"));
   }
 
   @Test
@@ -129,13 +130,13 @@ class AdminServiceImplUpdateCTATest {
     CTADetails details = buildDetails(ctaId, gen, CTAStatus.DRAFT);
 
     when(ctaRepository.findWithGeneration(tenantId, ctaId)).thenReturn(Maybe.just(details));
-    when(ctaRepository.update(any(), eq(gen))).thenReturn(Completable.error(new RuntimeException("db")));
+    when(ctaRepository.update(any(), eq(gen)))
+        .thenReturn(Completable.error(new RuntimeException("db")));
 
     AdminService svc = new AdminServiceImpl(ctaRepository, nudgePreviewRepository);
     // blockingAwait throws on error; ensure it's our domain exception
     org.junit.jupiter.api.Assertions.assertThrows(
-        DefinedException.class, () -> svc.updateCTA(tenantId, req, ctaId, "user@x").blockingAwait());
+        DefinedException.class,
+        () -> svc.updateCTA(tenantId, req, ctaId, "user@x").blockingAwait());
   }
 }
-
-

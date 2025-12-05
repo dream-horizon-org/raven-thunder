@@ -1,21 +1,21 @@
 package com.dream11.thunder.api.rest;
 
-import com.dream11.thunder.core.io.Response;
-// Removed Dream11 RestResponse dependency;
 import com.dream11.thunder.api.io.request.CTASnapshotRequest;
 import com.dream11.thunder.api.io.response.CTAResponse;
 import com.dream11.thunder.api.service.SdkService;
+import com.dream11.thunder.core.io.Response;
+// Removed Dream11 RestResponse dependency;
 import com.dream11.thunder.core.model.NudgePreview;
 import com.dream11.thunder.core.util.ResponseWrapper;
+import com.google.inject.Inject;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
-import java.util.concurrent.CompletionStage;
-import javax.annotation.Nullable;
-import com.google.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import java.util.concurrent.CompletionStage;
+import javax.annotation.Nullable;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
@@ -27,10 +27,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 
-/**
- * SDK API controller exposing endpoints for CTA activation and snapshot merge.
- * Base path: /cta
- */
+/** SDK API controller exposing endpoints for CTA activation and snapshot merge. Base path: /cta */
 @Slf4j
 @Tag(
     name = "SDK",

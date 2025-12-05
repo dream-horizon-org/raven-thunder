@@ -10,9 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Utility class for state machine operations and data archiving.
- */
+/** Utility class for state machine operations and data archiving. */
 public final class StateMachineUtil {
 
   private StateMachineUtil() {
@@ -20,8 +18,8 @@ public final class StateMachineUtil {
   }
 
   /**
-   * Archives stale state machine data by removing CTAs that are no longer active or paused,
-   * and removing expired state machines based on TTL.
+   * Archives stale state machine data by removing CTAs that are no longer active or paused, and
+   * removing expired state machines based on TTL.
    *
    * @param activeCTAs map of active CTAs
    * @param pausedCTAs map of paused CTAs
@@ -54,9 +52,7 @@ public final class StateMachineUtil {
     return updated;
   }
 
-  /**
-   * Collects all active behaviour tags from active and paused CTAs.
-   */
+  /** Collects all active behaviour tags from active and paused CTAs. */
   private static Set<String> collectActiveBehaviourTags(
       Map<Long, CTA> activeCTAs, Map<Long, CTA> pausedCTAs) {
     Set<String> activeBehaviourTags = new HashSet<>();
@@ -67,9 +63,7 @@ public final class StateMachineUtil {
     return activeBehaviourTags;
   }
 
-  /**
-   * Removes CTAs from snapshot that are no longer active or paused.
-   */
+  /** Removes CTAs from snapshot that are no longer active or paused. */
   private static boolean removeInactiveCTAs(
       Map<Long, StateMachineSnapshot> stateMachineSnapshot,
       Map<Long, CTA> activeCTAs,
@@ -87,9 +81,7 @@ public final class StateMachineUtil {
     return updated;
   }
 
-  /**
-   * Removes expired state machines based on TTL rules.
-   */
+  /** Removes expired state machines based on TTL rules. */
   private static boolean removeExpiredStateMachines(
       Map<Long, StateMachineSnapshot> stateMachineSnapshot, Map<Long, CTA> activeCTAs) {
     boolean updated = false;
@@ -117,9 +109,7 @@ public final class StateMachineUtil {
     return updated;
   }
 
-  /**
-   * Removes behaviour tags that are no longer active.
-   */
+  /** Removes behaviour tags that are no longer active. */
   private static boolean removeStaleBehaviourTags(
       com.dream11.thunder.api.model.UserDataSnapshot snapshot, Set<String> activeBehaviourTags) {
     if (snapshot.getBehaviourTags() == null) {
@@ -159,9 +149,7 @@ public final class StateMachineUtil {
     }
   }
 
-  /**
-   * Initializes snapshot maps if they are null.
-   */
+  /** Initializes snapshot maps if they are null. */
   private static void initializeSnapshotMaps(
       com.dream11.thunder.api.model.UserDataSnapshot snapshot) {
     if (snapshot.getStateMachines() == null) {
@@ -172,9 +160,7 @@ public final class StateMachineUtil {
     }
   }
 
-  /**
-   * Merges state machine snapshots from delta into existing snapshot.
-   */
+  /** Merges state machine snapshots from delta into existing snapshot. */
   private static void mergeStateMachineSnapshots(
       com.dream11.thunder.api.model.UserDataSnapshot snapshot,
       List<StateMachineSnapshot> deltaCTAs) {
@@ -193,9 +179,7 @@ public final class StateMachineUtil {
     resetStateMachines(snapshot.getStateMachines(), deltaCTAs);
   }
 
-  /**
-   * Merges individual state machines for a CTA.
-   */
+  /** Merges individual state machines for a CTA. */
   private static void mergeStateMachinesForCTA(
       StateMachineSnapshot existing, StateMachineSnapshot delta) {
     Map<String, StateMachine> existingSMs = existing.getActiveStateMachines();
@@ -217,18 +201,13 @@ public final class StateMachineUtil {
     }
   }
 
-  /**
-   * Updates CTA metadata (resetAt, actionDoneAt) from delta.
-   */
-  private static void updateCTAMetadata(
-      StateMachineSnapshot existing, StateMachineSnapshot delta) {
+  /** Updates CTA metadata (resetAt, actionDoneAt) from delta. */
+  private static void updateCTAMetadata(StateMachineSnapshot existing, StateMachineSnapshot delta) {
     existing.setResetAt(delta.getResetAt());
     existing.setActionDoneAt(delta.getActionDoneAt());
   }
 
-  /**
-   * Resets state machines based on reset flags in delta snapshot.
-   */
+  /** Resets state machines based on reset flags in delta snapshot. */
   private static void resetStateMachines(
       Map<Long, StateMachineSnapshot> snapshot, List<StateMachineSnapshot> deltaSnapshot) {
     for (StateMachineSnapshot ctaDelta : deltaSnapshot) {
@@ -255,9 +234,7 @@ public final class StateMachineUtil {
     }
   }
 
-  /**
-   * Merges behaviour tag snapshots from delta into existing snapshot.
-   */
+  /** Merges behaviour tag snapshots from delta into existing snapshot. */
   private static void mergeBehaviourTagSnapshots(
       com.dream11.thunder.api.model.UserDataSnapshot snapshot,
       List<com.dream11.thunder.api.model.BehaviourTagSnapshot> deltaBehaviourTags) {
@@ -273,4 +250,3 @@ public final class StateMachineUtil {
     }
   }
 }
-

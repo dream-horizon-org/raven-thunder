@@ -8,4 +8,3 @@ public enum CTAStatus {
   CONCLUDED,
   TERMINATED,
 }
-
