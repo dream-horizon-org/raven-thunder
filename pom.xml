@@ -12,6 +12,14 @@
     <name>Thunder Parent</name>
     <description>Parent POM for Thunder multi-module project</description>
 
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
     <modules>
         <module>thunder-core</module>
         <module>thunder-api</module>
