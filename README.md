@@ -221,7 +221,7 @@ Complete REST API for managing CTAs, Nudges, and Behaviour Tags:
 - **Nudge Preview**: Create and manage nudge previews
 - **Filtering**: Advanced filtering and pagination
 
-**📖 [View Admin API Contracts →](https://dream-horizon-org.github.io/raven-thunder/admin/admin-contracts)**
+**📖 [View Admin API Contracts →](https://dream-horizon-org.github.io/raven-thunder/api/admin-contracts)**
 
 ### SDK API (Port 8080)
 
