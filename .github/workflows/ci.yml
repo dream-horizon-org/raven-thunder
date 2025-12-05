@@ -23,6 +23,9 @@ jobs:
       contents: read
       checks: write
       pull-requests: write
+    env:
+      # Disable Ryuk (resource reaper) to avoid Docker Hub pull issues in CI
+      TESTCONTAINERS_RYUK_DISABLED: true
     steps:
       - name: Checkout repo
         # v4.2.2
