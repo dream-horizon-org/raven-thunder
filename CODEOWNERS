@@ -1,0 +1,12 @@
+# CODEOWNERS file for Thunder
+# This file defines code owners who will be automatically requested for review
+# when changes are made to files in their respective paths.
+#
+# Format: <file-pattern> <@username or @team>
+# More specific patterns should come before more general patterns
+#
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global owners - all files
+* @ANIRAJ168 @khagesh1998 @kunalchavhan @anirudhdream11
+    

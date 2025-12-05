@@ -430,7 +430,9 @@ We welcome contributions! Please see our contributing guidelines:
 
 ## 📄 License
 
-[Add your license here]
+Thunder is licensed under the **MIT License**.
+
+See the [LICENSE](LICENSE) file for details.
 
 ---
 
