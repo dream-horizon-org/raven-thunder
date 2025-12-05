@@ -1,6 +1,7 @@
 // @ts-check
 
 const config = {
+  title: '⚡ Thunder',
   tagline: 'CTAs, Nudges and Behaviour Tags platform',
   url: 'https://dream-horizon-org.github.io',
   baseUrl: '/raven-thunder/',
