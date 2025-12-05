@@ -378,42 +378,6 @@ We use GitHub Actions in `.github/workflows/ci.yml`:
 
 Security scanning is performed by CodeQL via `.github/workflows/codeql.yml`.
 
-## Releases
-
-We publish both Docker images and fat JARs so different consumers can choose what fits their environment.
-
-### Docker images (GHCR)
-
-Images are pushed to GitHub Container Registry (GHCR) on tag pushes (see `.github/workflows/release.yml`). Example usage:
-
-```bash
-# Pull API/Admin images (replace <owner> and <repo> with your org/repo and <VERSION> with a tag)
-docker pull ghcr.io/<owner>/<repo>-thunder-api:<VERSION>
-docker pull ghcr.io/<owner>/<repo>-thunder-admin:<VERSION>
-
-# Run API locally
-docker run --rm -p 8080:8080 ghcr.io/<owner>/<repo>-thunder-api:<VERSION>
-
-# Run Admin locally
-docker run --rm -p 8081:8081 ghcr.io/<owner>/<repo>-thunder-admin:<VERSION>
-```
-
-Tags include semantic versions (e.g., `1.2.3`, `1.2`, `1`, `latest`) when pushed from a semver tag like `v1.2.3`.
-
-### Release assets (fat JARs)
-
-On GitHub Release publication, fat JARs are attached as assets (see `.github/workflows/release-assets.yml`). Download from the project’s Releases page and run:
-
-```bash
-# Example: thunder-api
-java -jar thunder-api-<VERSION>-fat.jar
-
-# Example: thunder-admin
-java -jar thunder-admin-<VERSION>-fat.jar
-```
-
-Artifacts remain available until manually deleted (Docker images can be managed via GHCR cleanup policies).
-
 ## 📁 Project Structure
 
 ```

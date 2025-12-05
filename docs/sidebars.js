@@ -46,7 +46,6 @@ const sidebars = {
         'operations/docker',
         'operations/testing',
         'operations/ci-cd',
-        'operations/releases',
       ],
     },
   ],
