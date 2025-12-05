@@ -27,6 +27,7 @@ const sidebars = {
       label: 'API',
       items: [
         'api/overview',
+        'api/admin-contracts',
         'api/thunder-api-contracts',
       ],
     },

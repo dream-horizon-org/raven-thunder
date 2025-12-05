@@ -104,6 +104,22 @@ If any of these ports are in use, you'll need to stop the conflicting services o
 git clone https://github.com/dream-horizon-org/thunder.git
 cd thunder
 ```
+## Documentation (Docusaurus)
+
+Run the docs site locally:
+
+```bash
+cd docs
+npm install
+npm run start
+# open http://localhost:3000
+```
+
+Requirements:
+- Node.js 18 or 20 (repo includes `.nvmrc`, so you can run `nvm use`)
+- Do not commit `docs/node_modules` or `docs/build` (gitignored).
+
+## Requirements
 
 2. **Start Thunder with Docker (Recommended):**
 
