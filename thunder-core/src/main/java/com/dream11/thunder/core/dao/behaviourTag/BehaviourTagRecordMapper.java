@@ -60,4 +60,3 @@ public class BehaviourTagRecordMapper implements Function<Record, BehaviourTag> 
     return behaviourTag;
   }
 }
-

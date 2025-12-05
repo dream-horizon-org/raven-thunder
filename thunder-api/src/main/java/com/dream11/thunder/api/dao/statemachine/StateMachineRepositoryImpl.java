@@ -11,14 +11,15 @@ import com.dream11.thunder.core.config.AerospikeConfig;
 import com.dream11.thunder.core.dao.AerospikeRepository;
 import com.dream11.thunder.core.util.ParseUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.inject.Inject;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
-import com.google.inject.Inject;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class StateMachineRepositoryImpl extends AerospikeRepository implements StateMachineRepository {
+public class StateMachineRepositoryImpl extends AerospikeRepository
+    implements StateMachineRepository {
 
   private final String namespace;
 

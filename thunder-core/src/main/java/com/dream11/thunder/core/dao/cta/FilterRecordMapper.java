@@ -30,4 +30,3 @@ public class FilterRecordMapper implements Function<Record, FilterResponse> {
     return filterResponse;
   }
 }
-

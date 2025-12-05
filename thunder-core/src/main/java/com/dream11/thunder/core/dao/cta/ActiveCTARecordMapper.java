@@ -14,4 +14,3 @@ public class ActiveCTARecordMapper implements Function<KeyRecord, ActiveCTA> {
     return activeCTA;
   }
 }
-

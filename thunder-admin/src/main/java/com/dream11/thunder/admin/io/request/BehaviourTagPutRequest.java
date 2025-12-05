@@ -21,4 +21,3 @@ public class BehaviourTagPutRequest {
         behaviourTagName, exposureRule, linkedCtas, ctaRelation);
   }
 }
-

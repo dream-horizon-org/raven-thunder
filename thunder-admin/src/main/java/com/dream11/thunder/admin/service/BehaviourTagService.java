@@ -9,14 +9,10 @@ import io.reactivex.rxjava3.core.Single;
 
 public interface BehaviourTagService {
 
-  /**
-   * Lists all behaviour tags for a tenant.
-   */
+  /** Lists all behaviour tags for a tenant. */
   Single<BehaviourTagsResponse> fetchAllBehaviourTags(String tenantId);
 
-  /**
-   * Fetches behaviour tag details by name for a tenant.
-   */
+  /** Fetches behaviour tag details by name for a tenant. */
   Single<BehaviourTag> fetchBehaviourTagDetail(String tenantId, String behaviourTagName);
 
   /**
@@ -43,4 +39,3 @@ public interface BehaviourTagService {
       BehaviourTagPutRequest behaviourTagPutRequest,
       String userId);
 }
-

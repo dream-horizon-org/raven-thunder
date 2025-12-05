@@ -9,25 +9,24 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RestVerticle extends AbstractRestVerticle {
 
-    private static final String PACKAGE_NAME = "com.dream11.thunder.admin";
+  private static final String PACKAGE_NAME = "com.dream11.thunder.admin";
 
-    public RestVerticle() {
-        super(PACKAGE_NAME);
-    }
+  public RestVerticle() {
+    super(PACKAGE_NAME);
+  }
 
-    public RestVerticle(HttpServerOptions options) {
-        super(PACKAGE_NAME, options);
-    }
+  public RestVerticle(HttpServerOptions options) {
+    super(PACKAGE_NAME, options);
+  }
 
-    @Override
-    protected ClassInjector getInjector() {
-        return GuiceInjector.getGuiceInjector();
-    }
+  @Override
+  protected ClassInjector getInjector() {
+    return GuiceInjector.getGuiceInjector();
+  }
 
-    @Override
-    public void stop() throws Exception {
-        log.info("Stopping RestVerticle");
-        super.stop();
-    }
+  @Override
+  public void stop() throws Exception {
+    log.info("Stopping RestVerticle");
+    super.stop();
+  }
 }
-

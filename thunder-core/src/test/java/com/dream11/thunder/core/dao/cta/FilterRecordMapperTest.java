@@ -1,12 +1,13 @@
 package com.dream11.thunder.core.dao.cta;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.aerospike.client.Record;
 import com.dream11.thunder.core.io.response.FilterResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import static org.assertj.core.api.Assertions.assertThat;
 
 class FilterRecordMapperTest {
 
@@ -39,5 +40,3 @@ class FilterRecordMapperTest {
     assertThat(out.getNames()).isNull();
   }
 }
-
-

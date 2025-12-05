@@ -21,4 +21,3 @@ public class BehaviourTag {
   private Set<String> linkedCtas;
   private String tenantId;
 }
-

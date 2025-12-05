@@ -16,4 +16,3 @@ public class Metadata {
   private String teams;
   private String lastEditedBy;
 }
-

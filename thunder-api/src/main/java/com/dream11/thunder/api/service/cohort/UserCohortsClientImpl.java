@@ -7,8 +7,8 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Deprecated implementation of UserCohortsClient.
- * Always returns Set.of("all") as cohorts are deprecated.
+ * Deprecated implementation of UserCohortsClient. Always returns Set.of("all") as cohorts are
+ * deprecated.
  */
 @Slf4j
 @Singleton

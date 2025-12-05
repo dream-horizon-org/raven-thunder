@@ -88,6 +88,12 @@ java -version
 
 ### Port Requirements
 
+- ✅ **Multi-module architecture**: `thunder-core`, `thunder-api`, and `thunder-admin`
+- ✅ **Complete REST APIs**: Admin panel (19 endpoints) and SDK/Debug APIs (7 endpoints)
+- ✅ **Aerospike integration**: Reactive data access with RxJava3
+- ✅ **Docker-ready**: Full Docker Compose setup with Aerospike, seed data, and indexes
+- ✅ **Health checks**: Comprehensive health monitoring for services and Aerospike
+- ✅ **CI & Security**: GitHub Actions CI, release pipelines, and CodeQL code scanning
 Make sure the following ports are free and not in use by other services:
 
 - **8080** – Thunder API service (SDK endpoints)
@@ -353,6 +359,24 @@ docker-compose up -d --build
 ```
 
 For detailed deployment instructions and production best practices, see the [Deployment Guide](https://dream-horizon-org.github.io/raven-thunder/operations/docker).
+
+Convenience scripts are available in the `scripts/` directory:
+
+- `start.sh` - Build and start Thunder in Docker
+- `stop.sh` - Stop Thunder Docker container
+- `restart.sh` - Restart Thunder Docker container
+- `logs.sh` - View Thunder Docker logs
+
+## Continuous Integration (CI)
+
+We use GitHub Actions in `.github/workflows/ci.yml`:
+
+- Runs on pull requests (opened/reopened/synchronize) and pushes to `main`
+- Builds with Java 17 and runs `mvn clean verify` (unit + integration tests)
+- Publishes JUnit results back to the PR for quick feedback
+- Cancels superseded runs to save time
+
+Security scanning is performed by CodeQL via `.github/workflows/codeql.yml`.
 
 ## 📁 Project Structure
 

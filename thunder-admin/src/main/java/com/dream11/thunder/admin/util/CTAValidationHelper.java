@@ -11,9 +11,7 @@ import java.util.Set;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Utility class for validating CTA operations related to behaviour tags.
- */
+/** Utility class for validating CTA operations related to behaviour tags. */
 @Slf4j
 public final class CTAValidationHelper {
 
@@ -22,8 +20,8 @@ public final class CTAValidationHelper {
   }
 
   /**
-   * Validates that linked CTAs have valid statuses for creating a new behaviour tag.
-   * Only DRAFT or PAUSED CTAs can be linked to new behaviour tags.
+   * Validates that linked CTAs have valid statuses for creating a new behaviour tag. Only DRAFT or
+   * PAUSED CTAs can be linked to new behaviour tags.
    *
    * @param allCTAs all CTAs for the tenant
    * @param linkedCtaIds the set of CTA IDs to be linked
@@ -47,8 +45,8 @@ public final class CTAValidationHelper {
   }
 
   /**
-   * Validates that linked CTAs have valid statuses for updating a behaviour tag.
-   * Only DRAFT or PAUSED CTAs can be linked during updates.
+   * Validates that linked CTAs have valid statuses for updating a behaviour tag. Only DRAFT or
+   * PAUSED CTAs can be linked during updates.
    *
    * @param allCTAs all CTAs for the tenant
    * @param linkedCtaIds the set of CTA IDs to be linked
@@ -111,15 +109,16 @@ public final class CTAValidationHelper {
       Function<CTAStatus, Boolean> statusValidator) {
     List<String> invalidCTANames = new ArrayList<>();
 
-    allCTAs.values().forEach(
-        cta -> {
-          if (linkedCtaIds.contains(cta.getId().toString())
-              && statusValidator.apply(cta.getCtaStatus())) {
-            invalidCTANames.add(cta.getName());
-          }
-        });
+    allCTAs
+        .values()
+        .forEach(
+            cta -> {
+              if (linkedCtaIds.contains(cta.getId().toString())
+                  && statusValidator.apply(cta.getCtaStatus())) {
+                invalidCTANames.add(cta.getName());
+              }
+            });
 
     return invalidCTANames;
   }
 }
-

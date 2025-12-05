@@ -6,4 +6,3 @@ public interface Constants {
   String CTA_COUNTER = "cta_counter";
   String META_RECORD = "meta_record";
 }
-

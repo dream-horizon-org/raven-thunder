@@ -43,8 +43,7 @@ public class AdminServiceImpl implements AdminService {
 
   @Inject
   public AdminServiceImpl(
-      CTARepository ctaRepository,
-      NudgePreviewRepository nudgePreviewRepository) {
+      CTARepository ctaRepository, NudgePreviewRepository nudgePreviewRepository) {
     this.ctaRepository = ctaRepository;
     this.nudgePreviewRepository = nudgePreviewRepository;
   }
@@ -177,9 +176,7 @@ public class AdminServiceImpl implements AdminService {
             cta -> {
               long startTime = System.currentTimeMillis();
               long endTime =
-                  cta.getEndTime() == null
-                      ? startTime + Constants.THREE_YEARS
-                      : cta.getEndTime();
+                  cta.getEndTime() == null ? startTime + Constants.THREE_YEARS : cta.getEndTime();
               return ctaRepository
                   .update(id, CTAStatus.LIVE, startTime, endTime)
                   .doOnComplete(() -> log.info("CTA {} made live", id))
@@ -273,9 +270,7 @@ public class AdminServiceImpl implements AdminService {
     return ctaRepository
         .find(tenantId, id)
         .toSingle()
-        .onErrorResumeNext(
-            throwable ->
-                Single.error(new DefinedException(ErrorEntity.NO_SUCH_CTA)))
+        .onErrorResumeNext(throwable -> Single.error(new DefinedException(ErrorEntity.NO_SUCH_CTA)))
         .flatMap(
             cta ->
                 validator.test(cta)
@@ -340,4 +335,3 @@ public class AdminServiceImpl implements AdminService {
             error -> log.error("Error terminating CTA: {}", ctaId, error));
   }
 }
-

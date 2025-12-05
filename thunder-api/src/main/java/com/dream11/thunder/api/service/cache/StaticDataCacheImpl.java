@@ -7,15 +7,14 @@ import com.dream11.thunder.core.model.BehaviourTag;
 import com.dream11.thunder.core.model.CTA;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * Simple cache implementation for static data (CTAs and BehaviourTags).
- * Loads data from repositories on initialization.
+ * Simple cache implementation for static data (CTAs and BehaviourTags). Loads data from
+ * repositories on initialization.
  */
 @Slf4j
 @Singleton
@@ -30,8 +29,7 @@ public class StaticDataCacheImpl implements StaticDataCache {
 
   @Inject
   public StaticDataCacheImpl(
-      CTARepository ctaRepository,
-      BehaviourTagsRepository behaviourTagsRepository) {
+      CTARepository ctaRepository, BehaviourTagsRepository behaviourTagsRepository) {
     this.ctaRepository = ctaRepository;
     this.behaviourTagsRepository = behaviourTagsRepository;
   }
@@ -108,4 +106,3 @@ public class StaticDataCacheImpl implements StaticDataCache {
     return new ConcurrentHashMap<>(behaviourTagCache);
   }
 }
-

@@ -12,4 +12,3 @@ public class GroupByConfig {
   private Integer maxActiveStateMachineCount;
   private List<String> groupByKeys;
 }
-

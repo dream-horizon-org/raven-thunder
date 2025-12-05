@@ -8,4 +8,3 @@ public final class Constants {
     // Prevent instantiation
   }
 }
-

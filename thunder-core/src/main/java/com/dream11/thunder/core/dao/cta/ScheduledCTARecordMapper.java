@@ -14,4 +14,3 @@ public class ScheduledCTARecordMapper implements Function<KeyRecord, ScheduledCT
     return scheduledCTA;
   }
 }
-

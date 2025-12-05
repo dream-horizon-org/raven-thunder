@@ -6,19 +6,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Main configuration class for the Thunder application.
- * This class provides a type-safe way to access application configuration.
+ * Main configuration class for the Thunder application. This class provides a type-safe way to
+ * access application configuration.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Config {
 
-    @JsonProperty("server")
-    private ServerConfig server;
+  @JsonProperty("server")
+  private ServerConfig server;
 
-    @JsonProperty("aerospike")
-    private AerospikeConfig aerospike;
-
+  @JsonProperty("aerospike")
+  private AerospikeConfig aerospike;
 }
-

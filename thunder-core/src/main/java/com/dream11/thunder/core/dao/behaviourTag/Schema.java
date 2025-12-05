@@ -13,4 +13,3 @@ interface Schema {
   String LINKED_CTAS = "linked_ctas";
   String TENANT_BIN = "tenantId";
 }
-

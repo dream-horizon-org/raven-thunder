@@ -6,4 +6,3 @@ public enum WindowFrequencyUnit {
   minutes,
   seconds
 }
-

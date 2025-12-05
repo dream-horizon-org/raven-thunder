@@ -17,8 +17,8 @@ public class CTAUpdateValidator {
   private final PausedCTAUpdateValidator pausedCTAUpdateValidator = new PausedCTAUpdateValidator();
 
   /**
-   * Validates update eligibility based on current CTA status and delegates
-   * to the appropriate validator (DRAFT or PAUSED).
+   * Validates update eligibility based on current CTA status and delegates to the appropriate
+   * validator (DRAFT or PAUSED).
    *
    * @throws DefinedException when updates are not allowed for current status
    */
@@ -34,4 +34,3 @@ public class CTAUpdateValidator {
     return pausedCTAUpdateValidator.apply(ctaRequest, ctaDetails, user, ctaId);
   }
 }
-

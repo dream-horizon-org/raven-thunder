@@ -30,4 +30,3 @@ public class Rule {
   @NotNull @Valid private List<Map<String, Object>> actions;
   @NotNull @Valid private Frequency frequency;
 }
-

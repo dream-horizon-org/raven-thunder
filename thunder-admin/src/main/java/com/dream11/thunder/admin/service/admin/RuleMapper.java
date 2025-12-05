@@ -28,4 +28,3 @@ public class RuleMapper {
         ruleRequest.getFrequency());
   }
 }
-

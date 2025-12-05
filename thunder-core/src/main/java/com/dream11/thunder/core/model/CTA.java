@@ -29,4 +29,3 @@ public class CTA {
   private String lastUpdatedBy;
   private String tenantId;
 }
-

@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: CI
+    runs-on:
+      - ubuntu-24.04
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+    env:
+      # Disable Ryuk (resource reaper) to avoid Docker Hub pull issues in CI
+      TESTCONTAINERS_RYUK_DISABLED: true
+    steps:
+      - name: Checkout repo
+        # v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Set up Temurin JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Check code formatting (Spotless)
+        run: |
+          mvn -B -ntp spotless:check
+        continue-on-error: false
+
+      - name: Check code style (Checkstyle)
+        run: |
+          mvn -B -ntp checkstyle:check
+        continue-on-error: false
+
+      - name: Test
+        run: |
+          mvn -B -ntp -DskipITs=false -Dstyle.color=always clean verify
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@afb2984f4d89672b2f9d9c13ae23d53779671984
+        if: always()
+        with:
+          files: |
+            **/target/surefire-reports/TEST-*.xml
+            **/target/failsafe-reports/TEST-*.xml
+

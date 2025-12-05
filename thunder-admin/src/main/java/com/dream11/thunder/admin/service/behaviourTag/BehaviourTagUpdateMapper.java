@@ -6,8 +6,8 @@ import com.dream11.thunder.core.model.BehaviourTag;
 public class BehaviourTagUpdateMapper {
 
   /**
-   * Maps an update request to a BehaviourTag model, setting lastUpdatedBy/lastUpdatedAt,
-   * and preserving the tag name as identifier.
+   * Maps an update request to a BehaviourTag model, setting lastUpdatedBy/lastUpdatedAt, and
+   * preserving the tag name as identifier.
    *
    * @param tenantId tenant identifier
    * @param behaviourTag update request
@@ -16,7 +16,10 @@ public class BehaviourTagUpdateMapper {
    * @return updated BehaviourTag model
    */
   public BehaviourTag apply(
-      String tenantId, BehaviourTagPutRequest behaviourTag, String behaviourTagName, String userId) {
+      String tenantId,
+      BehaviourTagPutRequest behaviourTag,
+      String behaviourTagName,
+      String userId) {
     return new BehaviourTag(
         behaviourTagName,
         behaviourTag.getDescription(),
@@ -30,4 +33,3 @@ public class BehaviourTagUpdateMapper {
         tenantId);
   }
 }
-

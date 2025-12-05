@@ -1,5 +1,10 @@
 package com.dream11.thunder.admin.service.admin;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
 import com.dream11.thunder.admin.exception.DefinedException;
 import com.dream11.thunder.admin.service.AdminService;
 import com.dream11.thunder.core.dao.CTARepository;
@@ -9,18 +14,12 @@ import com.dream11.thunder.core.model.CTA;
 import com.dream11.thunder.core.model.CTAStatus;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Maybe;
-import io.reactivex.rxjava3.core.Single;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AdminServiceImplStatusTest {
@@ -41,15 +40,15 @@ class AdminServiceImplStatusTest {
     when(ctaRepository.find(tenantId, id)).thenReturn(Maybe.just(draft));
     ArgumentCaptor<Long> startCaptor = ArgumentCaptor.forClass(Long.class);
     ArgumentCaptor<Long> endCaptor = ArgumentCaptor.forClass(Long.class);
-    when(ctaRepository.update(eq(id), eq(CTAStatus.LIVE), startCaptor.capture(), endCaptor.capture()))
+    when(ctaRepository.update(
+            eq(id), eq(CTAStatus.LIVE), startCaptor.capture(), endCaptor.capture()))
         .thenReturn(Completable.complete());
 
     AdminService svc = new AdminServiceImpl(ctaRepository, nudgePreviewRepository);
     svc.updateStatusToLive(tenantId, id).test().assertComplete();
 
     verify(ctaRepository, times(1)).find(tenantId, id);
-    verify(ctaRepository, times(1))
-        .update(eq(id), eq(CTAStatus.LIVE), anyLong(), anyLong());
+    verify(ctaRepository, times(1)).update(eq(id), eq(CTAStatus.LIVE), anyLong(), anyLong());
     long start = startCaptor.getValue();
     long end = endCaptor.getValue();
     // end should be after start; exact offset is implementation-specific, so assert ordering
@@ -67,7 +66,8 @@ class AdminServiceImplStatusTest {
     when(ctaRepository.find(tenantId, id)).thenReturn(Maybe.just(live));
 
     AdminService svc = new AdminServiceImpl(ctaRepository, nudgePreviewRepository);
-    assertThrows(DefinedException.class, () -> svc.updateStatusToLive(tenantId, id).blockingAwait());
+    assertThrows(
+        DefinedException.class, () -> svc.updateStatusToLive(tenantId, id).blockingAwait());
     verify(ctaRepository, never()).update(eq(id), eq(CTAStatus.LIVE), anyLong(), anyLong());
   }
 
@@ -83,7 +83,8 @@ class AdminServiceImplStatusTest {
     details.setStartTime(System.currentTimeMillis() + 60_000); // in future
 
     when(ctaRepository.findWithGeneration(tenantId, id)).thenReturn(Maybe.just(details));
-    when(ctaRepository.update(id, generation, CTAStatus.SCHEDULED)).thenReturn(Completable.complete());
+    when(ctaRepository.update(id, generation, CTAStatus.SCHEDULED))
+        .thenReturn(Completable.complete());
 
     AdminService svc = new AdminServiceImpl(ctaRepository, nudgePreviewRepository);
     svc.updateStatusToScheduled(tenantId, id).test().assertComplete();
@@ -105,7 +106,8 @@ class AdminServiceImplStatusTest {
     when(ctaRepository.findWithGeneration(tenantId, id)).thenReturn(Maybe.just(details));
 
     AdminService svc = new AdminServiceImpl(ctaRepository, nudgePreviewRepository);
-    assertThrows(DefinedException.class, () -> svc.updateStatusToScheduled(tenantId, id).blockingAwait());
+    assertThrows(
+        DefinedException.class, () -> svc.updateStatusToScheduled(tenantId, id).blockingAwait());
     verify(ctaRepository, never()).update(eq(id), anyInt(), eq(CTAStatus.SCHEDULED));
   }
 
@@ -126,5 +128,3 @@ class AdminServiceImplStatusTest {
     verify(ctaRepository, times(1)).update(id, CTAStatus.PAUSED);
   }
 }
-
-

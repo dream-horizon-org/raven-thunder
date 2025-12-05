@@ -8,8 +8,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 /**
- * Utility class to wrap RxJava3 reactive types into CompletionStage<Response<T>>.
- * Used for converting reactive streams to JAX-RS compatible responses.
+ * Utility class to wrap RxJava3 reactive types into CompletionStage<Response<T>>. Used for
+ * converting reactive streams to JAX-RS compatible responses.
  */
 public class ResponseWrapper {
 
@@ -58,8 +58,7 @@ public class ResponseWrapper {
    * @param <T> Type of data
    * @return CompletionStage with Response
    */
-  public static <T> CompletionStage<Response<T>> fromSingle(
-      Single<T> source, int httpStatusCode) {
+  public static <T> CompletionStage<Response<T>> fromSingle(Single<T> source, int httpStatusCode) {
     CompletableFuture<Response<T>> future = new CompletableFuture<>();
     source.subscribe(
         value -> future.complete(Response.successfulResponse(value, httpStatusCode)),
@@ -67,4 +66,3 @@ public class ResponseWrapper {
     return future;
   }
 }
-

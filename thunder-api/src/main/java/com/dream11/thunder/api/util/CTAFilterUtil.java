@@ -5,9 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Utility class for filtering CTAs based on various criteria.
- */
+/** Utility class for filtering CTAs based on various criteria. */
 public final class CTAFilterUtil {
 
   private CTAFilterUtil() {
@@ -28,10 +26,9 @@ public final class CTAFilterUtil {
   }
 
   /**
-   * Filters active CTAs that are eligible for a user based on cohort eligibility rules.
-   * A CTA is eligible if:
-   * - User has at least one cohort in the CTA's include list
-   * - User has no cohorts in the CTA's exclude list
+   * Filters active CTAs that are eligible for a user based on cohort eligibility rules. A CTA is
+   * eligible if: - User has at least one cohort in the CTA's include list - User has no cohorts in
+   * the CTA's exclude list
    *
    * @param tenantId the tenant ID
    * @param userCohorts the set of user cohorts
@@ -60,8 +57,7 @@ public final class CTAFilterUtil {
 
     // Check if user has at least one cohort in include list
     boolean hasIncludedCohort =
-        cta.getRule().getCohortEligibility().getIncludes().stream()
-            .anyMatch(userCohorts::contains);
+        cta.getRule().getCohortEligibility().getIncludes().stream().anyMatch(userCohorts::contains);
 
     if (!hasIncludedCohort) {
       return false;
@@ -69,10 +65,8 @@ public final class CTAFilterUtil {
 
     // Check if user has any cohort in exclude list
     boolean hasExcludedCohort =
-        cta.getRule().getCohortEligibility().getExcludes().stream()
-            .anyMatch(userCohorts::contains);
+        cta.getRule().getCohortEligibility().getExcludes().stream().anyMatch(userCohorts::contains);
 
     return !hasExcludedCohort;
   }
 }
-
