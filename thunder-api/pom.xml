@@ -17,8 +17,8 @@
     <description>REST API module for Thunder application</description>
 
     <properties>
-        <main.verticle>com.dream11.thunder.api.verticle.MainVerticle</main.verticle>
-        <launcher.class>com.dream11.thunder.api.Main</launcher.class>
+        <main.verticle>com.raven.thunder.api.verticle.MainVerticle</main.verticle>
+        <launcher.class>com.raven.thunder.api.Main</launcher.class>
     </properties>
 
     <dependencies>

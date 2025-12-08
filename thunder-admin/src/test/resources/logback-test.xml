@@ -5,7 +5,7 @@
 		</encoder>
 	</appender>
 
-	<logger name="com.dream11.thunder" level="INFO"/>
+	<logger name="com.raven.thunder" level="INFO"/>
 
 	<root level="INFO">
 		<appender-ref ref="CONSOLE" />
