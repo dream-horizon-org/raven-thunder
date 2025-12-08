@@ -406,16 +406,6 @@ components:
         limit:
           type: integer
           format: int32
-    Nudge:
-      type: object
-      required:
-      - id
-      properties:
-        id:
-          type: string
-        property:
-          type: object
-          additionalProperties: {}
     NudgePreview:
       type: object
       properties:
@@ -612,10 +602,6 @@ tags:
   description: APIs for managing Nudge Previews. Nudge Previews are used to preview
     nudge templates before they are used in CTAs. The preview includes the nudge template
     and TTL (time-to-live) configuration.
-- name: Nudges
-  description: "APIs for managing Nudge templates and Nudge Previews. Nudges define\
-    \ the UI components and actions displayed to users in CTAs. Note: Nudge routes\
-    \ are deprecated. Use Nudge Preview routes instead."
 paths:
   /healthcheck:
     get:
@@ -1563,87 +1549,6 @@ paths:
               examples:
                 Success Response:
                   summary: Nudge Preview created/updated
-                  value:
-                    success: true
-                    data: null
-                    statusCode: 200
-        "400":
-          description: Invalid request data or validation failed
-  /thunder/nudges:
-    put:
-      summary: Update an existing Nudge (Deprecated)
-      description: Updates an existing Nudge template. All fields in the request will
-        update the corresponding fields in the Nudge. ⚠️ This endpoint is deprecated.
-        Use Nudge Preview endpoints instead.
-      operationId: updateNudge
-      deprecated: true
-      tags:
-      - Nudges
-      parameters:
-      - description: Tenant identifier
-        example: default
-        name: x-tenant-id
-        required: false
-        in: header
-        schema:
-          type: string
-          default: default
-      requestBody:
-        description: Updated Nudge template definition
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Nudge"
-        required: true
-      responses:
-        "200":
-          description: Nudge updated successfully
-          content:
-            application/json:
-              examples:
-                Success Response:
-                  summary: Nudge updated
-                  value:
-                    success: true
-                    data: null
-                    statusCode: 200
-        "400":
-          description: Invalid request data or validation failed
-        "404":
-          description: Nudge not found
-    post:
-      summary: Create a new Nudge (Deprecated)
-      description: Creates a new Nudge template that can be used in CTAs. Nudges define
-        the UI components and actions that will be displayed to users. ⚠️ This endpoint
-        is deprecated. Use Nudge Preview endpoints instead.
-      operationId: createNudge
-      deprecated: true
-      tags:
-      - Nudges
-      parameters:
-      - description: Tenant identifier for multi-tenancy support
-        example: default
-        name: x-tenant-id
-        required: false
-        schema:
-          type: string
-          default: default
-        in: header
-      requestBody:
-        description: Nudge template definition
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Nudge"
-        required: true
-      responses:
-        "200":
-          description: Nudge created successfully
-          content:
-            application/json:
-              examples:
-                Success Response:
-                  summary: Nudge created
                   value:
                     success: true
                     data: null
