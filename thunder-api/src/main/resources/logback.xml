@@ -34,7 +34,7 @@
     </encoder>
   </appender>
 
-  <logger name="com.dream11.thunder" level="debug"/>
+  <logger name="com.raven.thunder" level="debug"/>
 
   <root level="info">
     <appender-ref ref="CONSOLE"/>

@@ -17,8 +17,8 @@
     <description>Admin API module for Thunder application</description>
 
     <properties>
-        <main.verticle>com.dream11.thunder.admin.verticle.MainVerticle</main.verticle>
-        <launcher.class>com.dream11.thunder.admin.Main</launcher.class>
+        <main.verticle>com.raven.thunder.admin.verticle.MainVerticle</main.verticle>
+        <launcher.class>com.raven.thunder.admin.Main</launcher.class>
     </properties>
 
     <dependencies>
