@@ -162,8 +162,7 @@ public final class StateMachineUtil {
 
   /** Merges state machine snapshots from delta into existing snapshot. */
   private static void mergeStateMachineSnapshots(
-      com.raven.thunder.api.model.UserDataSnapshot snapshot,
-      List<StateMachineSnapshot> deltaCTAs) {
+      com.raven.thunder.api.model.UserDataSnapshot snapshot, List<StateMachineSnapshot> deltaCTAs) {
     for (StateMachineSnapshot ctaDelta : deltaCTAs) {
       Long ctaId = Long.parseLong(ctaDelta.getCtaId());
 

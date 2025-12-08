@@ -1,5 +1,6 @@
 package com.raven.thunder.api.service.sdk;
 
+import com.google.inject.Inject;
 import com.raven.thunder.api.dao.StateMachineRepository;
 import com.raven.thunder.api.io.request.CTASnapshotRequest;
 import com.raven.thunder.api.io.response.CTAResponse;
@@ -13,7 +14,6 @@ import com.raven.thunder.core.dao.NudgePreviewRepository;
 import com.raven.thunder.core.model.BehaviourTag;
 import com.raven.thunder.core.model.CTA;
 import com.raven.thunder.core.model.NudgePreview;
-import com.google.inject.Inject;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
 import java.util.HashMap;

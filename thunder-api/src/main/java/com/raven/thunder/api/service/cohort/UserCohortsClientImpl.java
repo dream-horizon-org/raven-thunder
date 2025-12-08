@@ -1,7 +1,7 @@
 package com.raven.thunder.api.service.cohort;
 
-import com.raven.thunder.api.service.UserCohortsClient;
 import com.google.inject.Singleton;
+import com.raven.thunder.api.service.UserCohortsClient;
 import io.reactivex.rxjava3.core.Single;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;

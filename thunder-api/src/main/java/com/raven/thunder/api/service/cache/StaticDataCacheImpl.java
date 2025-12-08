@@ -1,12 +1,12 @@
 package com.raven.thunder.api.service.cache;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.raven.thunder.api.service.StaticDataCache;
 import com.raven.thunder.core.dao.BehaviourTagsRepository;
 import com.raven.thunder.core.dao.CTARepository;
 import com.raven.thunder.core.model.BehaviourTag;
 import com.raven.thunder.core.model.CTA;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;

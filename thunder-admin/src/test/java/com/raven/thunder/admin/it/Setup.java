@@ -66,8 +66,7 @@ public class Setup
   private void initializeGuiceInjector() {
     try {
       com.raven.thunder.admin.injection.GuiceInjector.initialize(
-          java.util.List.of(
-              new com.raven.thunder.admin.injection.MainModule(vertx.getDelegate())));
+          java.util.List.of(new com.raven.thunder.admin.injection.MainModule(vertx.getDelegate())));
     } catch (IllegalStateException ignored) {
       // Already initialized - safe to continue
     }

@@ -1,5 +1,6 @@
 package com.raven.thunder.admin.service.admin;
 
+import com.google.inject.Inject;
 import com.raven.thunder.admin.exception.DefinedException;
 import com.raven.thunder.admin.exception.ErrorEntity;
 import com.raven.thunder.admin.io.request.CTARequest;
@@ -21,7 +22,6 @@ import com.raven.thunder.core.io.response.FilterResponse;
 import com.raven.thunder.core.model.CTA;
 import com.raven.thunder.core.model.CTAStatus;
 import com.raven.thunder.core.model.NudgePreview;
-import com.google.inject.Inject;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;

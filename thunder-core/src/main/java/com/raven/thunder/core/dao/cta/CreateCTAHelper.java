@@ -2,9 +2,9 @@ package com.raven.thunder.core.dao.cta;
 
 import com.aerospike.client.Bin;
 import com.aerospike.client.Value;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.raven.thunder.core.model.CTA;
 import com.raven.thunder.core.util.ParseUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.reactivex.rxjava3.annotations.NonNull;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,12 +1,12 @@
 package com.raven.thunder.admin.rest;
 
 import com.aerospike.client.Info;
+import com.google.inject.Inject;
 import com.raven.thunder.core.client.AerospikeClient;
 import com.raven.thunder.core.client.AerospikeClientHolder;
 import com.raven.thunder.core.config.AerospikeConfig;
 import com.raven.thunder.core.config.Config;
 import com.raven.thunder.core.util.SharedDataUtils;
-import com.google.inject.Inject;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import jakarta.ws.rs.Consumes;

@@ -2,6 +2,7 @@ package com.raven.thunder.admin.rest;
 
 import static com.raven.thunder.admin.constant.Constants.USER_ID_NULL_ERROR_MESSAGE;
 
+import com.google.inject.Inject;
 import com.raven.thunder.admin.io.request.CTARequest;
 import com.raven.thunder.admin.io.request.CTAUpdateRequest;
 import com.raven.thunder.admin.io.response.CTAListResponse;
@@ -14,7 +15,6 @@ import com.raven.thunder.core.model.CTA;
 import com.raven.thunder.core.model.NudgePreview;
 import com.raven.thunder.core.util.FormatUtil;
 import com.raven.thunder.core.util.ResponseWrapper;
-import com.google.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import java.util.concurrent.CompletionStage;

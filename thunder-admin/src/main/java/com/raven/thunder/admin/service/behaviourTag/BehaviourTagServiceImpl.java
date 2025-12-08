@@ -1,5 +1,6 @@
 package com.raven.thunder.admin.service.behaviourTag;
 
+import com.google.inject.Inject;
 import com.raven.thunder.admin.exception.DefinedException;
 import com.raven.thunder.admin.exception.ErrorEntity;
 import com.raven.thunder.admin.io.request.BehaviourTagCreateRequest;
@@ -11,7 +12,6 @@ import com.raven.thunder.admin.util.CTAValidationHelper;
 import com.raven.thunder.core.dao.BehaviourTagsRepository;
 import com.raven.thunder.core.dao.CTARepository;
 import com.raven.thunder.core.model.BehaviourTag;
-import com.google.inject.Inject;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
 import java.util.ArrayList;

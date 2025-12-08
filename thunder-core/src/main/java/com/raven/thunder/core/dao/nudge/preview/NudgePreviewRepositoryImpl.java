@@ -7,13 +7,13 @@ import com.aerospike.client.Bin;
 import com.aerospike.client.Key;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
+import com.google.inject.Inject;
 import com.raven.thunder.core.client.AerospikeClient;
 import com.raven.thunder.core.config.AerospikeConfig;
 import com.raven.thunder.core.dao.AerospikeRepository;
 import com.raven.thunder.core.dao.NudgePreviewRepository;
 import com.raven.thunder.core.exception.ThunderException;
 import com.raven.thunder.core.model.NudgePreview;
-import com.google.inject.Inject;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Maybe;
 

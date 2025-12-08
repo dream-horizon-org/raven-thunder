@@ -1,5 +1,7 @@
 package com.raven.thunder.api.injection;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Singleton;
 import com.raven.thunder.api.dao.StateMachineRepository;
 import com.raven.thunder.api.dao.statemachine.StateMachineRepositoryImpl;
 import com.raven.thunder.api.service.SdkService;
@@ -20,8 +22,6 @@ import com.raven.thunder.core.dao.behaviourTag.BehaviourTagRepositoryImpl;
 import com.raven.thunder.core.dao.cta.CTARepositoryImpl;
 import com.raven.thunder.core.dao.nudge.preview.NudgePreviewRepositoryImpl;
 import com.raven.thunder.core.util.SharedDataUtils;
-import com.google.inject.AbstractModule;
-import com.google.inject.Singleton;
 import io.vertx.core.Vertx;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
