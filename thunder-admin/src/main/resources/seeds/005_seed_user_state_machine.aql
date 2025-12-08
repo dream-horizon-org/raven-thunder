@@ -1,0 +1,7 @@
+SET KEY_SEND TRUE
+
+-- Seed User State Machine for user 12345 (matches documentation examples)
+-- This allows testing GET /cta/state-machines endpoint immediately
+DELETE FROM thunder.state-machine WHERE PK = 'tenant1:12345'
+INSERT INTO thunder.state-machine (PK, snapshot) VALUES ('tenant1:12345', '{"stateMachines":{"101":{"ctaId":"101","activeStateMachines":{"5":{"currentState":"2","lastTransitionAt":1720166608502,"context":{"cohort":"new_user","appVersion":"1.2.3"},"createdAt":1720166608502,"reset":true}},"resetAt":[1701603029000],"actionDoneAt":[1756099199923]},"202":{"ctaId":"202","activeStateMachines":{},"resetAt":[],"actionDoneAt":[]}},"behaviourTags":{"onboarding_eligible":{"behaviourTagName":"onboarding_eligible","exposureRule":{"session":{"limit":2},"window":{"limit":3,"unit":"days","value":7},"lifespan":{"limit":10}},"ctaRelation":{"shownCta":{"rule":"LIST","ctaList":["101"]},"hideCta":{"rule":"ANY","ctaList":[]},"activeCtas":["101"]}}}}')
+

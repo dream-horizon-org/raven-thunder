@@ -99,8 +99,32 @@
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                             </transformers>
-                            <artifactSet/>
+                            <artifactSet>
+                                <excludes>
+                                    <!-- Exclude provided scope dependencies (build-time only, e.g., SmallRye OpenAPI) -->
+                                    <exclude>io.smallrye:*</exclude>
+                                </excludes>
+                            </artifactSet>
                             <outputFile>${project.build.directory}/${project.artifactId}-${project.version}-fat.jar</outputFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- SmallRye OpenAPI Maven Plugin -->
+            <plugin>
+                <groupId>io.smallrye</groupId>
+                <artifactId>smallrye-open-api-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-openapi</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>generate-schema</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/openapi</outputDirectory>
+                            <outputFileTypeFilter>YAML</outputFileTypeFilter>
                         </configuration>
                     </execution>
                 </executions>

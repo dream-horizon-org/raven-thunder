@@ -12,12 +12,25 @@ import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Schema(
+    description =
+        "Rule configuration for CTA including cohort eligibility, state transitions, actions, and frequency. "
+            + "Note: cohortEligibility must use includes: [\"all\"] and excludes: [].")
 public class RuleRequest {
-  @NotNull @Valid private CohortEligibility cohortEligibility;
+  @Schema(
+      description =
+          "Cohort eligibility. Must use includes: [\"all\"] and excludes: [] "
+              + "since user-cohorts system is not currently supported.",
+      required = true)
+  @NotNull
+  @Valid
+  private CohortEligibility cohortEligibility;
+
   @NotEmpty Map<String, String> stateToAction;
   private List<String> resetStates;
   private Boolean resetCTAonFirstLaunch;

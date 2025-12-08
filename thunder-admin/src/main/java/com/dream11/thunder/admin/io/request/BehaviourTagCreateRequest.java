@@ -10,15 +10,48 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
+@Schema(description = "Request to create a new Behaviour Tag")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class BehaviourTagCreateRequest {
+  @Schema(
+      description = "Name of the Behaviour Tag",
+      examples = {"new_user_tag", "onboarding_eligible"},
+      required = true)
   private String behaviourTagName;
+
+  @Schema(
+      description = "Description of the Behaviour Tag",
+      examples = {"Users eligible for onboarding nudges"})
   private String description;
+
+  @Schema(
+      description =
+          "Exposure rules defining when this behaviour tag applies to users. "
+              + "Includes session, window, and lifespan frequency limits.",
+      required = true,
+      examples = {
+        "{\"session\": {\"limit\": 2}, \"window\": {\"limit\": 3, \"unit\": \"days\", \"value\": 7}, \"lifespan\": {\"limit\": 10}}"
+      })
   private ExposureRule exposureRule;
+
+  @Schema(
+      description =
+          "CTA relation rules defining which CTAs are shown/hidden for this behaviour tag. "
+              + "shownCta defines which CTAs to show (rule: LIST/ANY/NONE), "
+              + "hideCta defines which CTAs to hide (rule: LIST/ANY/NONE).",
+      required = true,
+      examples = {
+        "{\"shownCta\": {\"rule\": \"LIST\", \"ctaList\": [\"cta-101\"]}, \"hideCta\": {\"rule\": \"ANY\", \"ctaList\": []}}"
+      })
   private CTARelation ctaRelation;
+
+  @Schema(
+      description = "Set of CTA IDs linked to this behaviour tag",
+      examples = {""})
   private Set<String> linkedCtas;
 
   public void validate() {

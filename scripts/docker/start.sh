@@ -5,7 +5,7 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR/.." || exit 1
+cd "$SCRIPT_DIR/../.." || exit 1
 
 echo "⚡ Starting Thunder in Docker..."
 echo ""
@@ -40,7 +40,13 @@ echo "🔗 Thunder Admin:    http://localhost:8081"
 echo "🏥 Admin Health check: http://localhost:8081/healthcheck"
 echo "🏥 Admin Ping:        http://localhost:8081/healthcheck/ping"
 echo ""
-echo "📋 View logs:    ./scripts/logs.sh"
-echo "🛑 Stop:         ./scripts/stop.sh"
-echo "🔄 Restart:      ./scripts/restart.sh"
+echo "📚 API Documentation:"
+echo "   📖 Scalar API Reference: http://localhost:8082"
+echo "      (Switch between Thunder API and Thunder Admin using dropdown)"
+echo ""
+echo "📋 View logs:    ./scripts/docker/logs.sh"
+echo "🛑 Stop:         ./scripts/docker/stop.sh"
+echo "🔄 Restart:      ./scripts/docker/restart.sh"
+echo ""
+echo "💡 Quick Start:  ./quick-start.sh"
 

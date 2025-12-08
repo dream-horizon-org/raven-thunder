@@ -56,9 +56,24 @@
         
         <!-- Dependency Versions -->
         <aerospike-client.version>6.3.0</aerospike-client.version>
+        <smallrye-open-api.version>4.0.0</smallrye-open-api.version>
     </properties>
 
     <dependencies>
+        <!-- SmallRye OpenAPI (build-time only, inherited by all child modules) -->
+        <dependency>
+            <groupId>io.smallrye</groupId>
+            <artifactId>smallrye-open-api-core</artifactId>
+            <version>${smallrye-open-api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.smallrye</groupId>
+            <artifactId>smallrye-open-api-jaxrs</artifactId>
+            <version>${smallrye-open-api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- Vert.x REST -->
         <dependency>
             <groupId>com.dream11</groupId>
@@ -326,6 +341,15 @@
                     <artifactId>maven-shade-plugin</artifactId>
                     <version>${maven-shade-plugin.version}</version>
                 </plugin>
+
+                <!-- SmallRye OpenAPI Maven Plugin -->
+                <plugin>
+                    <groupId>io.smallrye</groupId>
+                    <artifactId>smallrye-open-api-maven-plugin</artifactId>
+                    <version>${smallrye-open-api.version}</version>
+                </plugin>
+
+                <!-- Maven Failsafe Plugin -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>

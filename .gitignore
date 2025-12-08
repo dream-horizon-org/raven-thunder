@@ -69,3 +69,10 @@ nbdist/
 .env.local
 .env.*.local
 
+# OpenAPI temporary files (generated in target/)
+thunder-api/target/openapi/
+thunder-admin/target/openapi/
+
+# Generated OpenAPI files (keep docs/openapi.yaml for Scalar)
+# docs/openapi.yaml is committed for Docker deployment
+

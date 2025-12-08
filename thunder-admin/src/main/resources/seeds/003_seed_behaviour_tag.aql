@@ -1,0 +1,6 @@
+SET KEY_SEND TRUE
+
+-- Seed Behaviour Tag: onboarding_eligible (matches documentation examples)
+DELETE FROM thunder-admin.behaviour_tag WHERE PK = 'tenant1:onboarding_eligible'
+INSERT INTO thunder-admin.behaviour_tag (PK, name, description, exposure_rule, cta_relation, linked_ctas, tenantId, created_at, created_by, last_updated_at, last_updated_by) VALUES ('tenant1:onboarding_eligible', 'onboarding_eligible', 'Users eligible for onboarding nudges', JSON('{"session":{"limit":2},"window":{"limit":3,"unit":"days","value":7},"lifespan":{"limit":10}}'), JSON('{"shownCta":{"rule":"LIST","ctaList":["101"]},"hideCta":{"rule":"ANY","ctaList":[]}}'), JSON('["101"]'), 'tenant1', 1609459200000, 'admin@example.com', 1609459200000, 'admin@example.com')
+
