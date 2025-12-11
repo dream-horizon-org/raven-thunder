@@ -86,6 +86,7 @@
   background-clip: text;
   position: relative;
   z-index: 1;
+  text-align: center;
 }
 
 .hero__subtitle {
