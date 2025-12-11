@@ -1,0 +1,1557 @@
+---
+openapi: 3.1.0
+info:
+  description: Thunder Admin - Management endpoints
+  title: Thunder Admin
+  version: 1.0.0
+servers:
+- url: http://localhost:8081
+  description: Thunder Admin Server (Management endpoints)
+components:
+  schemas:
+    BehaviourTag:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: integer
+          format: int64
+        createdBy:
+          type: string
+        lastUpdatedAt:
+          type: integer
+          format: int64
+        lastUpdatedBy:
+          type: string
+        exposureRule:
+          $ref: "#/components/schemas/ExposureRule"
+        ctaRelation:
+          $ref: "#/components/schemas/CTARelation"
+        linkedCtas:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+        tenantId:
+          type: string
+    BehaviourTagCreateRequest:
+      description: Request to create a new Behaviour Tag
+      type: object
+      required:
+      - behaviourTagName
+      - exposureRule
+      - ctaRelation
+      properties:
+        behaviourTagName:
+          type: string
+          description: Name of the Behaviour Tag
+          examples:
+          - new_user_tag
+          - onboarding_eligible
+        description:
+          type: string
+          description: Description of the Behaviour Tag
+          examples:
+          - Users eligible for onboarding nudges
+        exposureRule:
+          description: "Exposure rules defining when this behaviour tag applies to\
+            \ users. Includes session, window, and lifespan frequency limits."
+          type: object
+          examples:
+          - session:
+              limit: 2
+            window:
+              limit: 3
+              unit: days
+              value: 7
+            lifespan:
+              limit: 10
+          $ref: "#/components/schemas/ExposureRule"
+        ctaRelation:
+          description: "CTA relation rules defining which CTAs are shown/hidden for\
+            \ this behaviour tag. shownCta defines which CTAs to show (rule: LIST/ANY/NONE),\
+            \ hideCta defines which CTAs to hide (rule: LIST/ANY/NONE)."
+          type: object
+          examples:
+          - shownCta:
+              rule: LIST
+              ctaList:
+              - cta-101
+            hideCta:
+              rule: ANY
+              ctaList: []
+          $ref: "#/components/schemas/CTARelation"
+        linkedCtas:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+          description: Set of CTA IDs linked to this behaviour tag
+          examples:
+          - ""
+    BehaviourTagPutRequest:
+      description: Request to update an existing Behaviour Tag. All fields are optional
+        - only provided fields will be updated.
+      type: object
+      properties:
+        description:
+          type: string
+          description: Updated description of the Behaviour Tag
+          examples:
+          - Updated description for onboarding eligible users
+        exposureRule:
+          description: "Updated exposure rules defining when this behaviour tag applies\
+            \ to users. Includes session, window, and lifespan frequency limits."
+          type: object
+          examples:
+          - session:
+              limit: 1
+            window:
+              limit: 1
+              unit: days
+              value: 7
+            lifespan:
+              limit: 5
+          $ref: "#/components/schemas/ExposureRule"
+        ctaRelation:
+          description: "Updated CTA relation rules defining which CTAs are shown/hidden\
+            \ for this behaviour tag. shownCta defines which CTAs to show (rule: LIST/ANY/NONE),\
+            \ hideCta defines which CTAs to hide (rule: LIST/ANY/NONE)."
+          type: object
+          examples:
+          - shownCta:
+              rule: ANY
+            hideCta:
+              rule: NONE
+          $ref: "#/components/schemas/CTARelation"
+        linkedCtas:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+          description: Updated set of CTA IDs linked to this behaviour tag
+          examples:
+          - []
+    BehaviourTagsResponse:
+      type: object
+      properties:
+        behaviourTags:
+          type: array
+          items:
+            $ref: "#/components/schemas/BehaviourTag"
+    CTA:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          type: integer
+          format: int64
+        rule:
+          $ref: "#/components/schemas/Rule"
+        ctaStatus:
+          $ref: "#/components/schemas/CTAStatus"
+        name:
+          type: string
+        description:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        team:
+          type: string
+        behaviourTags:
+          type: array
+          items:
+            type: string
+        startTime:
+          type: integer
+          format: int64
+        endTime:
+          type: integer
+          format: int64
+        createdAt:
+          type: integer
+          format: int64
+        createdBy:
+          type: string
+        lastUpdatedAt:
+          type: integer
+          format: int64
+        lastUpdatedBy:
+          type: string
+        tenantId:
+          type: string
+    CTAListResponse:
+      type: object
+      properties:
+        ctas:
+          type: array
+          items:
+            $ref: "#/components/schemas/CTA"
+        totalEntries:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        statusWiseCount:
+          $ref: "#/components/schemas/StatusWiseCount"
+    CTARelation:
+      type: object
+      properties:
+        shownCta:
+          $ref: "#/components/schemas/CtaRelationRule"
+        hideCta:
+          $ref: "#/components/schemas/CtaRelationRule"
+    CTARequest:
+      description: "Request to create a new CTA (Call-to-Action). Note: Cohort eligibility\
+        \ must use 'all' as the cohort value. Use includes: [\"all\"] for single cohort\
+        \ or includes: [\"all\"] for list, and always keep excludes: [] empty. User-cohorts\
+        \ system is not currently supported."
+      type: object
+      required:
+      - name
+      - team
+      - rule
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          description: Name of the CTA
+          examples:
+          - Testing1
+          - Welcome Bonus
+        tags:
+          type: array
+          items:
+            type: string
+          description: Tags associated with the CTA for categorization
+          examples:
+          - growth
+          - notifications
+        description:
+          type: string
+          maxLength: 500
+          description: Detailed description of the CTA
+          examples:
+          - Bottom sheet to prompt enabling notifications when lineups are out
+        team:
+          type: string
+          description: Team that owns this CTA
+          examples:
+          - marketing
+        startTime:
+          type: integer
+          format: int64
+          description: "Start time in epoch milliseconds. If null, CTA starts immediately\
+            \ when activated."
+          examples:
+          - 1609459200000
+        endTime:
+          type: integer
+          format: int64
+          description: "End time in epoch milliseconds. If null, CTA has no end time."
+          examples:
+          - 1640995200000
+        rule:
+          description: "Rule configuration for the CTA including cohort eligibility,\
+            \ state transitions, actions, and frequency controls. IMPORTANT: cohortEligibility.includes\
+            \ must be [\"all\"] and excludes must be []. User-cohorts system is not\
+            \ currently supported."
+          type: object
+          $ref: "#/components/schemas/RuleRequest"
+    CTAStatus:
+      type: string
+      enum:
+      - DRAFT
+      - SCHEDULED
+      - LIVE
+      - PAUSED
+      - CONCLUDED
+      - TERMINATED
+    CTAUpdateRequest:
+      type: object
+      properties:
+        tags:
+          type: array
+          items:
+            type: string
+        description:
+          type: string
+        team:
+          type: string
+        startTime:
+          type: integer
+          format: int64
+        endTime:
+          type: integer
+          format: int64
+        rule:
+          $ref: "#/components/schemas/RuleRequest"
+    CohortEligibility:
+      type: object
+      description: "Cohort eligibility configuration for CTAs. IMPORTANT: User-cohorts\
+        \ system is not currently supported. Always use includes: [\"all\"] (single\
+        \ cohort) or includes: [\"all\"] (list), and keep excludes: [] empty."
+      required:
+      - includes
+      - excludes
+      properties:
+        includes:
+          type: array
+          items:
+            type: string
+          description: "List of cohort names to include. Must be [\"all\"] since user-cohorts\
+            \ system is not currently supported."
+          minItems: 1
+        excludes:
+          type: array
+          items:
+            type: string
+          description: "List of cohort names to exclude. Must always be empty [] since\
+            \ user-cohorts system is not currently supported."
+    CtaRelationRule:
+      type: object
+      properties:
+        rule:
+          $ref: "#/components/schemas/CtaRelationRuleTypes"
+        ctaList:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+    CtaRelationRuleTypes:
+      type: string
+      enum:
+      - ANY
+      - LIST
+      - REST
+    ExposureRule:
+      type: object
+      properties:
+        session:
+          $ref: "#/components/schemas/SessionFrequency"
+        window:
+          $ref: "#/components/schemas/WindowFrequency"
+        lifespan:
+          $ref: "#/components/schemas/LifespanFrequency"
+    FilterResponse:
+      type: object
+      properties:
+        names:
+          type: array
+          items:
+            type: string
+        tags:
+          type: array
+          items:
+            type: string
+        teams:
+          type: array
+          items:
+            type: string
+        createdBy:
+          type: array
+          items:
+            type: string
+    Filters:
+      type: object
+      required:
+      - operator
+      - filter
+      properties:
+        operator:
+          type: string
+        filter:
+          type: array
+          items: {}
+    Frequency:
+      type: object
+      properties:
+        session:
+          $ref: "#/components/schemas/SessionFrequency"
+        window:
+          $ref: "#/components/schemas/WindowFrequency"
+        lifeSpan:
+          $ref: "#/components/schemas/LifespanFrequency"
+    GroupByConfig:
+      type: object
+      properties:
+        maxActiveStateMachineCount:
+          type: integer
+          format: int32
+        groupByKeys:
+          type: array
+          items:
+            type: string
+    JsonObject:
+      type: array
+      items: {}
+    LifespanFrequency:
+      type: object
+      required:
+      - limit
+      properties:
+        limit:
+          type: integer
+          format: int32
+    NudgePreview:
+      type: object
+      properties:
+        id:
+          type: string
+        template:
+          type: string
+        tenantId:
+          type: string
+        ttl:
+          type: integer
+          format: int32
+    Rule:
+      type: object
+      required:
+      - cohortEligibility
+      - stateToAction
+      - stateTransition
+      - priority
+      - actions
+      - frequency
+      properties:
+        cohortEligibility:
+          $ref: "#/components/schemas/CohortEligibility"
+        stateToAction:
+          type: object
+          additionalProperties:
+            type: string
+          minProperties: 1
+        resetStates:
+          type: array
+          items:
+            type: string
+        resetCTAonFirstLaunch:
+          type: boolean
+        contextParams:
+          type: array
+          items:
+            type: string
+        stateTransition:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: array
+              items:
+                $ref: "#/components/schemas/StateTransitionCondition"
+        groupByConfig:
+          $ref: "#/components/schemas/GroupByConfig"
+        priority:
+          type: integer
+          format: int32
+        stateMachineTTL:
+          type: integer
+          format: int64
+        ctaValidTill:
+          type: integer
+          format: int64
+        actions:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        frequency:
+          $ref: "#/components/schemas/Frequency"
+    RuleRequest:
+      type: object
+      description: "Rule configuration for CTA including cohort eligibility, state\
+        \ transitions, actions, and frequency. Note: cohortEligibility must use includes:\
+        \ [\"all\"] and excludes: []."
+      required:
+      - cohortEligibility
+      - stateToAction
+      - stateTransition
+      - priority
+      - stateMachineTTL
+      - actions
+      - frequency
+      properties:
+        cohortEligibility:
+          description: "Cohort eligibility. Must use includes: [\"all\"] and excludes:\
+            \ [] since user-cohorts system is not currently supported."
+          type: object
+          $ref: "#/components/schemas/CohortEligibility"
+        stateToAction:
+          type: object
+          additionalProperties:
+            type: string
+          minProperties: 1
+        resetStates:
+          type: array
+          items:
+            type: string
+        resetCTAonFirstLaunch:
+          type: boolean
+        contextParams:
+          type: array
+          items:
+            type: string
+        stateTransition:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: array
+              items:
+                $ref: "#/components/schemas/StateTransitionCondition"
+        groupByConfig:
+          $ref: "#/components/schemas/GroupByConfig"
+        priority:
+          type: integer
+          format: int32
+        stateMachineTTL:
+          type: integer
+          format: int64
+        actions:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        frequency:
+          $ref: "#/components/schemas/Frequency"
+    SessionFrequency:
+      type: object
+      required:
+      - limit
+      properties:
+        limit:
+          type: integer
+          format: int32
+    StateTransitionCondition:
+      type: object
+      required:
+      - transitionTo
+      - filters
+      properties:
+        transitionTo:
+          type: string
+        filters:
+          $ref: "#/components/schemas/Filters"
+    StatusWiseCount:
+      type: object
+      properties:
+        draft:
+          type: object
+        paused:
+          type: object
+        live:
+          type: object
+        scheduled:
+          type: object
+        concluded:
+          type: object
+        terminated:
+          type: object
+    WindowFrequency:
+      type: object
+      required:
+      - limit
+      - unit
+      - value
+      properties:
+        limit:
+          type: integer
+          format: int32
+        unit:
+          $ref: "#/components/schemas/WindowFrequencyUnit"
+        value:
+          type: integer
+          format: int32
+    WindowFrequencyUnit:
+      type: string
+      enum:
+      - days
+      - hours
+      - minutes
+      - seconds
+tags:
+- name: Behaviour Tags
+  description: "APIs for managing Behaviour Tags. Behaviour Tags define user segments\
+    \ and their exposure rules for CTAs. They control which CTAs are shown or hidden\
+    \ to specific user groups based on session limits, time windows, and CTA relationships."
+- name: CTA Status
+  description: "APIs for managing CTA lifecycle status transitions. CTAs move through\
+    \ states: DRAFT → SCHEDULED → LIVE → PAUSED → CONCLUDED/TERMINATED."
+- name: CTAs
+  description: "APIs for managing Call-to-Actions (CTAs). Includes CRUD operations\
+    \ for creating, updating, retrieving, and listing CTAs with filtering and pagination\
+    \ support."
+- name: Filters
+  description: "APIs for retrieving filter values used in the admin UI. Provides available\
+    \ options for tags, teams, statuses, behaviour tags, and creators."
+- name: Nudge Previews
+  description: APIs for managing Nudge Previews. Nudge Previews are used to preview
+    nudge templates before they are used in CTAs. The preview includes the nudge template
+    and TTL (time-to-live) configuration.
+paths:
+  /healthcheck:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JsonObject"
+  /healthcheck/ping:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+  /openapi:
+    get:
+      responses:
+        "200":
+          description: OK
+  /openapi.{type}:
+    get:
+      parameters:
+      - name: type
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: json|yaml
+      responses:
+        "200":
+          description: OK
+  /thunder/behaviour-tags:
+    get:
+      summary: List all Behaviour Tags
+      description: Retrieves a list of all Behaviour Tags for the specified tenant.
+        Behaviour Tags define user segments and their exposure rules for CTAs.
+      operationId: listBehaviourTags
+      tags:
+      - Behaviour Tags
+      parameters:
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
+        in: header
+        schema:
+          type: string
+          default: default
+      responses:
+        "200":
+          description: List of Behaviour Tags retrieved successfully
+          content:
+            application/json:
+              examples:
+                Success Response:
+                  summary: Example list of behaviour tags
+                  value:
+                    success: true
+                    data:
+                      behaviourTags:
+                      - name: onboarding_eligible
+                        description: Users eligible for onboarding nudges
+                        exposureRule:
+                          session:
+                            limit: 2
+                          window:
+                            limit: 3
+                            unit: days
+                            value: 7
+                          lifespan:
+                            limit: 10
+                        ctaRelation:
+                          shownCta:
+                            rule: LIST
+                            ctaList:
+                            - cta-101
+                          hideCta:
+                            rule: ANY
+                            ctaList: []
+                        linkedCtas:
+                        - cta-101
+                        createdAt: 1609459200000
+                        createdBy: admin@example.com
+                        lastUpdatedAt: 1609459200000
+                        lastUpdatedBy: admin@example.com
+                        tenantId: tenant1
+                    statusCode: 200
+                    error: null
+                    message: null
+              schema:
+                $ref: "#/components/schemas/BehaviourTagsResponse"
+    post:
+      summary: Create a new Behaviour Tag
+      description: "Creates a new Behaviour Tag with exposure rules and CTA relations.\
+        \ Behaviour Tags define user segments and control which CTAs are shown or\
+        \ hidden. The exposureRule defines frequency limits (session, window, lifespan).\
+        \ The ctaRelation defines which CTAs to show (shownCta) and hide (hideCta)."
+      operationId: createBehaviourTag
+      tags:
+      - Behaviour Tags
+      parameters:
+      - description: User ID of the admin creating the Behaviour Tag
+        example: admin@example.com
+        name: user
+        required: true
+        in: header
+        schema:
+          type: string
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
+        in: header
+        schema:
+          type: string
+          default: default
+      requestBody:
+        description: "Behaviour Tag creation request with name, description, exposure\
+          \ rules, and CTA relations"
+        content:
+          application/json:
+            examples:
+              Create Request:
+                summary: Example request to create a behaviour tag
+                value:
+                  behaviourTagName: onboarding_eligible
+                  description: Users eligible for onboarding nudges
+                  linkedCtas: []
+                  exposureRule:
+                    session:
+                      limit: 2
+                    window:
+                      limit: 3
+                      unit: days
+                      value: 7
+                    lifespan:
+                      limit: 10
+                  ctaRelation:
+                    shownCta:
+                      rule: LIST
+                      ctaList:
+                      - cta-101
+                    hideCta:
+                      rule: ANY
+                      ctaList: []
+            schema:
+              $ref: "#/components/schemas/BehaviourTagCreateRequest"
+        required: true
+      responses:
+        "200":
+          description: Behaviour Tag created successfully
+          content:
+            application/json:
+              examples:
+                Success Response:
+                  summary: Behaviour tag created
+                  value:
+                    success: true
+                    data: null
+                    statusCode: 200
+                    error: null
+                    message: null
+        "400":
+          description: Invalid request data or validation failed
+  /thunder/behaviour-tags/{behaviourTagName}:
+    put:
+      summary: Update an existing Behaviour Tag
+      description: "Updates an existing Behaviour Tag's description, exposure rules,\
+        \ and CTA relations. Only the fields provided in the request will be updated.\
+        \ The behaviourTagName in the path must match the tag being updated."
+      operationId: updateBehaviourTag
+      tags:
+      - Behaviour Tags
+      parameters:
+      - description: Name of the Behaviour Tag to update
+        example: onboarding_eligible
+        name: behaviourTagName
+        required: true
+        schema:
+          type: string
+        in: path
+      - description: User ID of the admin updating the Behaviour Tag
+        example: admin@example.com
+        name: user
+        required: true
+        in: header
+        schema:
+          type: string
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
+        in: header
+        schema:
+          type: string
+          default: default
+      requestBody:
+        description: "Behaviour Tag update request with description, exposure rules,\
+          \ and CTA relations"
+        content:
+          application/json:
+            examples:
+              Update Request:
+                summary: Example request to update a behaviour tag
+                value:
+                  description: Updated description for onboarding eligible users
+                  exposureRule:
+                    session:
+                      limit: 1
+                    window:
+                      limit: 1
+                      unit: days
+                      value: 7
+                    lifespan:
+                      limit: 5
+                  ctaRelation:
+                    shownCta:
+                      rule: ANY
+                    hideCta:
+                      rule: NONE
+                  linkedCtas: []
+            schema:
+              $ref: "#/components/schemas/BehaviourTagPutRequest"
+        required: true
+      responses:
+        "200":
+          description: Behaviour Tag updated successfully
+          content:
+            application/json:
+              examples:
+                Success Response:
+                  summary: Behaviour tag updated
+                  value:
+                    success: true
+                    data: null
+                    statusCode: 200
+                    error: null
+                    message: null
+        "400":
+          description: Invalid request data or validation failed
+        "404":
+          description: Behaviour Tag not found
+    get:
+      summary: Get Behaviour Tag by name
+      description: "Retrieves a specific Behaviour Tag by its name. Returns the complete\
+        \ Behaviour Tag object including all metadata, exposure rules, CTA relations,\
+        \ and linked CTAs."
+      operationId: getBehaviourTag
+      tags:
+      - Behaviour Tags
+      parameters:
+      - description: Name of the Behaviour Tag to retrieve
+        example: onboarding_eligible
+        name: behaviourTagName
+        required: true
+        schema:
+          type: string
+        in: path
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
+        in: header
+        schema:
+          type: string
+          default: default
+      responses:
+        "200":
+          description: Behaviour Tag retrieved successfully
+          content:
+            application/json:
+              examples:
+                Success Response:
+                  summary: Example behaviour tag response
+                  value:
+                    success: true
+                    data:
+                      name: onboarding_eligible
+                      description: Users eligible for onboarding nudges
+                      exposureRule:
+                        session:
+                          limit: 2
+                        window:
+                          limit: 3
+                          unit: days
+                          value: 7
+                        lifespan:
+                          limit: 10
+                      ctaRelation:
+                        shownCta:
+                          rule: LIST
+                          ctaList:
+                          - cta-101
+                        hideCta:
+                          rule: ANY
+                          ctaList: []
+                      linkedCtas:
+                      - cta-101
+                      createdAt: 1609459200000
+                      createdBy: admin@example.com
+                      lastUpdatedAt: 1609459200000
+                      lastUpdatedBy: admin@example.com
+                      tenantId: tenant1
+                    statusCode: 200
+                    error: null
+                    message: null
+              schema:
+                $ref: "#/components/schemas/BehaviourTag"
+        "404":
+          description: Behaviour Tag not found
+  /thunder/ctas:
+    get:
+      summary: List CTAs
+      description: Retrieves a paginated list of CTAs matching the specified filters.
+        All query parameters are optional. Results are sorted by creation date (newest
+        first). Use pagination parameters to control page size and navigation.
+      operationId: listCTAs
+      tags:
+      - CTAs
+      parameters:
+      - description: Filter by behaviour tag name
+        example: new_user
+        name: behaviourTag
+        required: false
+        in: query
+        schema:
+          type: string
+      - description: Filter by creator user ID
+        example: admin@example.com
+        name: createdBy
+        required: false
+        in: query
+        schema:
+          type: string
+      - description: Filter by exact CTA name (case-sensitive)
+        example: Welcome Bonus
+        name: name
+        required: false
+        in: query
+        schema:
+          type: string
+      - description: Page number (0-indexed). Default is 0.
+        example: 0
+        name: pageNumber
+        required: false
+        schema:
+          minimum: 0
+          type: integer
+          default: 0
+        in: query
+      - description: "Number of items per page. Default is 10, maximum is 100."
+        example: 10
+        name: pageSize
+        required: false
+        schema:
+          maximum: 100
+          minimum: 1
+          type: integer
+          default: 10
+        in: query
+      - description: Search CTA names (partial match)
+        example: welcome
+        name: searchName
+        required: false
+        in: query
+        schema:
+          type: string
+      - description: Filter by CTA status
+        example: LIVE
+        name: status
+        required: false
+        schema:
+          type: string
+          enum:
+          - DRAFT
+          - SCHEDULED
+          - LIVE
+          - PAUSED
+          - CONCLUDED
+          - TERMINATED
+        in: query
+      - description: Comma-separated list of tags to filter by
+        example: "promotion,signup"
+        name: tags
+        required: false
+        in: query
+        schema:
+          type: string
+      - description: Comma-separated list of teams to filter by
+        example: "marketing,growth"
+        name: teams
+        required: false
+        in: query
+        schema:
+          type: string
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
+        in: header
+        schema:
+          type: string
+          default: default
+      responses:
+        "200":
+          description: List of CTAs retrieved successfully
+          content:
+            application/json:
+              examples:
+                CTAs List Response:
+                  summary: Paginated list of CTAs
+                  value:
+                    success: true
+                    data:
+                      ctas:
+                      - id: 12345
+                        name: Welcome Bonus
+                        tags:
+                        - growth
+                        - notifications
+                        team: marketing
+                        ctaStatus: LIVE
+                        createdBy: admin@example.com
+                        createdAt: 1609459200000
+                      totalCount: 1
+                      pageNumber: 0
+                      pageSize: 10
+                    statusCode: 200
+              schema:
+                $ref: "#/components/schemas/CTAListResponse"
+    post:
+      summary: Create CTA
+      description: "Creates a new Call-to-Action (CTA) with the provided details.\
+        \ The CTA will be created in DRAFT status and can be activated later using\
+        \ status update endpoints. Includes rule configuration, state machine setup,\
+        \ actions, and frequency controls. IMPORTANT: rule.cohortEligibility must\
+        \ use includes: [\"all\"] and excludes: [] since user-cohorts system is not\
+        \ currently supported."
+      operationId: createCTA
+      tags:
+      - CTAs
+      parameters:
+      - description: User ID of the person creating the CTA
+        example: admin@example.com
+        name: user
+        required: true
+        schema:
+          type: string
+        in: header
+      - description: Tenant identifier for multi-tenancy support
+        example: tenant1
+        name: x-tenant-id
+        required: false
+        schema:
+          type: string
+          default: default
+        in: header
+      requestBody:
+        description: "CTA creation request containing name, description, tags, team,\
+          \ rule configuration, state machine setup, actions, and frequency controls.\
+          \ Note: rule.cohortEligibility must use includes: [\"all\"] and excludes:\
+          \ []."
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CTARequest"
+        required: true
+      responses:
+        "200":
+          description: CTA created successfully. Returns the new CTA ID.
+          content:
+            application/json:
+              examples:
+                Success Response:
+                  summary: CTA created successfully
+                  value:
+                    success: true
+                    data: 12345
+                    statusCode: 200
+              schema:
+                description: New CTA ID
+                format: int64
+                type: integer
+        "400":
+          description: Invalid request data or validation failed
+  /thunder/ctas/{ctaId}:
+    put:
+      summary: Update CTA
+      description: "Updates an existing CTA. Only the fields provided in the request\
+        \ will be updated. Can update rule configuration, state machine setup, actions,\
+        \ and frequency controls. IMPORTANT: If updating rule.cohortEligibility, must\
+        \ use includes: [\"all\"] and excludes: [] since user-cohorts system is not\
+        \ currently supported."
+      operationId: updateCTA
+      tags:
+      - CTAs
+      parameters:
+      - description: Unique identifier of the CTA to update
+        example: 12345
+        name: ctaId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        in: path
+      - description: User ID of the person updating the CTA
+        example: admin@example.com
+        name: user
+        required: true
+        in: header
+        schema:
+          type: string
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
+        in: header
+        schema:
+          type: string
+          default: default
+      requestBody:
+        description: "CTA update request containing fields to update. If updating\
+          \ rule.cohortEligibility, must use includes: [\"all\"] and excludes: []."
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CTAUpdateRequest"
+        required: true
+      responses:
+        "200":
+          description: CTA updated successfully
+          content:
+            application/json:
+              examples:
+                Success Response:
+                  summary: CTA updated
+                  value:
+                    success: true
+                    data: null
+                    statusCode: 200
+        "400":
+          description: Invalid request data or validation failed
+        "404":
+          description: CTA not found
+    get:
+      summary: Get CTA by ID
+      description: "Retrieves a specific CTA by its unique identifier. Returns the\
+        \ complete CTA object including all metadata, rules, status, and configuration."
+      operationId: getCTA
+      tags:
+      - CTAs
+      parameters:
+      - description: Unique identifier of the CTA
+        example: 12345
+        name: ctaId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        in: path
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
+        in: header
+        schema:
+          type: string
+          default: default
+      responses:
+        "200":
+          description: CTA retrieved successfully
+          content:
+            application/json:
+              examples:
+                CTA Response:
+                  summary: Example CTA response
+                  value:
+                    success: true
+                    data:
+                      id: 12345
+                      name: Welcome Bonus
+                      description: Bottom sheet to prompt enabling notifications when
+                        lineups are out
+                      tags:
+                      - growth
+                      - notifications
+                      team: marketing
+                      ctaStatus: LIVE
+                      startTime: null
+                      endTime: null
+                      createdAt: 1609459200000
+                      createdBy: admin@example.com
+                      lastUpdatedAt: 1609459200000
+                      lastUpdatedBy: admin@example.com
+                      tenantId: tenant1
+                      behaviourTags: []
+                    statusCode: 200
+              schema:
+                $ref: "#/components/schemas/CTA"
+        "404":
+          description: CTA not found
+  /thunder/ctas/{id}/conclude:
+    put:
+      summary: Conclude CTA
+      description: Changes the CTA status to CONCLUDED. The CTA must be in LIVE or
+        PAUSED status. Concluded CTAs have completed their lifecycle and are no longer
+        available to end users.
+      operationId: concludeCTA
+      tags:
+      - CTA Status
+      parameters:
+      - description: Unique identifier of the CTA to conclude
+        example: 12345
+        name: id
+        required: true
+        schema:
+          format: int64
+          type: integer
+        in: path
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
+        in: header
+        schema:
+          type: string
+          default: default
+      responses:
+        "200":
+          description: CTA concluded successfully
+          content:
+            application/json:
+              examples:
+                Success Response:
+                  summary: CTA concluded
+                  value:
+                    success: true
+                    data: null
+                    statusCode: 200
+        "400":
+          description: CTA cannot be concluded from current status. Only LIVE or PAUSED
+            CTAs can be concluded.
+        "404":
+          description: CTA not found
+  /thunder/ctas/{id}/live:
+    put:
+      summary: Activate CTA
+      description: "Changes the CTA status to LIVE. The CTA must be in SCHEDULED or\
+        \ PAUSED status. Once LIVE, the CTA will be available to end users through\
+        \ the SDK APIs."
+      operationId: activateCTA
+      tags:
+      - CTA Status
+      parameters:
+      - description: Unique identifier of the CTA to activate
+        example: 12345
+        name: id
+        required: true
+        schema:
+          format: int64
+          type: integer
+        in: path
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
+        in: header
+        schema:
+          type: string
+          default: default
+      responses:
+        "200":
+          description: CTA activated successfully
+          content:
+            application/json:
+              examples:
+                Success Response:
+                  summary: CTA activated
+                  value:
+                    success: true
+                    data: null
+                    statusCode: 200
+        "400":
+          description: CTA cannot be activated from current status. Only SCHEDULED
+            or PAUSED CTAs can be activated.
+        "404":
+          description: CTA not found
+  /thunder/ctas/{id}/pause:
+    put:
+      summary: Pause CTA
+      description: Changes the CTA status to PAUSED. The CTA must be in LIVE status.
+        Paused CTAs are not available to end users but can be reactivated later.
+      operationId: pauseCTA
+      tags:
+      - CTA Status
+      parameters:
+      - description: Unique identifier of the CTA to pause
+        example: 12345
+        name: id
+        required: true
+        schema:
+          format: int64
+          type: integer
+        in: path
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
+        in: header
+        schema:
+          type: string
+          default: default
+      responses:
+        "200":
+          description: CTA paused successfully
+          content:
+            application/json:
+              examples:
+                Success Response:
+                  summary: CTA paused
+                  value:
+                    success: true
+                    data: null
+                    statusCode: 200
+        "400":
+          description: CTA cannot be paused from current status. Only LIVE CTAs can
+            be paused.
+        "404":
+          description: CTA not found
+  /thunder/ctas/{id}/schedule:
+    put:
+      summary: Schedule CTA
+      description: Changes the CTA status to SCHEDULED. The CTA must be in DRAFT status.
+        Scheduled CTAs will become LIVE automatically based on their startTime configuration.
+      operationId: scheduleCTA
+      tags:
+      - CTA Status
+      parameters:
+      - description: Unique identifier of the CTA to schedule
+        example: 12345
+        name: id
+        required: true
+        schema:
+          format: int64
+          type: integer
+        in: path
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
+        in: header
+        schema:
+          type: string
+          default: default
+      responses:
+        "200":
+          description: CTA scheduled successfully
+          content:
+            application/json:
+              examples:
+                Success Response:
+                  summary: CTA scheduled
+                  value:
+                    success: true
+                    data: null
+                    statusCode: 200
+        "400":
+          description: CTA cannot be scheduled from current status. Only DRAFT CTAs
+            can be scheduled.
+        "404":
+          description: CTA not found
+  /thunder/ctas/{id}/terminate:
+    put:
+      summary: Terminate CTA
+      description: "Changes the CTA status to TERMINATED. The CTA must be in DRAFT,\
+        \ SCHEDULED, LIVE, or PAUSED status. Terminated CTAs are permanently stopped\
+        \ and cannot be reactivated."
+      operationId: terminateCTA
+      tags:
+      - CTA Status
+      parameters:
+      - description: Unique identifier of the CTA to terminate
+        example: 12345
+        name: id
+        required: true
+        schema:
+          format: int64
+          type: integer
+        in: path
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
+        in: header
+        schema:
+          type: string
+          default: default
+      responses:
+        "200":
+          description: CTA terminated successfully
+          content:
+            application/json:
+              examples:
+                Success Response:
+                  summary: CTA terminated
+                  value:
+                    success: true
+                    data: null
+                    statusCode: 200
+        "400":
+          description: "CTA cannot be terminated from current status. Only DRAFT,\
+            \ SCHEDULED, LIVE, or PAUSED CTAs can be terminated."
+        "404":
+          description: CTA not found
+  /thunder/filters:
+    get:
+      summary: Get Filters
+      description: "Retrieves available filter values for CTAs including tags, teams,\
+        \ statuses, behaviour tags, and creators. Used to populate filter dropdowns\
+        \ in the admin UI."
+      operationId: getFilters
+      tags:
+      - Filters
+      parameters:
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
+        in: header
+        schema:
+          type: string
+          default: default
+      responses:
+        "200":
+          description: Filter values retrieved successfully
+          content:
+            application/json:
+              examples:
+                Filters Response:
+                  summary: Available filter values
+                  value:
+                    success: true
+                    data:
+                      names:
+                      - Welcome Bonus
+                      - Testing1
+                      tags:
+                      - growth
+                      - notifications
+                      - promotion
+                      teams:
+                      - marketing
+                      - growth
+                      - default
+                      createdBy:
+                      - admin@example.com
+                      statuses:
+                      - DRAFT
+                      - SCHEDULED
+                      - LIVE
+                      - PAUSED
+                      - CONCLUDED
+                      - TERMINATED
+                    statusCode: 200
+              schema:
+                $ref: "#/components/schemas/FilterResponse"
+  /thunder/nudge/preview:
+    get:
+      summary: Get Nudge Preview
+      description: Retrieves a Nudge Preview by its ID. Returns the preview template
+        and TTL configuration.
+      operationId: getNudgePreview
+      tags:
+      - Nudge Previews
+      parameters:
+      - description: Unique identifier of the Nudge Preview
+        example: preview_001
+        name: id
+        required: true
+        schema:
+          type: string
+        in: query
+      - description: Tenant identifier
+        example: default
+        name: x-tenant-id
+        required: false
+        in: header
+        schema:
+          type: string
+          default: default
+      responses:
+        "200":
+          description: Nudge Preview retrieved successfully
+          content:
+            application/json:
+              examples:
+                Nudge Preview Response:
+                  summary: Nudge Preview with template and TTL
+                  value:
+                    success: true
+                    data:
+                      id: preview_001
+                      template: "{\"type\":\"BottomSheet\"}"
+                      ttl: 9999999
+                    statusCode: 200
+              schema:
+                $ref: "#/components/schemas/NudgePreview"
+        "404":
+          description: Nudge Preview not found
+    post:
+      summary: Create or Update Nudge Preview
+      description: Creates a new Nudge Preview or updates an existing one if it already
+        exists. Nudge Previews are used to preview nudge templates before they are
+        used in CTAs. The preview includes the nudge template and TTL (time-to-live)
+        configuration.
+      operationId: createOrUpdateNudgePreview
+      tags:
+      - Nudge Previews
+      parameters:
+      - description: Tenant identifier
+        example: default
+        name: x-tenant-id
+        required: false
+        in: header
+        schema:
+          type: string
+          default: default
+      requestBody:
+        description: "Nudge Preview definition with id, template, and TTL"
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NudgePreview"
+        required: true
+      responses:
+        "200":
+          description: Nudge Preview created or updated successfully
+          content:
+            application/json:
+              examples:
+                Success Response:
+                  summary: Nudge Preview created/updated
+                  value:
+                    success: true
+                    data: null
+                    statusCode: 200
+        "400":
+          description: Invalid request data or validation failed

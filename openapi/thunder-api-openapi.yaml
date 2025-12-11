@@ -1,0 +1,750 @@
+---
+openapi: 3.1.0
+info:
+  description: Thunder API - SDK & Debug endpoints
+  title: Thunder API
+  version: 1.0.0
+servers:
+- url: http://localhost:8080
+  description: Thunder API Server (SDK & Debug endpoints)
+components:
+  schemas:
+    BehaviourExposureRule:
+      type: object
+      properties:
+        session:
+          $ref: "#/components/schemas/SessionFrequency"
+        lifespan:
+          $ref: "#/components/schemas/LifespanFrequency"
+        window:
+          $ref: "#/components/schemas/WindowFrequency"
+        ctasResetAt:
+          type: array
+          items:
+            $ref: "#/components/schemas/CTAReset"
+    BehaviourTagSnapshot:
+      type: object
+      properties:
+        behaviourTagName:
+          type: string
+        exposureRule:
+          $ref: "#/components/schemas/BehaviourExposureRule"
+        ctaRelation:
+          $ref: "#/components/schemas/CTARelationSnapshot"
+    CTARelationSnapshot:
+      type: object
+      properties:
+        shownCta:
+          $ref: "#/components/schemas/CtaRelationRule"
+        hideCta:
+          $ref: "#/components/schemas/CtaRelationRule"
+        activeCtas:
+          type: array
+          items:
+            type: string
+    CTAReset:
+      type: object
+      properties:
+        ctaId:
+          type: string
+        resetAt:
+          type: integer
+          format: int64
+    CTAResponse:
+      type: object
+      properties:
+        ctas:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserCTAAndStateMachineResponse"
+        behaviourTags:
+          type: array
+          items:
+            $ref: "#/components/schemas/BehaviourTagSnapshot"
+    CTASnapshotRequest:
+      description: "Request containing current state snapshot from client including\
+        \ CTAs, active state machines, and behaviour tags. This is sent by the client\
+        \ to synchronize state with the server."
+      type: object
+      properties:
+        ctas:
+          type: array
+          items:
+            $ref: "#/components/schemas/StateMachineSnapshot"
+          description: "List of CTA state machine snapshots. Each snapshot contains:\
+            \ ctaId, activeStateMachines (map of state machine IDs to state data),\
+            \ resetAt (list of reset timestamps), and actionDoneAt (list of action\
+            \ completion timestamps)."
+          examples:
+          - - ctaId: "101"
+              activeStateMachines:
+                "5":
+                  currentState: "2"
+                  lastTransitionAt: 1720166608502
+                  context: {}
+                  createdAt: 1720166608502
+                  reset: true
+              resetAt:
+              - 1701603029000
+              actionDoneAt:
+              - 1756099199923
+        behaviourTags:
+          type: array
+          items:
+            $ref: "#/components/schemas/BehaviourTagSnapshot"
+          description: "List of behaviour tag snapshots. Each snapshot contains: behaviourTagName,\
+            \ exposureRule (session/window/lifespan limits), and ctaRelation (shownCta/hideCta\
+            \ rules with activeCtas list)."
+          examples:
+          - - behaviourTagName: onboarding_eligible
+              exposureRule:
+                session:
+                  limit: 1
+                window:
+                  limit: 1
+                  unit: days
+                  value: 7
+              ctaRelation:
+                activeCtas:
+                - 1
+    CohortEligibility:
+      description: "Cohort eligibility configuration for CTAs. IMPORTANT: User-cohorts\
+        \ system is not currently supported. Always use includes: [\"all\"] (single\
+        \ cohort) or includes: [\"all\"] (list), and keep excludes: [] empty."
+      type: object
+      required:
+      - includes
+      - excludes
+      properties:
+        includes:
+          type: array
+          items:
+            type: string
+          description: "List of cohort names to include. Must be [\"all\"] since user-cohorts\
+            \ system is not currently supported."
+          minItems: 1
+        excludes:
+          type: array
+          items:
+            type: string
+          description: "List of cohort names to exclude. Must always be empty [] since\
+            \ user-cohorts system is not currently supported."
+    CtaRelationRule:
+      type: object
+      properties:
+        rule:
+          $ref: "#/components/schemas/CtaRelationRuleTypes"
+        ctaList:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+    CtaRelationRuleTypes:
+      type: string
+      enum:
+      - ANY
+      - LIST
+      - REST
+    Filters:
+      type: object
+      required:
+      - operator
+      - filter
+      properties:
+        operator:
+          type: string
+        filter:
+          type: array
+          items: {}
+    Frequency:
+      type: object
+      properties:
+        session:
+          $ref: "#/components/schemas/SessionFrequency"
+        window:
+          $ref: "#/components/schemas/WindowFrequency"
+        lifeSpan:
+          $ref: "#/components/schemas/LifespanFrequency"
+    GroupByConfig:
+      type: object
+      properties:
+        maxActiveStateMachineCount:
+          type: integer
+          format: int32
+        groupByKeys:
+          type: array
+          items:
+            type: string
+    JsonObject:
+      type: array
+      items: {}
+    LifespanFrequency:
+      type: object
+      required:
+      - limit
+      properties:
+        limit:
+          type: integer
+          format: int32
+    NudgePreview:
+      type: object
+      properties:
+        id:
+          type: string
+        template:
+          type: string
+        tenantId:
+          type: string
+        ttl:
+          type: integer
+          format: int32
+    RuleResponse:
+      type: object
+      required:
+      - stateToAction
+      - stateTransition
+      - priority
+      - actions
+      - frequency
+      properties:
+        stateToAction:
+          type: object
+          additionalProperties:
+            type: string
+          minProperties: 1
+        resetStates:
+          type: array
+          items:
+            type: string
+        resetCTAonFirstLaunch:
+          type: boolean
+        contextParams:
+          type: array
+          items:
+            type: string
+        stateTransition:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: array
+              items:
+                $ref: "#/components/schemas/StateTransitionCondition"
+        groupByConfig:
+          $ref: "#/components/schemas/GroupByConfig"
+        priority:
+          type: integer
+          format: int32
+        stateMachineTTL:
+          type: integer
+          format: int64
+        ctaValidTill:
+          type: integer
+          format: int64
+        actions:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        frequency:
+          $ref: "#/components/schemas/Frequency"
+    SessionFrequency:
+      type: object
+      required:
+      - limit
+      properties:
+        limit:
+          type: integer
+          format: int32
+    StateMachine:
+      type: object
+      required:
+      - currentState
+      - lastTransitionAt
+      - createdAt
+      properties:
+        currentState:
+          type: string
+        lastTransitionAt:
+          type: integer
+          format: int64
+        context:
+          type: object
+          additionalProperties: {}
+        createdAt:
+          type: integer
+          format: int64
+        reset:
+          type: boolean
+    StateMachineSnapshot:
+      type: object
+      properties:
+        ctaId:
+          type: string
+        activeStateMachines:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/StateMachine"
+        resetAt:
+          type: array
+          items:
+            type: integer
+            format: int64
+        actionDoneAt:
+          type: array
+          items:
+            type: integer
+            format: int64
+    StateTransitionCondition:
+      type: object
+      required:
+      - transitionTo
+      - filters
+      properties:
+        transitionTo:
+          type: string
+        filters:
+          $ref: "#/components/schemas/Filters"
+    UserCTAAndStateMachineResponse:
+      type: object
+      properties:
+        ctaId:
+          type: string
+        rule:
+          $ref: "#/components/schemas/RuleResponse"
+        activeStateMachines:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/StateMachine"
+        resetAt:
+          type: array
+          items:
+            type: integer
+            format: int64
+        actionDoneAt:
+          type: array
+          items:
+            type: integer
+            format: int64
+        behaviourTagName:
+          type: string
+    WindowFrequency:
+      type: object
+      required:
+      - limit
+      - unit
+      - value
+      properties:
+        limit:
+          type: integer
+          format: int32
+        unit:
+          $ref: "#/components/schemas/WindowFrequencyUnit"
+        value:
+          type: integer
+          format: int32
+    WindowFrequencyUnit:
+      type: string
+      enum:
+      - days
+      - hours
+      - minutes
+      - seconds
+paths:
+  /cta/active/state-machines:
+    post:
+      summary: App Launch - Active State Machines
+      description: "Called by the client app on launch to synchronize state machines\
+        \ and retrieve active CTAs. The client sends its current state snapshot (CTAs\
+        \ and behaviour tags), and the server returns the updated state with active\
+        \ CTAs that should be shown to the user. Requires api_version header >= 1,\
+        \ otherwise returns empty response."
+      operationId: appLaunch
+      tags:
+      - SDK
+      parameters:
+      - description: "API version. Must be >= 1 for the endpoint to process the request.\
+          \ If null or < 1, returns empty response."
+        example: 1
+        name: api_version
+        required: false
+        schema:
+          format: int64
+          type: integer
+        in: header
+      - description: Client app version
+        example: 1.2.3
+        name: app_version
+        required: false
+        in: header
+        schema:
+          type: string
+      - description: User ID of the authenticated user
+        example: 12345
+        name: auth-userid
+        required: true
+        schema:
+          format: int64
+          type: integer
+        in: header
+      - description: CodePush version (for React Native apps)
+        example: 1.0.0
+        name: codepush_version
+        required: false
+        in: header
+        schema:
+          type: string
+      - description: App package name
+        example: com.example.app
+        name: package_name
+        required: false
+        in: header
+        schema:
+          type: string
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
+        in: header
+        schema:
+          type: string
+          default: default
+      requestBody:
+        description: Current state snapshot from client including CTAs and behaviour
+          tags
+        content:
+          application/json:
+            examples:
+              App Launch Request:
+                summary: Example request with CTAs and behaviour tags
+                value:
+                  ctas:
+                  - ctaId: "101"
+                    activeStateMachines:
+                      "5":
+                        currentState: "2"
+                        lastTransitionAt: 1720166608502
+                        context: {}
+                        createdAt: 1720166608502
+                        reset: true
+                    resetAt:
+                    - 1701603029000
+                    actionDoneAt:
+                    - 1756099199923
+                  behaviourTags:
+                  - behaviourTagName: onboarding_eligible
+                    exposureRule:
+                      session:
+                        limit: 1
+                      window:
+                        limit: 1
+                        unit: days
+                        value: 7
+                    ctaRelation:
+                      activeCtas:
+                      - 1
+            schema:
+              $ref: "#/components/schemas/CTASnapshotRequest"
+        required: true
+      responses:
+        "200":
+          description: Active CTAs and state machines retrieved successfully
+          content:
+            application/json:
+              examples:
+                Success Response:
+                  summary: Example app launch response
+                  value:
+                    success: true
+                    data:
+                      ctas:
+                      - ctaId: "101"
+                        rule:
+                          stateToAction:
+                            "1": actionId1
+                          resetStates: []
+                          resetCTAonFirstLaunch: false
+                          contextParams:
+                          - mode
+                          - contestId
+                          stateTransition:
+                            ContestJoinedClient:
+                              "0":
+                              - transitionTo: 1
+                                filters:
+                                  operator: AND
+                                  filter:
+                                  - propertyName: mode
+                                    propertyType: string
+                                    comparisonType: =
+                                    comparisonValue: normal
+                          groupByConfig:
+                            groupBy:
+                            - roundId
+                          priority: 1
+                          stateMachineTTL: 1812517298168
+                          ctaValidTill: 1812517298168
+                          actions:
+                          - actionId1:
+                              type: BottomSheet
+                              nudgeId: "5"
+                              nudgeTemplate:
+                                testId: nudge_container_bottom_sheet
+                          frequency:
+                            session:
+                              limit: 1
+                            window:
+                              limit: 1
+                              unit: days
+                              value: 2
+                            lifespan:
+                              limit: 10
+                        activeStateMachines:
+                          "5":
+                            currentState: "2"
+                            lastTransitionAt: 1720166608502
+                            context: {}
+                            createdAt: 1720166608502
+                            reset: true
+                        resetAt:
+                        - 1701603029000
+                        actionDoneAt:
+                        - 1756099199923
+                        behaviourTagName: onboarding_eligible
+                      behaviourTags:
+                      - behaviourTagName: onboarding_eligible
+                        exposureRule:
+                          session:
+                            limit: 1
+                          window:
+                            limit: 1
+                            unit: days
+                            value: 7
+                        ctaRelation:
+                          activeCtas:
+                          - 1
+                    statusCode: 200
+                    error: null
+                    message: null
+              schema:
+                $ref: "#/components/schemas/CTAResponse"
+        "400":
+          description: Invalid request data or missing required headers
+  /cta/nudge/preview/{id}:
+    get:
+      summary: Get Nudge Preview
+      description: Retrieves a Nudge Preview by its ID. Nudge Previews contain the
+        UI template and configuration that will be displayed to users. This is the
+        recommended endpoint for retrieving nudge templates.
+      operationId: getNudgePreview
+      tags:
+      - SDK
+      parameters:
+      - description: Nudge Preview ID
+        example: 5
+        name: id
+        required: true
+        schema:
+          type: string
+        in: path
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
+        in: header
+        schema:
+          type: string
+          default: default
+      responses:
+        "200":
+          description: Nudge Preview retrieved successfully
+          content:
+            application/json:
+              examples:
+                Success Response:
+                  summary: Example nudge preview response
+                  value:
+                    success: true
+                    data:
+                      id: "5"
+                      template: "{\"type\":\"BottomSheet\",\"testId\":\"nudge_container_bottom_sheet\"\
+                        }"
+                      ttl: 9999999
+                    statusCode: 200
+                    error: null
+                    message: null
+              schema:
+                $ref: "#/components/schemas/NudgePreview"
+        "404":
+          description: Nudge Preview not found
+  /cta/state-machines/snapshot/delta:
+    post:
+      summary: Merge Snapshot Delta
+      description: "Merges a delta snapshot from the client with the server state.\
+        \ This endpoint is used to synchronize incremental state changes (CTAs and\
+        \ behaviour tags) between the client and server. The server merges the delta\
+        \ and updates the user's state. Requires api_version header >= 1, otherwise\
+        \ returns false."
+      operationId: mergeSnapshotDelta
+      tags:
+      - SDK
+      parameters:
+      - description: "API version. Must be >= 1 for the endpoint to process the request.\
+          \ If null or < 1, returns false."
+        example: 1
+        name: api_version
+        required: false
+        schema:
+          format: int64
+          type: integer
+        in: header
+      - description: Client app version
+        example: 1.2.3
+        name: app_version
+        required: false
+        in: header
+        schema:
+          type: string
+      - description: User ID of the authenticated user
+        example: 12345
+        name: auth-userid
+        required: true
+        schema:
+          format: int64
+          type: integer
+        in: header
+      - description: CodePush version (for React Native apps)
+        example: 1.0.0
+        name: codepush_version
+        required: false
+        in: header
+        schema:
+          type: string
+      - description: App package name
+        example: com.example.app
+        name: package_name
+        required: false
+        in: header
+        schema:
+          type: string
+      - description: Tenant identifier
+        example: tenant1
+        name: x-tenant-id
+        required: false
+        in: header
+        schema:
+          type: string
+          default: default
+      requestBody:
+        description: Delta snapshot containing updated CTAs and behaviour tags to
+          merge with server state
+        content:
+          application/json:
+            examples:
+              Merge Delta Request:
+                summary: Example request to merge snapshot delta
+                value:
+                  ctas:
+                  - ctaId: "101"
+                    activeStateMachines:
+                      default:
+                        currentState: "1"
+                        lastTransitionAt: 1699999999000
+                        context:
+                          cohort: new_user
+                          appVersion: 1.2.3
+                        createdAt: 1699900000000
+                        reset: false
+                    resetAt:
+                    - 1699800000000
+                    actionDoneAt:
+                    - 1699850000000
+                  - ctaId: "202"
+                    activeStateMachines: {}
+                    resetAt: []
+                    actionDoneAt: []
+                  behaviourTags:
+                  - behaviourTagName: onboarding_eligible
+                    exposureRule:
+                      session:
+                        limit: 2
+                      lifespan:
+                        limit: 10
+                      window:
+                        limit: 3
+                        unit: days
+                        value: 7
+                      ctasResetAt:
+                      - ctaId: "101"
+                        resetAt: 1699700000000
+                    ctaRelation:
+                      shownCta:
+                        rule: LIST
+                        ctaList:
+                        - "101"
+                      hideCta:
+                        rule: ANY
+                        ctaList: []
+                      activeCtas:
+                      - "101"
+            schema:
+              $ref: "#/components/schemas/CTASnapshotRequest"
+        required: true
+      responses:
+        "200":
+          description: Snapshot delta merged successfully
+          content:
+            application/json:
+              examples:
+                Success Response:
+                  summary: Merge successful
+                  value:
+                    success: true
+                    data: true
+                    statusCode: 200
+                    error: null
+                    message: null
+              schema:
+                type: boolean
+        "400":
+          description: Invalid request data or missing required headers
+  /healthcheck:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JsonObject"
+  /healthcheck/ping:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+  /openapi:
+    get:
+      responses:
+        "200":
+          description: OK
+  /openapi.{type}:
+    get:
+      parameters:
+      - name: type
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: json|yaml
+      responses:
+        "200":
+          description: OK
+tags:
+- name: SDK
+  description: "APIs for SDK clients to interact with Thunder. These endpoints handle\
+    \ app launch, state machine synchronization, and nudge preview retrieval for mobile\
+    \ and web clients."
