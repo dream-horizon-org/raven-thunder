@@ -11,7 +11,7 @@ import TabItem from '@theme/TabItem';
   <div className="container">
     <h1 className="hero__title">⚡ Thunder ⚡</h1>
     <p className="hero__subtitle">
-      A powerful Java 17 + Vert.x platform for managing CTAs (Call-to-Actions), Nudges, and Behaviour Tags
+      A powerful Java 17 + Vert.x platform for managing CTA Journeys (Call-to-Actions), Nudges, and Behaviour
     </p>
     <div className="hero__buttons">
       <a className="button button--primary button--lg" href="/raven-thunder/getting-started/quickstart">
@@ -46,7 +46,7 @@ import TabItem from '@theme/TabItem';
       </div>
       <div className="card__body">
         <p>
-          Complete Admin API (19 endpoints) and SDK/Debug APIs (7 endpoints) for managing CTAs and Behaviour Tags.
+          Complete Admin API (19 endpoints) and SDK/Debug APIs (7 endpoints) for managing CTA Journeys and Behaviour.
         </p>
       </div>
     </div>
@@ -138,7 +138,7 @@ import TabItem from '@theme/TabItem';
 ## Documentation Sections
 
 - **[Getting Started](/raven-thunder/getting-started/overview)** - Setup and quickstart guides
-- **[Core Entities](/raven-thunder/getting-started/core-entities)** - Understanding CTAs, Behaviour Tags, and Nudges
+- **[Core Entities](/raven-thunder/getting-started/core-entities)** - Understanding CTA Journeys, Behaviour, and Nudges
 - **[Architecture](/raven-thunder/architecture/modules)** - System architecture and design
 - **[API Documentation](/raven-thunder/api/overview)** - SDK API endpoints and contracts
 - **[Admin Documentation](/raven-thunder/admin/overview)** - Admin API endpoints and contracts
@@ -155,6 +155,6 @@ import TabItem from '@theme/TabItem';
 
 <div className="margin-top--lg">
   <p>
-    <strong>New to Thunder?</strong> Start with understanding the <a href="/raven-thunder/getting-started/core-entities">Core Entities</a> (CTAs, Behaviour Tags, and Nudges), then check out the <a href="/raven-thunder/getting-started/quickstart">Quickstart</a> guide.
+    <strong>New to Thunder?</strong> Start with understanding the <a href="/raven-thunder/getting-started/core-entities">Core Entities</a> (CTA Journeys, Behaviour, and Nudges), then check out the <a href="/raven-thunder/getting-started/quickstart">Quickstart</a> guide.
   </p>
 </div>
