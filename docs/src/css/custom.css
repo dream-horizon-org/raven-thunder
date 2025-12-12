@@ -1,102 +1,119 @@
 /**
  * Custom CSS for Thunder Documentation
- * Color scheme and typography matching Raven Panel
+ * Font and styling matching React Native documentation
  */
 
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  /* Primary palette - Deep violet to electric purple (matching Raven Panel) */
-  --ifm-color-primary: #8b5cf6;
-  --ifm-color-primary-dark: #7c3aed;
-  --ifm-color-primary-darker: #6d28d9;
-  --ifm-color-primary-darkest: #5b21b6;
-  --ifm-color-primary-light: #a78bfa;
-  --ifm-color-primary-lighter: #c4b5fd;
-  --ifm-color-primary-lightest: #ddd6fe;
+  /* Primary palette - React Native blue */
+  --ifm-color-primary: #0A84FF;
+  --ifm-color-primary-dark: #0071E3;
+  --ifm-color-primary-darker: #0051A5;
+  --ifm-color-primary-darkest: #003D7A;
+  --ifm-color-primary-light: #40A9FF;
+  --ifm-color-primary-lighter: #69C0FF;
+  --ifm-color-primary-lightest: #91D5FF;
 
-  /* Typography - Matching Raven Panel */
-  --ifm-font-family-base: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --ifm-font-family-monospace: 'JetBrains Mono', 'Fira Code', monospace;
-  --ifm-heading-font-family: 'Outfit', sans-serif;
+  /* Typography - Inter font (matching React Native) */
+  --ifm-font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  --ifm-font-family-monospace: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  --ifm-heading-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   
-  /* Sizing */
-  --ifm-code-font-size: 90%;
-  --ifm-h1-font-size: 2.5rem;
+  /* Font sizes - React Native style */
+  --ifm-font-size-base: 16px;
+  --ifm-code-font-size: 14px;
+  --ifm-h1-font-size: 2.25rem;
   --ifm-h2-font-size: 1.75rem;
+  --ifm-h3-font-size: 1.5rem;
+  --ifm-h4-font-size: 1.25rem;
+  --ifm-h5-font-size: 1.125rem;
+  --ifm-h6-font-size: 1rem;
   
-  /* Borders and shadows */
-  --ifm-global-radius: 12px;
-  --ifm-code-border-radius: 8px;
+  /* Line heights - React Native style */
+  --ifm-line-height-base: 1.6;
+  --ifm-heading-line-height: 1.3;
   
-  /* Backgrounds */
-  --ifm-background-color: #fafafa;
-  --ifm-navbar-background-color: rgba(255, 255, 255, 0.95);
-  --ifm-footer-background-color: #1e1b4b;
+  /* Borders and shadows - Clean and minimal */
+  --ifm-global-radius: 8px;
+  --ifm-code-border-radius: 6px;
+  
+  /* Backgrounds - Light and clean */
+  --ifm-background-color: #ffffff;
+  --ifm-navbar-background-color: #ffffff;
+  --ifm-footer-background-color: #1a1a1a;
   
   /* Code blocks */
-  --docusaurus-highlighted-code-line-bg: rgba(139, 92, 246, 0.15);
+  --docusaurus-highlighted-code-line-bg: rgba(10, 132, 255, 0.1);
+  
+  /* Colors */
+  --ifm-color-content: #1a1a1a;
+  --ifm-color-content-secondary: #6b7280;
 }
 
 [data-theme='dark'] {
-  --ifm-color-primary: #a78bfa;
-  --ifm-color-primary-dark: #8b5cf6;
-  --ifm-color-primary-darker: #7c3aed;
-  --ifm-color-primary-darkest: #6d28d9;
-  --ifm-color-primary-light: #c4b5fd;
-  --ifm-color-primary-lighter: #ddd6fe;
-  --ifm-color-primary-lightest: #ede9fe;
+  --ifm-color-primary: #40A9FF;
+  --ifm-color-primary-dark: #0A84FF;
+  --ifm-color-primary-darker: #0071E3;
+  --ifm-color-primary-darkest: #0051A5;
+  --ifm-color-primary-light: #69C0FF;
+  --ifm-color-primary-lighter: #91D5FF;
+  --ifm-color-primary-lightest: #BAE7FF;
   
-  --ifm-background-color: #0f0a1f;
-  --ifm-background-surface-color: #1a1333;
-  --ifm-navbar-background-color: rgba(15, 10, 31, 0.95);
-  --ifm-footer-background-color: #0a0612;
+  --ifm-background-color: #1a1a1a;
+  --ifm-background-surface-color: #242424;
+  --ifm-navbar-background-color: #1a1a1a;
+  --ifm-footer-background-color: #0f0f0f;
   
-  --docusaurus-highlighted-code-line-bg: rgba(167, 139, 250, 0.2);
+  --docusaurus-highlighted-code-line-bg: rgba(64, 169, 255, 0.15);
+  
+  --ifm-color-content: #e5e5e5;
+  --ifm-color-content-secondary: #a1a1aa;
 }
 
-/* Hero section styling - Matching Raven Panel */
+/* Hero section styling - React Native style */
 .hero {
-  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
-  position: relative;
-  overflow: hidden;
+  background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
+  border-bottom: 1px solid #e5e7eb;
+  padding: 4rem 0;
+  width: 100%;
+  margin: 0;
 }
 
-.hero::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.2) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, rgba(34, 211, 238, 0.15) 0%, transparent 40%);
-  pointer-events: none;
+/* Center hero on landing page */
+[data-page-id="index"] .hero,
+html[data-page-id="index"] .hero {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+[data-page-id="index"] .hero .container,
+html[data-page-id="index"] .hero .container {
+  max-width: 1200px;
+  margin: 0 auto !important;
+  padding: 0 2rem !important;
+  width: 100% !important;
 }
 
 .hero__title {
-  font-weight: 800;
-  font-size: 3.5rem;
+  font-weight: 700;
+  font-size: 3rem;
   letter-spacing: -0.02em;
-  background: linear-gradient(135deg, #fff 0%, #c4b5fd 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  position: relative;
-  z-index: 1;
+  color: #1a1a1a;
   text-align: center;
+  margin-bottom: 1rem;
 }
 
 .hero__subtitle {
   font-weight: 400;
-  font-size: 1.35rem;
-  color: rgba(255, 255, 255, 0.85);
-  max-width: 600px;
+  font-size: 1.25rem;
+  color: #6b7280;
+  max-width: 700px;
   margin: 0 auto;
-  position: relative;
-  z-index: 1;
+  text-align: center;
+  line-height: 1.6;
 }
 
 .hero__buttons {
@@ -104,134 +121,195 @@
   gap: 1rem;
   justify-content: center;
   flex-wrap: wrap;
+  margin-top: 2rem;
 }
 
 .hero__buttons .button {
   margin: 0.5rem;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
 }
 
 .hero__buttons .button--primary {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  background: var(--ifm-color-primary);
   color: white;
   border: none;
-  position: relative;
-  z-index: 1;
 }
 
 .hero__buttons .button--primary:hover {
-  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+  background: var(--ifm-color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3);
 }
 
 .hero__buttons .button--secondary {
   background-color: transparent;
-  color: white;
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  position: relative;
-  z-index: 1;
+  color: var(--ifm-color-primary);
+  border: 1px solid var(--ifm-color-primary);
 }
 
 .hero__buttons .button--secondary:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-color: white;
+  background-color: rgba(10, 132, 255, 0.05);
+  border-color: var(--ifm-color-primary-dark);
 }
 
-/* Navbar - Matching Raven Panel */
+/* Navbar - React Native style */
 .navbar {
-  backdrop-filter: blur(16px);
-  box-shadow: 0 1px 0 rgba(139, 92, 246, 0.1);
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: none;
+  padding: 0.75rem 1.5rem;
+}
+
+/* Add padding to main content area */
+.main-wrapper {
+  padding: 0 1rem;
+}
+
+@media (min-width: 768px) {
+  .main-wrapper {
+    padding: 0 2rem;
+  }
 }
 
 .navbar__title {
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.01em;
+  /* Disable emoji rendering while keeping text */
+  font-variant-emoji: text;
+  /* Alternative: use font-feature-settings */
+  font-feature-settings: "liga" 1;
+}
+
+.navbar__brand {
+  display: flex;
+  align-items: center;
 }
 
 .navbar__link {
   font-weight: 500;
+  font-size: 15px;
 }
 
-/* Cards and boxes - Matching Raven Panel */
+/* Cards and boxes - React Native style */
 .card {
   border-radius: var(--ifm-global-radius);
-  border: 1px solid rgba(139, 92, 246, 0.2);
-  transition: all 0.3s ease;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+  background: #ffffff;
   height: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 [data-theme='dark'] .card {
-  background: linear-gradient(135deg, rgba(26, 19, 51, 0.95) 0%, rgba(15, 10, 31, 0.9) 100%);
-  border-color: rgba(139, 92, 246, 0.3);
+  background: #242424;
+  border-color: #3a3a3a;
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border-color: var(--ifm-color-primary);
 }
 
+.card__header {
+  padding: 1.25rem 1.25rem 0.75rem 1.25rem;
+}
+
 .card__header h3 {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
   font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+[data-theme='dark'] .card__header h3 {
+  color: #e5e5e5;
 }
 
 .card__body {
-  padding: 1rem 0;
+  padding: 0 1.25rem 1.25rem 1.25rem;
+  color: #6b7280;
 }
 
-/* Code blocks - Matching Raven Panel */
+[data-theme='dark'] .card__body {
+  color: #a1a1aa;
+}
+
+/* Code blocks - React Native style */
 pre {
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  border: 1px solid #e5e7eb;
   border-radius: var(--ifm-code-border-radius);
+  background: #f8f9fa;
 }
 
 [data-theme='dark'] pre {
-  background: #0d0820 !important;
+  background: #1e1e1e !important;
+  border-color: #3a3a3a;
 }
 
 code {
-  border: 1px solid rgba(139, 92, 246, 0.15);
-  background: rgba(139, 92, 246, 0.08);
+  border: 1px solid #e5e7eb;
+  background: #f1f5f9;
   padding: 2px 6px;
   border-radius: 4px;
+  font-size: 0.875em;
+  color: #e11d48;
 }
 
-/* Tables - Matching Raven Panel */
+[data-theme='dark'] code {
+  background: #2a2a2a;
+  border-color: #3a3a3a;
+  color: #fb7185;
+}
+
+/* Tables - React Native style */
 table {
   border-radius: var(--ifm-global-radius);
   overflow: hidden;
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  border: 1px solid #e5e7eb;
   display: table;
   width: 100%;
 }
 
 th {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(167, 139, 250, 0.1) 100%);
+  background: #f8f9fa;
   font-weight: 600;
+  color: #1a1a1a;
 }
 
-/* Sidebar - Matching Raven Panel */
+[data-theme='dark'] th {
+  background: #2a2a2a;
+  color: #e5e5e5;
+}
+
+/* Sidebar - React Native style */
 .menu__link {
-  border-radius: 8px;
+  border-radius: 6px;
   font-weight: 500;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
+  font-size: 14px;
+  color: #6b7280;
 }
 
 .menu__link:hover {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(167, 139, 250, 0.05) 100%);
+  background: #f1f5f9;
+  color: var(--ifm-color-primary);
+}
+
+[data-theme='dark'] .menu__link:hover {
+  background: #2a2a2a;
 }
 
 .menu__link--active {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(167, 139, 250, 0.1) 100%);
-  border-left: 3px solid var(--ifm-color-primary);
+  background: rgba(10, 132, 255, 0.1);
+  color: var(--ifm-color-primary);
+  font-weight: 600;
 }
 
-/* Footer */
-.footer {
-  background-color: var(--ifm-footer-background-color);
-  border-top: 1px solid var(--ifm-color-emphasis-200);
+[data-theme='dark'] .menu__link--active {
+  background: rgba(64, 169, 255, 0.15);
 }
 
 /* Responsive adjustments */
@@ -264,82 +342,98 @@ th {
   margin-top: 2rem;
 }
 
-/* Link styling */
-a {
-  transition: color 0.2s ease-in-out;
-  color: var(--ifm-color-primary);
-}
-
-a:hover {
-  color: var(--ifm-color-primary-dark);
-}
-
-/* Buttons - Matching Raven Panel */
+/* Buttons - React Native style */
 .button--primary {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  background: var(--ifm-color-primary);
   border: none;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  transition: all 0.3s ease;
+  font-weight: 500;
+  transition: all 0.2s ease;
   border-radius: var(--ifm-global-radius);
+  padding: 0.625rem 1.25rem;
 }
 
 .button--primary:hover {
-  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+  background: var(--ifm-color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3);
 }
 
 .button--secondary {
-  border: 2px solid rgba(139, 92, 246, 0.5);
+  border: 1px solid var(--ifm-color-primary);
   color: var(--ifm-color-primary);
-  font-weight: 600;
+  font-weight: 500;
   border-radius: var(--ifm-global-radius);
+  padding: 0.625rem 1.25rem;
+  background: transparent;
 }
 
 .button--secondary:hover {
-  background: rgba(139, 92, 246, 0.1);
-  border-color: var(--ifm-color-primary);
+  background: rgba(10, 132, 255, 0.05);
+  border-color: var(--ifm-color-primary-dark);
 }
 
-/* Admonitions - Matching Raven Panel */
+/* Admonitions - React Native style */
 .admonition {
   border-radius: var(--ifm-global-radius);
   border-left-width: 4px;
+  border-color: var(--ifm-color-primary);
 }
 
 /* Blockquotes */
 blockquote {
   border-left: 4px solid var(--ifm-color-primary);
-  background: rgba(139, 92, 246, 0.05);
+  background: #f8f9fa;
   border-radius: 0 var(--ifm-global-radius) var(--ifm-global-radius) 0;
   padding: 1rem 1.5rem;
+  color: #6b7280;
 }
 
-/* Search - Matching Raven Panel */
+[data-theme='dark'] blockquote {
+  background: #2a2a2a;
+  color: #a1a1aa;
+}
+
+/* Search - React Native style */
 .DocSearch-Button {
-  border-radius: 10px !important;
-  background: rgba(139, 92, 246, 0.1) !important;
-  border: 1px solid rgba(139, 92, 246, 0.2) !important;
+  border-radius: 8px !important;
+  background: #f8f9fa !important;
+  border: 1px solid #e5e7eb !important;
 }
 
-/* Scrollbar - Matching Raven Panel */
+[data-theme='dark'] .DocSearch-Button {
+  background: #2a2a2a !important;
+  border-color: #3a3a3a !important;
+}
+
+/* Scrollbar - React Native style */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(139, 92, 246, 0.05);
+  background: #f1f5f9;
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-track {
+  background: #1a1a1a;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(139, 92, 246, 0.3);
+  background: #cbd5e1;
   border-radius: 4px;
 }
 
+[data-theme='dark'] ::-webkit-scrollbar-thumb {
+  background: #3a3a3a;
+}
+
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(139, 92, 246, 0.5);
+  background: #94a3b8;
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
+  background: #4a4a4a;
 }
 
 /* TOC - Matching Raven Panel */
@@ -348,34 +442,328 @@ blockquote {
   font-weight: 600;
 }
 
-/* Better text rendering */
+/* Better text rendering - React Native style */
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  font-family: var(--ifm-font-family-base);
+  color: var(--ifm-color-content);
 }
 
 /* Improved spacing and readability */
 p {
   margin-bottom: 1rem;
-  line-height: 1.7;
+  line-height: 1.6;
+  color: var(--ifm-color-content);
 }
 
-/* Footer - Matching Raven Panel */
+/* Headings - React Native style */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  color: #1a1a1a;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+[data-theme='dark'] h1,
+[data-theme='dark'] h2,
+[data-theme='dark'] h3,
+[data-theme='dark'] h4,
+[data-theme='dark'] h5,
+[data-theme='dark'] h6 {
+  color: #e5e5e5;
+}
+
+/* Links - React Native style */
+a {
+  transition: color 0.15s ease-in-out;
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--ifm-color-primary-dark);
+  text-decoration: underline;
+}
+
+/* Footer - React Native style */
 .footer {
-  background: linear-gradient(180deg, #1e1b4b 0%, #0a0612 100%);
+  background: #1a1a1a;
+  border-top: 1px solid #3a3a3a;
 }
 
 .footer__title {
-  color: #c4b5fd;
-  font-weight: 700;
+  color: #ffffff;
+  font-weight: 600;
 }
 
 .footer__link-item {
-  color: rgba(255, 255, 255, 0.7);
+  color: #a1a1aa;
   transition: color 0.2s ease;
+  font-size: 14px;
 }
 
 .footer__link-item:hover {
-  color: #a78bfa;
+  color: var(--ifm-color-primary-light);
+}
+
+/* Hide sidebar on landing page (index) - React Native style */
+[data-page-id="index"] .theme-doc-sidebar-container,
+html[data-page-id="index"] .theme-doc-sidebar-container {
+  display: none !important;
+  width: 0 !important;
+  flex: 0 0 0 !important;
+}
+
+/* Hide table of contents on landing page - all possible selectors */
+[data-page-id="index"] .table-of-contents,
+[data-page-id="index"] .theme-doc-toc-mobile,
+[data-page-id="index"] .theme-doc-toc-desktop,
+[data-page-id="index"] [class*="toc"],
+[data-page-id="index"] [class*="TOC"],
+[data-page-id="index"] [class*="table-of-contents"],
+[data-page-id="index"] .toc-wrapper,
+[data-page-id="index"] .toc-container,
+[data-page-id="index"] aside[class*="toc"],
+[data-page-id="index"] nav[class*="toc"],
+[data-page-id="index"] .col--3:last-child,
+[data-page-id="index"] .col[class*="toc"],
+[data-page-id="index"] .theme-doc-toc,
+[data-page-id="index"] aside,
+[data-page-id="index"] .col--3,
+html[data-page-id="index"] .table-of-contents,
+html[data-page-id="index"] .theme-doc-toc-mobile,
+html[data-page-id="index"] .theme-doc-toc-desktop,
+html[data-page-id="index"] [class*="toc"],
+html[data-page-id="index"] [class*="TOC"],
+html[data-page-id="index"] [class*="table-of-contents"],
+html[data-page-id="index"] .toc-wrapper,
+html[data-page-id="index"] .toc-container,
+html[data-page-id="index"] aside[class*="toc"],
+html[data-page-id="index"] nav[class*="toc"],
+html[data-page-id="index"] .col--3:last-child,
+html[data-page-id="index"] .col[class*="toc"],
+html[data-page-id="index"] .theme-doc-toc,
+html[data-page-id="index"] aside {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  opacity: 0 !important;
+  position: absolute !important;
+  left: -9999px !important;
+}
+
+/* Hide any right-side column in the main content area */
+[data-page-id="index"] .theme-doc-wrapper .row > .col:last-child,
+[data-page-id="index"] .main-wrapper .row > .col:last-child,
+[data-page-id="index"] .row > .col:last-child:not(.col--12):not(.col--4):not(.col--6):not(.col--8),
+html[data-page-id="index"] .theme-doc-wrapper .row > .col:last-child,
+html[data-page-id="index"] .main-wrapper .row > .col:last-child,
+html[data-page-id="index"] .row > .col:last-child:not(.col--12):not(.col--4):not(.col--6):not(.col--8) {
+  display: none !important;
+}
+
+/* Target the specific Docusaurus layout structure for TOC */
+[data-page-id="index"] .theme-doc-wrapper > .container > .row > .col:last-child,
+[data-page-id="index"] .theme-doc-wrapper .container .row .col:last-child:not(.col--12),
+html[data-page-id="index"] .theme-doc-wrapper > .container > .row > .col:last-child,
+html[data-page-id="index"] .theme-doc-wrapper .container .row .col:last-child:not(.col--12) {
+  display: none !important;
+  width: 0 !important;
+  flex: 0 0 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Make sure the main content column takes full width */
+[data-page-id="index"] .theme-doc-wrapper .row > .col:first-child,
+[data-page-id="index"] .theme-doc-wrapper .row > .col:not(:last-child),
+[data-page-id="index"] .main-wrapper .row > .col:first-child,
+[data-page-id="index"] .main-wrapper .row > .col:not(:last-child),
+[data-page-id="index"] .theme-doc-wrapper .container .row .col:first-child,
+[data-page-id="index"] .theme-doc-wrapper .container .row .col:not(:last-child),
+html[data-page-id="index"] .theme-doc-wrapper .row > .col:first-child,
+html[data-page-id="index"] .theme-doc-wrapper .row > .col:not(:last-child),
+html[data-page-id="index"] .main-wrapper .row > .col:first-child,
+html[data-page-id="index"] .main-wrapper .row > .col:not(:last-child),
+html[data-page-id="index"] .theme-doc-wrapper .container .row .col:first-child,
+html[data-page-id="index"] .theme-doc-wrapper .container .row .col:not(:last-child) {
+  flex: 1 1 100% !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Aggressive rule: Hide any element that might be a TOC or right sidebar */
+[data-page-id="index"] .theme-doc-wrapper .container .row .col.col--3,
+[data-page-id="index"] .theme-doc-wrapper .container .row .col[class*="col--"][class*="3"],
+html[data-page-id="index"] .theme-doc-wrapper .container .row .col.col--3,
+html[data-page-id="index"] .theme-doc-wrapper .container .row .col[class*="col--"][class*="3"] {
+  display: none !important;
+}
+
+/* Ensure main content takes full width when TOC is hidden */
+[data-page-id="index"] .theme-doc-markdown,
+[data-page-id="index"] .col[class*="col--"]:not([class*="toc"]):not([class*="TOC"]),
+html[data-page-id="index"] .theme-doc-markdown,
+html[data-page-id="index"] .col[class*="col--"]:not([class*="toc"]):not([class*="TOC"]) {
+  max-width: 100% !important;
+}
+
+/* Main wrapper - full width, no padding */
+[data-page-id="index"] .main-wrapper,
+html[data-page-id="index"] .main-wrapper {
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+/* Theme doc wrapper - remove flex and left padding */
+[data-page-id="index"] .theme-doc-wrapper,
+html[data-page-id="index"] .theme-doc-wrapper {
+  display: block !important;
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  position: relative;
+}
+
+/* Ensure the doc page container takes full width and centers content */
+[data-page-id="index"] .theme-doc-wrapper > .container,
+html[data-page-id="index"] .theme-doc-wrapper > .container {
+  width: 100% !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 0 2rem !important;
+}
+
+/* Main content container - centered with max-width */
+[data-page-id="index"] .theme-doc-wrapper .container,
+[data-page-id="index"] .main-wrapper .container,
+html[data-page-id="index"] .theme-doc-wrapper .container,
+html[data-page-id="index"] .main-wrapper .container {
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 0 2rem !important;
+  width: 100% !important;
+  position: relative;
+  left: auto !important;
+  right: auto !important;
+}
+
+/* Markdown content area - centered */
+[data-page-id="index"] .theme-doc-markdown,
+html[data-page-id="index"] .theme-doc-markdown {
+  max-width: 100% !important;
+  margin: 0 auto !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  width: 100% !important;
+}
+
+/* Remove version badge */
+[data-page-id="index"] .theme-doc-version-badge,
+html[data-page-id="index"] .theme-doc-version-badge {
+  display: none;
+}
+
+/* Row layout - centered */
+[data-page-id="index"] .row,
+html[data-page-id="index"] .row {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  justify-content: center;
+}
+
+/* Column padding for proper card spacing */
+[data-page-id="index"] .col {
+  padding-left: calc(var(--ifm-spacing-horizontal) * 0.5) !important;
+  padding-right: calc(var(--ifm-spacing-horizontal) * 0.5) !important;
+}
+
+/* Center all content on landing page - React Native style */
+[data-page-id="index"] .main-wrapper .container h2,
+[data-page-id="index"] .theme-doc-markdown h2,
+html[data-page-id="index"] .main-wrapper .container h2,
+html[data-page-id="index"] .theme-doc-markdown h2 {
+  text-align: center;
+  margin: 3rem 0 2rem 0;
+}
+
+/* Ensure the page container itself is centered */
+[data-page-id="index"] .main-wrapper > div,
+html[data-page-id="index"] .main-wrapper > div {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+}
+
+/* Handle the flex container that wraps sidebar and content */
+[data-page-id="index"] .main-wrapper,
+html[data-page-id="index"] .main-wrapper {
+  display: block !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+/* Ensure the entire page structure is centered - no left offset */
+[data-page-id="index"] body,
+html[data-page-id="index"] body {
+  overflow-x: hidden;
+}
+
+[data-page-id="index"] .main-wrapper,
+[data-page-id="index"] .theme-doc-wrapper,
+[data-page-id="index"] .theme-doc-markdown,
+html[data-page-id="index"] .main-wrapper,
+html[data-page-id="index"] .theme-doc-wrapper,
+html[data-page-id="index"] .theme-doc-markdown {
+  transform: translateX(0) !important;
+  left: 0 !important;
+  right: 0 !important;
+}
+
+/* Ensure content containers are properly centered */
+[data-page-id="index"] .theme-doc-wrapper .container,
+[data-page-id="index"] .main-wrapper .container,
+html[data-page-id="index"] .theme-doc-wrapper .container,
+html[data-page-id="index"] .main-wrapper .container {
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+}
+
+[data-page-id="index"] .main-wrapper .container .row,
+html[data-page-id="index"] .main-wrapper .container .row {
+  justify-content: center;
+}
+
+[data-page-id="index"] .main-wrapper .container ul,
+html[data-page-id="index"] .main-wrapper .container ul {
+  text-align: left;
+  display: inline-block;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+[data-page-id="index"] .main-wrapper .container .margin-top--lg,
+html[data-page-id="index"] .main-wrapper .container .margin-top--lg {
+  text-align: center;
+}
+
+[data-page-id="index"] .main-wrapper .container .tabs,
+html[data-page-id="index"] .main-wrapper .container .tabs {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+[data-page-id="index"] .main-wrapper .container p:not(.hero__subtitle),
+html[data-page-id="index"] .main-wrapper .container p:not(.hero__subtitle) {
+  text-align: center;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }

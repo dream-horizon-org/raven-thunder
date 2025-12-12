@@ -1,7 +1,7 @@
 // @ts-check
 
 const config = {
-  title: '⚡ Thunder',
+  title: 'Raven Thunder',
   tagline: 'CTAs, Nudges and Behaviour Tags platform',
   url: 'https://dream-horizon-org.github.io',
   baseUrl: '/raven-thunder/',
@@ -18,6 +18,10 @@ const config = {
     locales: ['en'],
   },
 
+  markdown: {
+    mermaid: true,
+  },
+
   presets: [
     [
       'classic',
@@ -25,11 +29,14 @@ const config = {
       ({
         docs: {
           path: 'docs',
-          routeBasePath: '/', // Docs as root
+          routeBasePath: '/', // Keep docs at root, but landing page will override index
           sidebarPath: require.resolve('./sidebars.js'),
           editCurrentVersion: false,
           showLastUpdateAuthor: true,
           showLastUpdateTime: true,
+        },
+        pages: {
+          path: 'src/pages',
         },
         blog: false, // Disable blog
         theme: {
@@ -39,11 +46,13 @@ const config = {
     ],
   ],
 
+  themes: ['@docusaurus/theme-mermaid'],
+
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       navbar: {
-        title: '⚡ Thunder',
+        title: 'Raven Thunder',
         logo: {
           alt: 'Thunder Logo',
           src: 'img/logo.svg',
@@ -78,17 +87,13 @@ const config = {
               },
               {
                 label: 'API Reference',
-                to: '/raven-thunder/api/overview',
+                to: '/raven-thunder/api/admin-contracts',
               },
             ],
           },
           {
             title: 'Resources',
             items: [
-              {
-                label: 'Admin API',
-                to: '/raven-thunder/admin/overview',
-              },
               {
                 label: 'Operations',
                 to: '/raven-thunder/operations/docker',
@@ -111,6 +116,9 @@ const config = {
         defaultMode: 'light',
         disableSwitch: false,
         respectPrefersColorScheme: true,
+      },
+      mermaid: {
+        theme: { light: 'default', dark: 'dark' },
       },
       // Algolia search can be added later if needed
       // algolia: {

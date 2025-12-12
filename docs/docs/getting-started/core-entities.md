@@ -299,6 +299,6 @@ Nudge
 
 - Learn how to create your first CTA Journey (to be added)
 - Understand Behaviour creation (to be added)
-- Explore the [API contracts](/raven-thunder/api/overview) for integration
+- Explore the [API Documentation](/raven-thunder/api/admin-contracts) for integration
 - Review [architecture details](/raven-thunder/architecture/modules) for deeper understanding
 
