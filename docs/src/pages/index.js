@@ -23,7 +23,6 @@ export default function Home() {
             fontWeight: 700,
             fontSize: '3rem',
             letterSpacing: '-0.02em',
-            color: '#1a1a1a',
             textAlign: 'center',
             marginBottom: '1rem'
           }}>
@@ -32,7 +31,6 @@ export default function Home() {
           <p className="hero__subtitle" style={{
             fontWeight: 400,
             fontSize: '1.25rem',
-            color: '#6b7280',
             maxWidth: '700px',
             margin: '0 auto',
             textAlign: 'center',
@@ -87,12 +85,11 @@ export default function Home() {
         padding: '3rem',
         textAlign: 'center'
       }}>
-        <h2 style={{
+        <h2 className="features-heading" style={{
           textAlign: 'center',
           margin: '3rem 0 2rem 0',
           fontWeight: 600,
-          fontSize: '1.75rem',
-          color: '#1a1a1a'
+          fontSize: '1.75rem'
         }}>Features</h2>
 
         <div className="row" style={{
@@ -141,10 +138,8 @@ export default function Home() {
               maxWidth: '33.333333%',
               minWidth: '280px'
             }}>
-              <div className="card" style={{
+              <div className="card feature-card" style={{
                 borderRadius: '8px',
-                border: '1px solid #e5e7eb',
-                background: '#ffffff',
                 boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
                 height: '100%',
                 transition: 'all 0.2s ease'
@@ -155,15 +150,13 @@ export default function Home() {
                   <h3 style={{
                     marginBottom: 0,
                     fontSize: '1.25rem',
-                    fontWeight: 600,
-                    color: '#1a1a1a'
+                    fontWeight: 600
                   }}>
                     {feature.emoji} {feature.title}
                   </h3>
                 </div>
                 <div className="card__body" style={{
-                  padding: '0 1.25rem 1.25rem 1.25rem',
-                  color: '#6b7280'
+                  padding: '0 1.25rem 1.25rem 1.25rem'
                 }}>
                   <p>{feature.description}</p>
                 </div>
