@@ -60,11 +60,11 @@ Understanding Thunder's core entities is essential for effectively using the pla
 
 ### Journeys
 
-A **Journey** is a configured sequence of steps that responds to user actions. As users perform actions in your application, each action can trigger a step in the Journey. When the user's actions match the configured rules for a step, Thunder displays the corresponding engagement or prompt. Journeys are the primary entities in Thunder that define how the system responds to user behavior, enabling you to deliver contextual experiences based on what users do.
+A **Journey** is a configured sequence of steps/nodes that responds to user actions. As users perform actions in your application, each action can trigger a step in the Journey. When the user's actions match the configured rules for a step, Thunder displays the corresponding engagement or prompt such as Bottomsheet, Tooltip, in-app Popup. Nudges can be configured on a journey Node.
 
 #### Key Features
 
-- **State Machine**: Each Journey uses a state machine to track user progress through different states
+- **State Machine**: A Journey is represented using state machines
 - **Rules & Eligibility**: Journeys define who can see them (cohort eligibility) and when they should be shown based on user actions
 - **Frequency Control**: Limits how often a user can enter a Journey (per session, time window, or lifetime)
 - **Status Management**: Journeys have lifecycle statuses: `DRAFT`, `SCHEDULED`, `LIVE`, `PAUSED`, `CONCLUDED`, `TERMINATED`
@@ -261,6 +261,5 @@ Journey
 
 ## Next Steps
 
-- Learn how to create your first Journey (to be added)
 - Explore the [API Documentation](/raven-thunder/api/admin-contracts) for integration
 - Review [architecture details](/raven-thunder/architecture/modules) for deeper understanding
