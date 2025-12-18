@@ -437,12 +437,12 @@ We welcome contributions! Please see our contributing guidelines:
 
 ## 📄 License
 
-Thunder is licensed under the **MIT License**.
+Thunder is licensed under the **Apache License 2.0**.
 
 See the [LICENSE](LICENSE) file for details.
 
 ---
 
-**Built with ❤️ by the Thunder team and contributors**
+**Built with ❤️ by Horizon Engineering**
 
 **📖 [View Full Documentation →](https://dream-horizon-org.github.io/raven-thunder/)**
