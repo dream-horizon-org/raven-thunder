@@ -2,7 +2,7 @@
 
 const config = {
   title: 'Raven Thunder',
-  tagline: 'CTAs, Nudges and Behaviour Tags platform',
+  tagline: 'The rules, journeys, and intelligence layer of Raven\'s engagement system',
   url: 'https://dream-horizon-org.github.io',
   baseUrl: '/raven-thunder/',
   favicon: 'img/logo.svg',
@@ -110,7 +110,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Thunder. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Dream Horizon`,
       },
       colorMode: {
         defaultMode: 'light',

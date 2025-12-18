@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <Layout
       title="Raven Thunder"
-      description="A powerful Java 17 + Vert.x platform for managing user journeys and nudges">
+      description="The rules, journeys, and intelligence layer of Raven's engagement system">
       <div className="hero" style={{
         padding: '4rem 0',
         width: '100%',
@@ -35,7 +35,7 @@ export default function Home() {
             lineHeight: 1.6,
             marginBottom: '2rem'
           }}>
-            A powerful Java 17 + Vert.x platform for managing user journeys and nudges
+            The rules, journeys, and intelligence layer of Raven's engagement system
           </p>
           <div className="hero__buttons" style={{
             display: 'flex',
@@ -64,6 +64,91 @@ export default function Home() {
         padding: '3rem',
         textAlign: 'center'
       }}>
+        <h2 className="platform-components-heading" style={{
+          textAlign: 'center',
+          margin: '3rem 0 2rem 0',
+          fontWeight: 600,
+          fontSize: '1.75rem'
+        }}>Platform Components</h2>
+
+        <div className="row" style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          margin: '0 -0.5rem',
+          justifyContent: 'center',
+          width: '100%',
+          marginBottom: '4rem'
+        }}>
+          {[
+            {
+              emoji: '📊',
+              title: 'Raven Panel',
+              description: 'The control panel for orchestrating Raven\'s customer engagement platform',
+              link: 'https://dream-horizon-org.github.io/raven-panel/'
+            },
+            {
+              emoji: '⚡',
+              title: 'Raven Client',
+              description: 'The in-app delivery layer of Raven\'s customer engagement platform',
+              link: 'https://dream-horizon-org.github.io/raven-client/'
+            }
+          ].map((component, idx) => (
+            <div key={idx} className="col col--6" style={{
+              padding: '0 0.5rem',
+              marginBottom: '2rem',
+              flex: '0 0 50%',
+              maxWidth: '50%',
+              minWidth: '300px'
+            }}>
+              <Link
+                href={component.link}
+                style={{
+                  textDecoration: 'none',
+                  color: 'inherit',
+                  display: 'block'
+                }}>
+                <div className="card platform-component-card" style={{
+                  borderRadius: '8px',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+                  height: '100%',
+                  transition: 'all 0.2s ease',
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  padding: '2rem 1.5rem'
+                }}>
+                  <div className="card__header" style={{
+                    padding: '0 0 1rem 0',
+                    textAlign: 'center'
+                  }}>
+                    <h3 style={{
+                      marginBottom: 0,
+                      fontSize: '1.5rem',
+                      fontWeight: 600,
+                      textAlign: 'center'
+                    }}>
+                      {component.emoji} {component.title}
+                    </h3>
+                  </div>
+                  <div className="card__body" style={{
+                    padding: 0,
+                    textAlign: 'center'
+                  }}>
+                    <p style={{
+                      margin: 0,
+                      fontSize: '1rem',
+                      lineHeight: '1.6',
+                      textAlign: 'center'
+                    }}>{component.description}</p>
+                  </div>
+                </div>
+              </Link>
+            </div>
+          ))}
+        </div>
+
         <h2 className="features-heading" style={{
           textAlign: 'center',
           margin: '3rem 0 2rem 0',
