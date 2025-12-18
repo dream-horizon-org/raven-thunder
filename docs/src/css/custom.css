@@ -73,8 +73,8 @@
 
 /* Hero section styling - Raven Client style */
 .hero {
-  background: linear-gradient(180deg, #f1f3f5 0%, #e9ecef 100%);
-  border-bottom: 1px solid #dee2e6;
+  background: linear-gradient(180deg, #2d3447 0%, #1e2332 100%);
+  border-bottom: 1px solid #3a4155;
   padding: 4rem 0;
   width: 100%;
   margin: 0;
@@ -101,7 +101,7 @@ html[data-page-id="index"] .hero .container {
   font-weight: 700;
   font-size: 3rem;
   letter-spacing: -0.02em;
-  color: #1a1a1a;
+  color: #ffffff;
   text-align: center;
   margin-bottom: 1rem;
 }
@@ -109,7 +109,7 @@ html[data-page-id="index"] .hero .container {
 .hero__subtitle {
   font-weight: 400;
   font-size: 1.25rem;
-  color: #6b7280;
+  color: #e5e5e5;
   max-width: 700px;
   margin: 0 auto;
   text-align: center;
@@ -847,6 +847,6 @@ html[data-page-id="index"] .feature-card .card__body p {
 
 [data-theme='dark'] [data-page-id="index"] .hero,
 [data-theme='dark'] html[data-page-id="index"] .hero {
-  background: linear-gradient(180deg, #2a2a2a 0%, #1f1f1f 100%) !important;
+  background: linear-gradient(180deg, #1e2332 0%, #151822 100%) !important;
   border-bottom-color: rgba(255, 255, 255, 0.1);
 }

@@ -16,7 +16,11 @@ const sidebars = {
       items: [
         'api/scalar',
         'api/admin-contracts',
-        ['api/thunder-api-contracts', 'Client API Contracts'],
+        {
+          type: 'doc',
+          id: 'api/thunder-api-contracts',
+          label: 'Client API Contracts',
+        },
       ],
     },
     {
