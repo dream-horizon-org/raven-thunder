@@ -8,8 +8,6 @@ export default function Home() {
       title="Raven Thunder"
       description="A powerful Java 17 + Vert.x platform for managing user journeys and nudges">
       <div className="hero" style={{
-        background: 'linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%)',
-        borderBottom: '1px solid #e5e7eb',
         padding: '4rem 0',
         width: '100%',
         textAlign: 'center'
@@ -48,31 +46,12 @@ export default function Home() {
           }}>
             <Link
               className="button button--primary button--lg"
-              to="/raven-thunder/getting-started/overview"
-              style={{
-                fontWeight: 500,
-                padding: '0.75rem 1.5rem',
-                borderRadius: '8px',
-                backgroundColor: '#0A84FF',
-                color: 'white',
-                border: 'none',
-                textDecoration: 'none',
-                display: 'inline-block'
-              }}>
+              to="/raven-thunder/getting-started/overview">
               Get Started
             </Link>
             <Link
               className="button button--secondary button--lg"
-              href="https://github.com/dream-horizon-org/thunder"
-              style={{
-                fontWeight: 500,
-                padding: '0.75rem 1.5rem',
-                borderRadius: '8px',
-                backgroundColor: 'transparent',
-                color: '#0A84FF',
-                border: '1px solid #0A84FF',
-                textDecoration: 'none'
-              }}>
+              href="https://github.com/dream-horizon-org/thunder">
               View on GitHub
             </Link>
           </div>

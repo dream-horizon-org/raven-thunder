@@ -1,21 +1,21 @@
 /**
  * Custom CSS for Thunder Documentation
- * Font and styling matching React Native documentation
+ * Font and styling matching Raven Client documentation
  */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  /* Primary palette - React Native blue */
-  --ifm-color-primary: #0A84FF;
-  --ifm-color-primary-dark: #0071E3;
-  --ifm-color-primary-darker: #0051A5;
-  --ifm-color-primary-darkest: #003D7A;
-  --ifm-color-primary-light: #40A9FF;
-  --ifm-color-primary-lighter: #69C0FF;
-  --ifm-color-primary-lightest: #91D5FF;
+  /* Primary palette - Raven Client style (modern blue/purple) */
+  --ifm-color-primary: #6366f1;
+  --ifm-color-primary-dark: #4f46e5;
+  --ifm-color-primary-darker: #4338ca;
+  --ifm-color-primary-darkest: #3730a3;
+  --ifm-color-primary-light: #818cf8;
+  --ifm-color-primary-lighter: #a5b4fc;
+  --ifm-color-primary-lightest: #c7d2fe;
 
-  /* Typography - Inter font (matching React Native) */
+  /* Typography - Inter font (matching Raven Client) */
   --ifm-font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   --ifm-font-family-monospace: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
   --ifm-heading-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -44,7 +44,7 @@
   --ifm-footer-background-color: #1a1a1a;
   
   /* Code blocks */
-  --docusaurus-highlighted-code-line-bg: rgba(10, 132, 255, 0.1);
+  --docusaurus-highlighted-code-line-bg: rgba(99, 102, 241, 0.1);
   
   /* Colors */
   --ifm-color-content: #1a1a1a;
@@ -52,29 +52,29 @@
 }
 
 [data-theme='dark'] {
-  --ifm-color-primary: #40A9FF;
-  --ifm-color-primary-dark: #0A84FF;
-  --ifm-color-primary-darker: #0071E3;
-  --ifm-color-primary-darkest: #0051A5;
-  --ifm-color-primary-light: #69C0FF;
-  --ifm-color-primary-lighter: #91D5FF;
-  --ifm-color-primary-lightest: #BAE7FF;
+  --ifm-color-primary: #818cf8;
+  --ifm-color-primary-dark: #6366f1;
+  --ifm-color-primary-darker: #4f46e5;
+  --ifm-color-primary-darkest: #4338ca;
+  --ifm-color-primary-light: #a5b4fc;
+  --ifm-color-primary-lighter: #c7d2fe;
+  --ifm-color-primary-lightest: #e0e7ff;
   
   --ifm-background-color: #1a1a1a;
   --ifm-background-surface-color: #242424;
   --ifm-navbar-background-color: #1a1a1a;
   --ifm-footer-background-color: #0f0f0f;
   
-  --docusaurus-highlighted-code-line-bg: rgba(64, 169, 255, 0.15);
+  --docusaurus-highlighted-code-line-bg: rgba(129, 140, 248, 0.15);
   
   --ifm-color-content: #e5e5e5;
   --ifm-color-content-secondary: #a1a1aa;
 }
 
-/* Hero section styling - React Native style */
+/* Hero section styling - Raven Client style */
 .hero {
-  background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
-  border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(180deg, #f1f3f5 0%, #e9ecef 100%);
+  border-bottom: 1px solid #dee2e6;
   padding: 4rem 0;
   width: 100%;
   margin: 0;
@@ -141,7 +141,7 @@ html[data-page-id="index"] .hero .container {
 .hero__buttons .button--primary:hover {
   background: var(--ifm-color-primary-dark);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
 .hero__buttons .button--secondary {
@@ -151,7 +151,7 @@ html[data-page-id="index"] .hero .container {
 }
 
 .hero__buttons .button--secondary:hover {
-  background-color: rgba(10, 132, 255, 0.05);
+  background-color: rgba(99, 102, 241, 0.05);
   border-color: var(--ifm-color-primary-dark);
 }
 
@@ -303,13 +303,13 @@ th {
 }
 
 .menu__link--active {
-  background: rgba(10, 132, 255, 0.1);
+  background: rgba(99, 102, 241, 0.1);
   color: var(--ifm-color-primary);
   font-weight: 600;
 }
 
 [data-theme='dark'] .menu__link--active {
-  background: rgba(64, 169, 255, 0.15);
+  background: rgba(129, 140, 248, 0.15);
 }
 
 /* Responsive adjustments */
@@ -355,7 +355,7 @@ th {
 .button--primary:hover {
   background: var(--ifm-color-primary-dark);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
 .button--secondary {
@@ -368,7 +368,7 @@ th {
 }
 
 .button--secondary:hover {
-  background: rgba(10, 132, 255, 0.05);
+  background: rgba(99, 102, 241, 0.05);
   border-color: var(--ifm-color-primary-dark);
 }
 
@@ -847,6 +847,6 @@ html[data-page-id="index"] .feature-card .card__body p {
 
 [data-theme='dark'] [data-page-id="index"] .hero,
 [data-theme='dark'] html[data-page-id="index"] .hero {
-  background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%) !important;
+  background: linear-gradient(180deg, #2a2a2a 0%, #1f1f1f 100%) !important;
   border-bottom-color: rgba(255, 255, 255, 0.1);
 }
