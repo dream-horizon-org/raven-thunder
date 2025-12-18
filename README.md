@@ -1,18 +1,16 @@
 # ⚡ Thunder
 
-**Enterprise-grade CTA, Nudge, and Behaviour Tag Management Platform**
-
 [![Documentation](https://img.shields.io/badge/docs-live-brightgreen)](https://dream-horizon-org.github.io/raven-thunder/)
 [![Java](https://img.shields.io/badge/Java-17-orange)](https://openjdk.org/)
 [![Vert.x](https://img.shields.io/badge/Vert.x-4.5-blue)](https://vertx.io/)
 
 ## 🌟 Overview
 
-Thunder is a robust, open-source platform built with **Java 17** and **Vert.x** for managing CTAs (Call-to-Actions), Nudges, and Behaviour Tags. It provides a comprehensive suite of APIs for both administrative management and SDK integration, enabling real-time user engagement and behavior-driven experiences.
+Thunder is a robust, open-source platform built with **Java 17** and **Vert.x** for managing User Journeys, Nudges, and Behaviour. It provides a comprehensive suite of APIs for both administrative management and SDK integration, enabling real-time user engagement and behavior-driven experiences.
 
 **📖 [View Full Documentation →](https://dream-horizon-org.github.io/raven-thunder/)**
 
-## Why Thunder?
+## Key Features
 
 - 🔐 **Enterprise-Grade**: Built with security and scalability in mind
 - ⚡ **Reactive Architecture**: Powered by Vert.x for high-performance, non-blocking I/O
@@ -22,48 +20,6 @@ Thunder is a robust, open-source platform built with **Java 17** and **Vert.x** 
 - 📱 **Real-Time Updates**: Dynamic CTA and Nudge management without app releases
 - 🔑 **State Machine Based**: Sophisticated state tracking for user journeys
 - 💾 **Aerospike Integration**: High-performance NoSQL database for reactive data access
-
-## 📋 Table of Contents
-
-- [Features](#-features)
-- [Getting Started](#-getting-started)
-- [Documentation](#-documentation)
-- [API Reference](#-api-reference)
-- [Configuration](#-configuration)
-- [Testing](#-testing)
-- [Deployment](#-deployment)
-- [Project Structure](#-project-structure)
-- [Contributing](#-contributing)
-- [Community](#-community)
-- [License](#-license)
-
-## ✨ Features
-
-### 🎯 Core Entities
-
-- **📢 CTAs (Call-to-Actions)**: User journey management with state machines
-- **💬 Nudges**: Real-time, configurable prompts for user guidance
-- **🏷️ Behaviour Tags**: Group and control multiple CTAs with frequency management
-
-### 🔌 REST APIs
-
-- **👨‍💼 Admin API** (19 endpoints): Complete CRUD operations for CTAs, Nudges, and Behaviour Tags
-- **📱 SDK API** (7 endpoints): Client-facing APIs for CTA decisions and state management
-- **🔍 Debug APIs**: Utilities for testing and debugging
-
-### 🏗️ Architecture
-
-- **📦 Multi-Module Design**: Clean separation with `thunder-core`, `thunder-api`, and `thunder-admin`
-- **⚡ Reactive Programming**: Built on RxJava3 for non-blocking operations
-- **💾 Aerospike Integration**: Reactive data access with automatic seeding and indexing
-- **🐳 Docker Ready**: Full Docker Compose setup with all dependencies
-
-### 🛡️ Quality & Reliability
-
-- **✅ Health Checks**: Comprehensive monitoring for services and database connectivity
-- **🧪 Testing**: Unit and integration tests with JUnit 5, Mockito, and Testcontainers
-- **📏 Code Quality**: Spotless formatting and Checkstyle linting
-- **🔒 Security**: Multi-tenant support with tenant-level isolation
 
 ## 🚀 Getting Started
 
