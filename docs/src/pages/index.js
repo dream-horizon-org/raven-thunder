@@ -35,7 +35,23 @@ export default function Home() {
             lineHeight: 1.6,
             marginBottom: '2rem'
           }}>
-            The rules, journeys, and intelligence layer of Raven's engagement system
+            The rules, journeys, and intelligence layer of{' '}
+            <Link
+              href="https://dream-horizon-org.github.io/raven-client/raven/"
+              style={{
+                color: 'var(--ifm-color-primary)',
+                fontWeight: 600,
+                textDecoration: 'none'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.textDecoration = 'underline';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.textDecoration = 'none';
+              }}>
+              Raven's
+            </Link>
+            {' '}engagement system
           </p>
           <div className="hero__buttons" style={{
             display: 'flex',
@@ -87,7 +103,7 @@ export default function Home() {
               link: 'https://dream-horizon-org.github.io/raven-panel/'
             },
             {
-              emoji: '⚡',
+              emoji: '📱',
               title: 'Raven Client',
               description: 'The in-app delivery layer of Raven\'s customer engagement platform',
               link: 'https://dream-horizon-org.github.io/raven-client/'
