@@ -133,26 +133,27 @@ html[data-page-id="index"] .hero .container {
 }
 
 .hero__buttons .button--primary {
-  background: var(--ifm-color-primary);
+  background: #10b981;
   color: white;
   border: none;
 }
 
 .hero__buttons .button--primary:hover {
-  background: var(--ifm-color-primary-dark);
+  background: #059669;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
 .hero__buttons .button--secondary {
   background-color: transparent;
-  color: var(--ifm-color-primary);
-  border: 1px solid var(--ifm-color-primary);
+  color: #10b981;
+  border: 1px solid #10b981;
 }
 
 .hero__buttons .button--secondary:hover {
-  background-color: rgba(99, 102, 241, 0.05);
-  border-color: var(--ifm-color-primary-dark);
+  background-color: rgba(16, 185, 129, 0.05);
+  border-color: #059669;
+  color: #059669;
 }
 
 /* Navbar - React Native style */
