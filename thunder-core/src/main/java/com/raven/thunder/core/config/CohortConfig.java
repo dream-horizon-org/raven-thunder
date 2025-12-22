@@ -35,5 +35,3 @@ public class CohortConfig {
   @JsonProperty("max-wait-queue-size")
   private Integer maxWaitQueueSize;
 }
-
-

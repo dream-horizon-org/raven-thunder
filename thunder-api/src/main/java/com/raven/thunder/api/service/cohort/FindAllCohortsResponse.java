@@ -11,4 +11,3 @@ public class FindAllCohortsResponse {
   @JsonProperty("data")
   private List<String> data;
 }
-

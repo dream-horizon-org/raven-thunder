@@ -34,13 +34,14 @@ public class UserCohortsClientImpl implements UserCohortsClient {
   public UserCohortsClientImpl(Vertx vertx, CohortConfig cohortConfig) {
     this.cohortConfig = cohortConfig;
     this.objectMapper = new ObjectMapper();
-    this.baseUrl = cohortConfig != null && cohortConfig.getUrl() != null 
-        ? cohortConfig.getUrl() 
-        : "http://localhost:8080/user-cohort/realtime";
+    this.baseUrl =
+        cohortConfig != null && cohortConfig.getUrl() != null
+            ? cohortConfig.getUrl()
+            : "http://localhost:8080/user-cohort/realtime";
 
     // Configure HTTP client with connection pooling
     HttpClientOptions httpClientOptions = new HttpClientOptions();
-    
+
     if (cohortConfig != null) {
       // Use max-pool-size if provided, otherwise fall back to connection-pool-size
       if (cohortConfig.getMaxPoolSize() != null) {
@@ -79,7 +80,7 @@ public class UserCohortsClientImpl implements UserCohortsClient {
     // Create HttpClient with the configured options, then create WebClient from it
     HttpClient httpClient = vertx.createHttpClient(httpClientOptions);
     this.webClient = WebClient.wrap(httpClient);
-    
+
     log.info(
         "UserCohortsClientImpl initialized with URL: {}, maxPoolSize: {}, connectTimeout: {}ms",
         baseUrl,
@@ -97,11 +98,12 @@ public class UserCohortsClientImpl implements UserCohortsClient {
     }
 
     // Construct URL by appending userId as query parameter
-    // baseUrl from config should be the full path (e.g., "http://localhost:8080/user-cohort/realtime")
+    // baseUrl from config should be the full path (e.g.,
+    // "http://localhost:8080/user-cohort/realtime")
     // We format the query parameter template and append it to the base URL
     String queryParam = String.format(FIND_ALL_COHORTS_URI, userId);
     String url = baseUrl + queryParam;
-    
+
     log.debug("Fetching cohorts for userId: {} from URL: {}", userId, url);
 
     return webClient
@@ -113,17 +115,17 @@ public class UserCohortsClientImpl implements UserCohortsClient {
                 try {
                   String body = response.bodyAsString();
                   log.debug("Received response for userId {}: {}", userId, body);
-                  
+
                   // Parse response as FindAllCohortsResponse with data field
                   FindAllCohortsResponse cohortResponse =
                       objectMapper.readValue(body, FindAllCohortsResponse.class);
-                  
+
                   // Convert List<String> to Set<String>
                   Set<String> cohorts =
                       cohortResponse.getData() != null
                           ? new HashSet<>(cohortResponse.getData())
                           : Collections.emptySet();
-                  
+
                   log.info(
                       "Successfully fetched {} cohorts for userId: {}", cohorts.size(), userId);
                   return cohorts;
@@ -146,8 +148,7 @@ public class UserCohortsClientImpl implements UserCohortsClient {
             })
         .onErrorResumeNext(
             error -> {
-              log.error(
-                  "Error fetching cohorts for userId: {} from URL: {}", userId, url, error);
+              log.error("Error fetching cohorts for userId: {} from URL: {}", userId, url, error);
               // Return empty set on error to allow the system to continue
               return Single.just(Collections.<String>emptySet());
             });
