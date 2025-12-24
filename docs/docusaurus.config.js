@@ -82,10 +82,6 @@ const config = {
                 to: '/raven-thunder/getting-started/overview',
               },
               {
-                label: 'Architecture',
-                to: '/raven-thunder/architecture/modules',
-              },
-              {
                 label: 'API Reference',
                 to: '/raven-thunder/api/admin-contracts',
               },

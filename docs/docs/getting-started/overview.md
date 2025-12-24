@@ -262,4 +262,4 @@ Journey
 ## Next Steps
 
 - Explore the [API Documentation](/raven-thunder/api/admin-contracts) for integration
-- Review [architecture details](/raven-thunder/architecture/modules) for deeper understanding
+- Check out the [Quickstart Guide](/raven-thunder/getting-started/quickstart) to get started
