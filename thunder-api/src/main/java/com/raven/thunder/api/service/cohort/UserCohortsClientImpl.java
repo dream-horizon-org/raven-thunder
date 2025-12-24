@@ -3,6 +3,7 @@ package com.raven.thunder.api.service.cohort;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.raven.thunder.api.constant.Constants;
 import com.raven.thunder.api.service.UserCohortsClient;
 import com.raven.thunder.core.config.CohortConfig;
 import io.reactivex.rxjava3.core.Single;
@@ -23,8 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 @Singleton
 public class UserCohortsClientImpl implements UserCohortsClient {
 
-  private static final String FIND_ALL_COHORTS_URI = "?userId=%s";
-
   private final WebClient webClient;
   private final CohortConfig cohortConfig;
   private final ObjectMapper objectMapper;
@@ -37,7 +36,7 @@ public class UserCohortsClientImpl implements UserCohortsClient {
     this.baseUrl =
         cohortConfig != null && cohortConfig.getUrl() != null
             ? cohortConfig.getUrl()
-            : "http://localhost:8080/user-cohort/realtime";
+            : null;
 
     // Configure HTTP client with connection pooling
     HttpClientOptions httpClientOptions = new HttpClientOptions();
@@ -90,24 +89,19 @@ public class UserCohortsClientImpl implements UserCohortsClient {
 
   @Override
   public Single<Set<String>> findAllCohorts(Long userId) {
-    if (cohortConfig == null || cohortConfig.getUrl() == null || cohortConfig.getUrl().isEmpty()) {
+    if (baseUrl == null || baseUrl.isEmpty()) {
       log.warn(
-          "Cohort service URL not configured. Returning default cohort 'all' for userId: {}",
+          "Cohort service URL not configured. Returning default cohort '{}' for userId: {}",
+          Constants.DEFAULT_COHORT_ALL,
           userId);
-      return Single.just(Set.of("all"));
+      return Single.just(Set.of(Constants.DEFAULT_COHORT_ALL));
     }
 
-    // Construct URL by appending userId as query parameter
-    // baseUrl from config should be the full path (e.g.,
-    // "http://localhost:8080/user-cohort/realtime")
-    // We format the query parameter template and append it to the base URL
-    String queryParam = String.format(FIND_ALL_COHORTS_URI, userId);
-    String url = baseUrl + queryParam;
-
-    log.debug("Fetching cohorts for userId: {} from URL: {}", userId, url);
+    log.debug("Fetching cohorts for userId: {} from base URL: {}", userId, baseUrl);
 
     return webClient
-        .getAbs(url)
+        .getAbs(baseUrl)
+        .addQueryParam(Constants.USER_ID_QUERY_PARAM, String.valueOf(userId))
         .rxSend()
         .map(
             response -> {
@@ -148,7 +142,8 @@ public class UserCohortsClientImpl implements UserCohortsClient {
             })
         .onErrorResumeNext(
             error -> {
-              log.error("Error fetching cohorts for userId: {} from URL: {}", userId, url, error);
+              log.error(
+                  "Error fetching cohorts for userId: {} from base URL: {}", userId, baseUrl, error);
               // Return empty set on error to allow the system to continue
               return Single.just(Collections.<String>emptySet());
             });
