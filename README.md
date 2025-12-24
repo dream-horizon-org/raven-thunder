@@ -144,10 +144,12 @@ docker-compose up -d --build
 
 If you prefer to run without Docker:
 
+**Important:** Ensure that Java 17 is the active version. Maven should also be configured to use Java 17 - you can verify this by checking that `mvn --version` shows Java 17 in its output.
 ```bash
 # Build the project
 mvn clean package
 
+### Port Requirements
 # Run Admin service
 java -jar thunder-admin/target/thunder-admin-1.0.0-SNAPSHOT-fat.jar
 
@@ -384,7 +386,6 @@ thunder/
 ├── docker-compose.yml
 └── pom.xml
 ```
-
 ## 🛠️ Scripts
 
 Docker-related scripts are in `scripts/docker/`:
