@@ -80,13 +80,57 @@
   margin: 0;
 }
 
-/* Center hero on landing page */
+/* Hero fullwidth class - breaks out of container */
+.hero-fullwidth {
+  width: 100vw !important;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw !important;
+  margin-right: -50vw !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  max-width: none !important;
+}
+
+/* Center hero on landing page and make it touch screen edges */
 [data-page-id="index"] .hero,
-html[data-page-id="index"] .hero {
+[data-page-id="index"] .hero-fullwidth,
+html[data-page-id="index"] .hero,
+html[data-page-id="index"] .hero-fullwidth {
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
+  width: 100vw !important;
+  position: relative;
+  left: 50% !important;
+  right: 50% !important;
+  margin-left: -50vw !important;
+  margin-right: -50vw !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  max-width: none !important;
+  box-sizing: border-box;
+}
+
+/* Override any parent container padding */
+[data-page-id="index"] .main-wrapper > *:first-child,
+html[data-page-id="index"] .main-wrapper > *:first-child {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Ensure body/html don't add padding on landing page */
+[data-page-id="index"] body,
+html[data-page-id="index"] body {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  overflow-x: hidden;
 }
 
 [data-page-id="index"] .hero .container,
@@ -172,6 +216,13 @@ html[data-page-id="index"] .hero .container {
   .main-wrapper {
     padding: 0 2rem;
   }
+}
+
+/* Remove padding from main-wrapper on landing page to allow hero to touch edges */
+[data-page-id="index"] .main-wrapper,
+html[data-page-id="index"] .main-wrapper {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
 .navbar__title {
@@ -619,6 +670,30 @@ html[data-page-id="index"] .main-wrapper {
   margin: 0 !important;
   padding: 0 !important;
   width: 100% !important;
+  overflow-x: hidden;
+}
+
+/* Override any container that wraps the hero */
+[data-page-id="index"] .main-wrapper .container:has(.hero),
+[data-page-id="index"] .main-wrapper > .container:first-child,
+html[data-page-id="index"] .main-wrapper .container:has(.hero),
+html[data-page-id="index"] .main-wrapper > .container:first-child {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  max-width: 100% !important;
+}
+
+/* Ensure hero breaks out of any container padding */
+[data-page-id="index"] .main-wrapper > .hero,
+[data-page-id="index"] .main-wrapper > *:first-child.hero,
+[data-page-id="index"] .container > .hero,
+html[data-page-id="index"] .main-wrapper > .hero,
+html[data-page-id="index"] .main-wrapper > *:first-child.hero,
+html[data-page-id="index"] .container > .hero {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
 /* Theme doc wrapper - remove flex and left padding */
