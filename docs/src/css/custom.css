@@ -3,7 +3,7 @@
  * Font and styling matching Raven Client documentation
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
   /* Primary palette - Raven Client style (modern blue/purple) */
@@ -15,26 +15,22 @@
   --ifm-color-primary-lighter: #a5b4fc;
   --ifm-color-primary-lightest: #c7d2fe;
 
-  /* Typography - Inter for modern, clean look (consistent with raven-panel and raven-client) */
-  --ifm-font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  --ifm-font-family-monospace: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
-  --ifm-heading-font-family: 'Inter', sans-serif;
+  /* Typography - Inter font (matching Raven Client) */
+  --ifm-font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  --ifm-font-family-monospace: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  --ifm-heading-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   
-  /* Base font size - consistent across all docs */
+  /* Font sizes - React Native style */
   --ifm-font-size-base: 16px;
+  --ifm-code-font-size: 14px;
+  --ifm-h1-font-size: 2.25rem;
+  --ifm-h2-font-size: 1.75rem;
+  --ifm-h3-font-size: 1.5rem;
+  --ifm-h4-font-size: 1.25rem;
+  --ifm-h5-font-size: 1.125rem;
+  --ifm-h6-font-size: 1rem;
   
-  /* Heading sizes - consistent typography scale */
-  --ifm-h1-font-size: 2.5rem;      /* 40px */
-  --ifm-h2-font-size: 1.75rem;    /* 28px */
-  --ifm-h3-font-size: 1.5rem;     /* 24px */
-  --ifm-h4-font-size: 1.25rem;    /* 20px */
-  --ifm-h5-font-size: 1.125rem;    /* 18px */
-  --ifm-h6-font-size: 1rem;       /* 16px */
-  
-  /* Code font size */
-  --ifm-code-font-size: 0.875rem; /* 14px */
-  
-  /* Line heights */
+  /* Line heights - React Native style */
   --ifm-line-height-base: 1.6;
   --ifm-heading-line-height: 1.3;
   
@@ -84,13 +80,57 @@
   margin: 0;
 }
 
-/* Center hero on landing page */
+/* Hero fullwidth class - breaks out of container */
+.hero-fullwidth {
+  width: 100vw !important;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw !important;
+  margin-right: -50vw !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  max-width: none !important;
+}
+
+/* Center hero on landing page and make it touch screen edges */
 [data-page-id="index"] .hero,
-html[data-page-id="index"] .hero {
+[data-page-id="index"] .hero-fullwidth,
+html[data-page-id="index"] .hero,
+html[data-page-id="index"] .hero-fullwidth {
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
+  width: 100vw !important;
+  position: relative;
+  left: 50% !important;
+  right: 50% !important;
+  margin-left: -50vw !important;
+  margin-right: -50vw !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  max-width: none !important;
+  box-sizing: border-box;
+}
+
+/* Override any parent container padding */
+[data-page-id="index"] .main-wrapper > *:first-child,
+html[data-page-id="index"] .main-wrapper > *:first-child {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Ensure body/html don't add padding on landing page */
+[data-page-id="index"] body,
+html[data-page-id="index"] body {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  overflow-x: hidden;
 }
 
 [data-page-id="index"] .hero .container,
@@ -178,6 +218,13 @@ html[data-page-id="index"] .hero .container {
   }
 }
 
+/* Remove padding from main-wrapper on landing page to allow hero to touch edges */
+[data-page-id="index"] .main-wrapper,
+html[data-page-id="index"] .main-wrapper {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
 .navbar__title {
   font-weight: 600;
   letter-spacing: -0.01em;
@@ -194,7 +241,7 @@ html[data-page-id="index"] .hero .container {
 
 .navbar__link {
   font-weight: 500;
-  font-size: 0.9375rem; /* 15px - consistent navbar link */
+  font-size: 15px;
 }
 
 /* Cards and boxes - React Native style */
@@ -259,7 +306,7 @@ code {
   background: #f1f5f9;
   padding: 2px 6px;
   border-radius: 4px;
-  font-size: 0.875rem; /* 14px - consistent with code font size */
+  font-size: 0.875em;
   color: #e11d48;
 }
 
@@ -294,7 +341,7 @@ th {
   border-radius: 6px;
   font-weight: 500;
   transition: all 0.15s ease;
-  font-size: 0.875rem; /* 14px - consistent with base */
+  font-size: 14px;
   color: #6b7280;
 }
 
@@ -506,7 +553,7 @@ a:hover {
 .footer__link-item {
   color: #a1a1aa;
   transition: color 0.2s ease;
-  font-size: 0.875rem; /* 14px - consistent footer links */
+  font-size: 14px;
 }
 
 .footer__link-item:hover {
@@ -623,6 +670,30 @@ html[data-page-id="index"] .main-wrapper {
   margin: 0 !important;
   padding: 0 !important;
   width: 100% !important;
+  overflow-x: hidden;
+}
+
+/* Override any container that wraps the hero */
+[data-page-id="index"] .main-wrapper .container:has(.hero),
+[data-page-id="index"] .main-wrapper > .container:first-child,
+html[data-page-id="index"] .main-wrapper .container:has(.hero),
+html[data-page-id="index"] .main-wrapper > .container:first-child {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  max-width: 100% !important;
+}
+
+/* Ensure hero breaks out of any container padding */
+[data-page-id="index"] .main-wrapper > .hero,
+[data-page-id="index"] .main-wrapper > *:first-child.hero,
+[data-page-id="index"] .container > .hero,
+html[data-page-id="index"] .main-wrapper > .hero,
+html[data-page-id="index"] .main-wrapper > *:first-child.hero,
+html[data-page-id="index"] .container > .hero {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
 /* Theme doc wrapper - remove flex and left padding */

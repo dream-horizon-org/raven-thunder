@@ -7,15 +7,16 @@ export default function Home() {
     <Layout
       title="Raven Thunder"
       description="The rules, journeys, and intelligence layer of Raven's engagement system">
-      <div className="hero" style={{
+      <div className="hero hero-fullwidth" style={{
         padding: '4rem 0',
         width: '100%',
+        margin: 0,
         textAlign: 'center'
       }}>
         <div className="container" style={{
           maxWidth: '1200px',
           margin: '0 auto',
-          padding: '0 3rem'
+          padding: '0 2rem'
         }}>
           <h1 className="hero__title" style={{
             fontWeight: 700,
@@ -24,7 +25,7 @@ export default function Home() {
             textAlign: 'center',
             marginBottom: '1rem'
           }}>
-            ⚡ Raven Thunder ⚡
+            Raven Thunder
           </h1>
           <p className="hero__subtitle" style={{
             fontWeight: 400,
@@ -37,7 +38,7 @@ export default function Home() {
           }}>
             The rules, journeys, and intelligence layer of{' '}
             <Link
-              href="https://dream-horizon-org.github.io/raven-client/raven/"
+              href="https://raven.dreamhorizon.org/"
               style={{
                 color: 'var(--ifm-color-primary)',
                 fontWeight: 600,
