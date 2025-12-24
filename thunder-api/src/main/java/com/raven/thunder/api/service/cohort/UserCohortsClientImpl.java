@@ -34,9 +34,7 @@ public class UserCohortsClientImpl implements UserCohortsClient {
     this.cohortConfig = cohortConfig;
     this.objectMapper = new ObjectMapper();
     this.baseUrl =
-        cohortConfig != null && cohortConfig.getUrl() != null
-            ? cohortConfig.getUrl()
-            : null;
+        cohortConfig != null && cohortConfig.getUrl() != null ? cohortConfig.getUrl() : null;
 
     // Configure HTTP client with connection pooling
     HttpClientOptions httpClientOptions = new HttpClientOptions();
@@ -143,7 +141,10 @@ public class UserCohortsClientImpl implements UserCohortsClient {
         .onErrorResumeNext(
             error -> {
               log.error(
-                  "Error fetching cohorts for userId: {} from base URL: {}", userId, baseUrl, error);
+                  "Error fetching cohorts for userId: {} from base URL: {}",
+                  userId,
+                  baseUrl,
+                  error);
               // Return empty set on error to allow the system to continue
               return Single.just(Collections.<String>emptySet());
             });
