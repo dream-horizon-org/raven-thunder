@@ -433,6 +433,7 @@ We welcome contributions! Please see our contributing guidelines:
 ## 👥 Community
 
 - **💬 [GitHub Discussions](https://github.com/dream-horizon-org/thunder/discussions)** - Ask questions and share ideas
+- **💬 [Discord Community](https://discord.gg/NryqGzJU)** - Join our Discord for support and discussions
 - **🐛 [Issue Tracker](https://github.com/dream-horizon-org/thunder/issues)** - Report bugs and request features
 - **📖 [Documentation](https://dream-horizon-org.github.io/raven-thunder/)** - Comprehensive guides and API reference
 
