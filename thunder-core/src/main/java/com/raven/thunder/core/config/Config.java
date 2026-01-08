@@ -19,4 +19,7 @@ public class Config {
 
   @JsonProperty("aerospike")
   private AerospikeConfig aerospike;
+
+  @JsonProperty("cohort")
+  private CohortConfig cohort;
 }

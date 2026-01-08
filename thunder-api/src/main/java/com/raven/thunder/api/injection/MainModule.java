@@ -13,6 +13,7 @@ import com.raven.thunder.api.service.sdk.SdkServiceImpl;
 import com.raven.thunder.core.client.AerospikeClient;
 import com.raven.thunder.core.client.AerospikeClientHolder;
 import com.raven.thunder.core.config.AerospikeConfig;
+import com.raven.thunder.core.config.CohortConfig;
 import com.raven.thunder.core.config.Config;
 import com.raven.thunder.core.config.ServerConfig;
 import com.raven.thunder.core.dao.BehaviourTagsRepository;
@@ -75,6 +76,18 @@ public class MainModule extends AbstractModule {
                 return null;
               }
               return config.getAerospike();
+            });
+
+    // Bind CohortConfig from Config
+    bind(CohortConfig.class)
+        .toProvider(
+            () -> {
+              Config config = SharedDataUtils.get(vertx, Config.class);
+              if (config == null || config.getCohort() == null) {
+                log.warn("CohortConfig not available, returning null");
+                return null;
+              }
+              return config.getCohort();
             });
 
     // Bind Aerospike Client from AerospikeClientHolder (initialized in MainVerticle)

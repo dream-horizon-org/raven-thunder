@@ -3,5 +3,6 @@ package com.raven.thunder.api.constant;
 public final class Constants {
   public static final String RUNNING = "RUNNING";
 
-  public static String USER_COHORTS_BREAKER = "user-cohorts-breaker";
+  public static final String USER_ID_QUERY_PARAM = "userId";
+  public static final String DEFAULT_COHORT_ALL = "all";
 }
