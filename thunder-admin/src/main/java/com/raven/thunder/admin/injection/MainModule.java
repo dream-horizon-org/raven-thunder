@@ -4,8 +4,10 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import com.raven.thunder.admin.service.AdminService;
 import com.raven.thunder.admin.service.BehaviourTagService;
+import com.raven.thunder.admin.service.EventService;
 import com.raven.thunder.admin.service.admin.AdminServiceImpl;
 import com.raven.thunder.admin.service.behaviourTag.BehaviourTagServiceImpl;
+import com.raven.thunder.admin.service.event.EventServiceImpl;
 import com.raven.thunder.core.client.AerospikeClient;
 import com.raven.thunder.core.client.AerospikeClientHolder;
 import com.raven.thunder.core.config.AerospikeConfig;
@@ -13,9 +15,11 @@ import com.raven.thunder.core.config.Config;
 import com.raven.thunder.core.config.ServerConfig;
 import com.raven.thunder.core.dao.BehaviourTagsRepository;
 import com.raven.thunder.core.dao.CTARepository;
+import com.raven.thunder.core.dao.EventRepository;
 import com.raven.thunder.core.dao.NudgePreviewRepository;
 import com.raven.thunder.core.dao.behaviourTag.BehaviourTagRepositoryImpl;
 import com.raven.thunder.core.dao.cta.CTARepositoryImpl;
+import com.raven.thunder.core.dao.event.EventRepositoryImpl;
 import com.raven.thunder.core.dao.nudge.preview.NudgePreviewRepositoryImpl;
 import com.raven.thunder.core.util.SharedDataUtils;
 import io.vertx.core.Vertx;
@@ -90,10 +94,12 @@ public class MainModule extends AbstractModule {
     bind(CTARepository.class).to(CTARepositoryImpl.class).in(Singleton.class);
     bind(BehaviourTagsRepository.class).to(BehaviourTagRepositoryImpl.class).in(Singleton.class);
     bind(NudgePreviewRepository.class).to(NudgePreviewRepositoryImpl.class).in(Singleton.class);
+    bind(EventRepository.class).to(EventRepositoryImpl.class).in(Singleton.class);
 
     // Bind Services
     bind(AdminService.class).to(AdminServiceImpl.class).in(Singleton.class);
     bind(BehaviourTagService.class).to(BehaviourTagServiceImpl.class).in(Singleton.class);
+    bind(EventService.class).to(EventServiceImpl.class).in(Singleton.class);
 
     log.info("MainModule configuration complete - all services and repositories bound");
   }
