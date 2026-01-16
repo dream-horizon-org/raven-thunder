@@ -1,0 +1,10 @@
+SET KEY_SEND TRUE
+
+-- Seed Event: UserLoginEvent
+DELETE FROM thunder-admin.event_schema WHERE PK = 'default:UserLoginEvent'
+INSERT INTO thunder-admin.event_schema (PK, tenant_id, event_name, event_data) VALUES ('default:UserLoginEvent', 'default', 'UserLoginEvent', '{"tenantId":"default","eventName":"UserLoginEvent","source":"CONCORD","lastSyncedAt":1609459200,"properties":[{"propertyName":"userId","type":"string","expectedValue":null,"isMandatory":true,"description":"User ID who logged in"},{"propertyName":"timestamp","type":"long","expectedValue":null,"isMandatory":true,"description":"Login timestamp"},{"propertyName":"deviceType","type":"string","expectedValue":"mobile","isMandatory":false,"description":"Device type used for login"}]}')
+
+-- Seed Event: PurchaseCompletedEvent
+DELETE FROM thunder-admin.event_schema WHERE PK = 'default:PurchaseCompletedEvent'
+INSERT INTO thunder-admin.event_schema (PK, tenant_id, event_name, event_data) VALUES ('default:PurchaseCompletedEvent', 'default', 'PurchaseCompletedEvent', '{"tenantId":"default","eventName":"PurchaseCompletedEvent","source":"CONCORD","lastSyncedAt":1609459200,"properties":[{"propertyName":"orderId","type":"string","expectedValue":null,"isMandatory":true,"description":"Order ID"},{"propertyName":"amount","type":"double","expectedValue":null,"isMandatory":true,"description":"Purchase amount"},{"propertyName":"currency","type":"string","expectedValue":"USD","isMandatory":false,"description":"Currency code"}]}')
+

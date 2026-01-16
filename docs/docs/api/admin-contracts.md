@@ -508,4 +508,225 @@ or
 }
 ```
 
+## Event APIs
+
+Events define the structure and properties of user actions that can trigger CTAs. Each event includes a name and a list of properties with types, expected values, and mandatory flags.
+
+### Create or Update Events
+- **Path**: `/thunder/events`
+- **Method**: POST
+- **Headers**:
+  - `Content-Type: application/json`
+  - `x-tenant-id: <string>` (optional, defaults to "default")
+  - `x-source: <string>` (optional, defaults to "CONCORD") - Source system identifier
+- **Request Body**:
+```json
+{
+  "events": [
+    {
+      "eventName": "string (required) - Unique name of the event",
+      "properties": [
+        {
+          "propertyName": "string (required) - Name of the property",
+          "type": "string (required) - Data type of the property (e.g., String, Integer, Boolean)",
+          "expectedValue": "string (optional) - Expected value for the property",
+          "isMandatory": "boolean (required) - Whether the property is mandatory",
+          "description": "string (optional) - Description of the property"
+        }
+      ]
+    }
+  ]
+}
+```
+- **Responses**:
+  - **200**: Success response with number of events processed
+```json
+{
+  "success": true,
+  "data": {
+    "eventsProcessed": 2
+  },
+  "statusCode": 200
+}
+```
+  - **400**: Error response
+```json
+{
+  "error": {
+    "message": "Invalid event data",
+    "code": "INVALID_REQUEST"
+  }
+}
+```
+
+### Get All Events
+- **Path**: `/thunder/events`
+- **Method**: GET
+- **Headers**:
+  - `Content-Type: application/json`
+  - `x-tenant-id: <string>` (optional, defaults to "default")
+- **Request**: None
+- **Response**: List of all events with their properties
+```json
+{
+  "success": true,
+  "data": {
+    "eventList": [
+      {
+        "eventName": "string - Event name",
+        "properties": [
+          {
+            "propertyName": "string - Property name",
+            "type": "string - Property type",
+            "expectedValue": "string (nullable) - Expected value",
+            "isMandatory": "boolean - Whether property is mandatory",
+            "description": "string (nullable) - Property description"
+          }
+        ]
+      }
+    ]
+  },
+  "statusCode": 200
+}
+```
+
+### Get All Event Names
+- **Path**: `/thunder/events/list/names`
+- **Method**: GET
+- **Headers**:
+  - `Content-Type: application/json`
+  - `x-tenant-id: <string>` (optional, defaults to "default")
+- **Request**: None
+- **Response**: List of event names (lightweight endpoint)
+```json
+{
+  "success": true,
+  "data": {
+    "eventNames": [
+      "UserLoginEvent",
+      "PurchaseCompletedEvent"
+    ]
+  },
+  "statusCode": 200
+}
+```
+
+### Get Event by Name
+- **Path**: `/thunder/events/{event-name}`
+- **Method**: GET
+- **Path Parameters**:
+  - `event-name` (required) - Name of the event to retrieve
+- **Headers**:
+  - `Content-Type: application/json`
+  - `x-tenant-id: <string>` (optional, defaults to "default")
+- **Request**: None
+- **Response**: Event details with properties
+```json
+{
+  "success": true,
+  "data": {
+    "eventName": "string - Event name",
+    "properties": [
+      {
+        "propertyName": "string - Property name",
+        "type": "string - Property type",
+        "expectedValue": "string (nullable) - Expected value",
+        "isMandatory": "boolean - Whether property is mandatory",
+        "description": "string (nullable) - Property description"
+      }
+    ]
+  },
+  "statusCode": 200
+}
+```
+- **Responses**:
+  - **200**: Event found and returned
+  - **404**: Event not found
+```json
+{
+  "error": {
+    "message": "Event not found",
+    "code": "EVENT_NOT_FOUND"
+  }
+}
+```
+
+### Update Event Properties
+- **Path**: `/thunder/events/{event-name}`
+- **Method**: PUT
+- **Path Parameters**:
+  - `event-name` (required) - Name of the event to update
+- **Headers**:
+  - `Content-Type: application/json`
+  - `x-tenant-id: <string>` (optional, defaults to "default")
+- **Request Body**:
+```json
+{
+  "properties": [
+    {
+      "propertyName": "string (required) - Name of the property",
+      "type": "string (required) - Data type of the property",
+      "expectedValue": "string (optional) - Expected value for the property",
+      "isMandatory": "boolean (required) - Whether the property is mandatory",
+      "description": "string (optional) - Description of the property"
+    }
+  ]
+}
+```
+- **Responses**:
+  - **200**: Success response with empty object
+```json
+{
+  "success": true,
+  "data": null,
+  "statusCode": 200
+}
+```
+  - **400**: Error response
+```json
+{
+  "error": {
+    "message": "Invalid event properties",
+    "code": "INVALID_REQUEST"
+  }
+}
+```
+  - **404**: Event not found
+```json
+{
+  "error": {
+    "message": "Event not found",
+    "code": "EVENT_NOT_FOUND"
+  }
+}
+```
+
+### Delete Event
+- **Path**: `/thunder/events/{event-name}`
+- **Method**: DELETE
+- **Path Parameters**:
+  - `event-name` (required) - Name of the event to delete
+- **Headers**:
+  - `Content-Type: application/json`
+  - `x-tenant-id: <string>` (optional, defaults to "default")
+- **Request**: None
+- **Responses**:
+  - **200**: Success response with empty object
+```json
+{
+  "success": true,
+  "data": null,
+  "statusCode": 200
+}
+```
+  - **404**: Event not found
+```json
+{
+  "error": {
+    "message": "Event not found",
+    "code": "EVENT_NOT_FOUND"
+  }
+}
+```
+
 
