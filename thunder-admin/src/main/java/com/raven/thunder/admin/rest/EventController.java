@@ -296,10 +296,7 @@ public class EventController {
           @DefaultValue("default")
           @HeaderParam("x-tenant-id")
           String tenantId,
-      @Parameter(
-              name = "event-name",
-              description = "Name of the event to update",
-              required = true)
+      @Parameter(name = "event-name", description = "Name of the event to update", required = true)
           @NotNull
           @PathParam("event-name")
           String eventName,
@@ -353,10 +350,7 @@ public class EventController {
           @DefaultValue("default")
           @HeaderParam("x-tenant-id")
           String tenantId,
-      @Parameter(
-              name = "event-name",
-              description = "Name of the event to delete",
-              required = true)
+      @Parameter(name = "event-name", description = "Name of the event to delete", required = true)
           @NotNull
           @PathParam("event-name")
           String eventName) {
