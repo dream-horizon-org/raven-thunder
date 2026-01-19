@@ -337,6 +337,56 @@ components:
       - ANY
       - LIST
       - REST
+    EventInput:
+      type: object
+      required:
+      - eventName
+      - properties
+      properties:
+        eventName:
+          type: string
+        properties:
+          type: array
+          items:
+            $ref: "#/components/schemas/EventPropertyInput"
+          minItems: 1
+    EventPatchRequest:
+      type: object
+      required:
+      - properties
+      properties:
+        properties:
+          type: array
+          items:
+            $ref: "#/components/schemas/EventPropertyInput"
+          minItems: 1
+    EventPropertyInput:
+      type: object
+      required:
+      - propertyName
+      - type
+      - isMandatory
+      properties:
+        propertyName:
+          type: string
+        type:
+          type: string
+        expectedValue:
+          type: string
+        isMandatory:
+          type: boolean
+        description:
+          type: string
+    EventsUpsertRequest:
+      type: object
+      required:
+      - events
+      properties:
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/EventInput"
+          minItems: 1
     ExposureRule:
       type: object
       properties:
@@ -595,6 +645,10 @@ tags:
   description: "APIs for managing Call-to-Actions (CTAs). Includes CRUD operations\
     \ for creating, updating, retrieving, and listing CTAs with filtering and pagination\
     \ support."
+- name: Events
+  description: "APIs for managing Events. Events define the structure and properties\
+    \ of user actions that can trigger CTAs. Events include event names and their\
+    \ associated properties with types, expected values, and mandatory flags."
 - name: Filters
   description: "APIs for retrieving filter values used in the admin UI. Provides available\
     \ options for tags, teams, statuses, behaviour tags, and creators."
@@ -1421,6 +1475,234 @@ paths:
             \ SCHEDULED, LIVE, or PAUSED CTAs can be terminated."
         "404":
           description: CTA not found
+  /thunder/events:
+    post:
+      summary: Create or Update Events
+      description: "Creates new events or updates existing events. Events define the\
+        \ structure and properties of user actions that can trigger CTAs. Each event\
+        \ includes a name and a list of properties with types, expected values, and\
+        \ mandatory flags."
+      operationId: upsertEvents
+      tags:
+      - Events
+      parameters:
+      - description: Source system identifier
+        name: x-source
+        required: false
+        schema:
+          default: CONCORD
+        in: header
+      - description: Tenant ID for multi-tenancy support
+        name: x-tenant-id
+        required: false
+        schema:
+          default: default
+        in: header
+      requestBody:
+        description: List of events to create or update
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventsUpsertRequest"
+        required: true
+      responses:
+        "200":
+          description: Events created or updated successfully
+          content:
+            application/json:
+              examples:
+                Success Response:
+                  summary: Events upserted successfully
+                  value:
+                    success: true
+                    data:
+                      eventsProcessed: 2
+                    statusCode: 200
+        "400":
+          description: Invalid request data or validation failed
+    get:
+      summary: Get All Events
+      description: "Retrieves a list of all events for the specified tenant. Each\
+        \ event includes its name and associated properties with types, expected values,\
+        \ and mandatory flags."
+      operationId: getAllEvents
+      tags:
+      - Events
+      parameters:
+      - description: Tenant ID for multi-tenancy support
+        name: x-tenant-id
+        required: false
+        schema:
+          default: default
+        in: header
+      responses:
+        "200":
+          description: List of events retrieved successfully
+          content:
+            application/json:
+              examples:
+                Success Response:
+                  summary: Events list
+                  value:
+                    success: true
+                    data:
+                      eventList:
+                      - eventName: UserLoginEvent
+                        properties:
+                        - propertyName: userId
+                          type: String
+                          isMandatory: true
+                    statusCode: 200
+  /thunder/events/list/names:
+    get:
+      summary: Get All Event Names
+      description: Retrieves a list of all event names for the specified tenant. This
+        is a lightweight endpoint that returns only the event names without their
+        property details.
+      operationId: getAllEventNames
+      tags:
+      - Events
+      parameters:
+      - description: Tenant ID for multi-tenancy support
+        name: x-tenant-id
+        required: false
+        schema:
+          default: default
+        in: header
+      responses:
+        "200":
+          description: List of event names retrieved successfully
+          content:
+            application/json:
+              examples:
+                Success Response:
+                  summary: Event names list
+                  value:
+                    success: true
+                    data:
+                      eventNames:
+                      - UserLoginEvent
+                      - PurchaseCompletedEvent
+                    statusCode: 200
+  /thunder/events/{event-name}:
+    put:
+      summary: Update Event Properties
+      description: Updates the properties of an existing event. Only the properties
+        provided in the request will be updated. This allows partial updates to event
+        property definitions.
+      operationId: patchEvent
+      tags:
+      - Events
+      parameters:
+      - description: Name of the event to update
+        name: event-name
+        required: true
+        in: path
+        schema:
+          type: string
+      - description: Tenant ID for multi-tenancy support
+        name: x-tenant-id
+        required: false
+        schema:
+          default: default
+        in: header
+      requestBody:
+        description: List of properties to update for the event
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventPatchRequest"
+        required: true
+      responses:
+        "200":
+          description: Event properties updated successfully
+          content:
+            application/json:
+              examples:
+                Success Response:
+                  summary: Event updated
+                  value:
+                    success: true
+                    data: null
+                    statusCode: 200
+        "400":
+          description: Invalid request data or validation failed
+        "404":
+          description: Event not found
+    get:
+      summary: Get Event by Name
+      description: "Retrieves a specific event by its name for the specified tenant.\
+        \ Returns the event name and all associated properties with types, expected\
+        \ values, and mandatory flags."
+      operationId: getEvent
+      tags:
+      - Events
+      parameters:
+      - description: Name of the event to retrieve
+        name: event-name
+        required: true
+        in: path
+        schema:
+          type: string
+      - description: Tenant ID for multi-tenancy support
+        name: x-tenant-id
+        required: false
+        schema:
+          default: default
+        in: header
+      responses:
+        "200":
+          description: Event retrieved successfully
+          content:
+            application/json:
+              examples:
+                Success Response:
+                  summary: Event details
+                  value:
+                    success: true
+                    data:
+                      eventName: UserLoginEvent
+                      properties:
+                      - propertyName: userId
+                        type: String
+                        isMandatory: true
+                    statusCode: 200
+        "404":
+          description: Event not found
+    delete:
+      summary: Delete Event
+      description: Deletes an event by its name for the specified tenant. This operation
+        is irreversible.
+      operationId: deleteEvent
+      tags:
+      - Events
+      parameters:
+      - description: Name of the event to delete
+        name: event-name
+        required: true
+        in: path
+        schema:
+          type: string
+      - description: Tenant ID for multi-tenancy support
+        name: x-tenant-id
+        required: false
+        schema:
+          default: default
+        in: header
+      responses:
+        "200":
+          description: Event deleted successfully
+          content:
+            application/json:
+              examples:
+                Success Response:
+                  summary: Event deleted
+                  value:
+                    success: true
+                    data: null
+                    statusCode: 200
+        "404":
+          description: Event not found
   /thunder/filters:
     get:
       summary: Get Filters

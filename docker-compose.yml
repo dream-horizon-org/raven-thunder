@@ -107,7 +107,7 @@ services:
       - AEROSPIKE_HOST=aerospike
       - AEROSPIKE_PORT=3000
     entrypoint: ["wrapper"]
-    command: ["asadm", "-h", "aerospike", "-p", "3000", "-e", "enable; manage sindex create string idx_status ns thunder-admin set cta bin status; manage sindex create string idx_cta_tenantId ns thunder-admin set cta bin tenantId; manage sindex create string idx_behaviour_tag_tenantId ns thunder-admin set behaviour_tag bin tenantId; manage sindex create string idx_nudge_tenantId ns thunder-admin set nudge bin tenantId; manage sindex create string idx_nudgePreview_tenantId ns thunder-admin set nudgePreview bin tenantId;"]
+    command: ["asadm", "-h", "aerospike", "-p", "3000", "-e", "enable; manage sindex create string idx_status ns thunder-admin set cta bin status; manage sindex create string idx_cta_tenantId ns thunder-admin set cta bin tenantId; manage sindex create string idx_behaviour_tag_tenantId ns thunder-admin set behaviour_tag bin tenantId; manage sindex create string idx_nudge_tenantId ns thunder-admin set nudge bin tenantId; manage sindex create string idx_nudgePreview_tenantId ns thunder-admin set nudgePreview bin tenantId; manage sindex create string idx_event_schema_tenantId ns thunder-admin set event_schema bin tenant_id;"]
     networks:
       - thunder-network
     restart: "no"
