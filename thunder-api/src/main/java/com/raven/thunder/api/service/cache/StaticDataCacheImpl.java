@@ -124,10 +124,11 @@ public class StaticDataCacheImpl implements StaticDataCache {
     // Try to get from Config if available, otherwise use default
     try {
       Config config = SharedDataUtils.get(vertx.getDelegate(), Config.class);
-      if (config != null
-          && config.getCacheRefresh() != null
-          && config.getCacheRefresh().getMs() != null) {
-        return config.getCacheRefresh().getMs();
+      if (config != null && config.getCacheRefresh() != null) {
+        Long ms = config.getCacheRefresh().getMs();
+        if (ms != null) {
+          return ms;
+        }
       }
     } catch (Exception e) {
       log.debug(

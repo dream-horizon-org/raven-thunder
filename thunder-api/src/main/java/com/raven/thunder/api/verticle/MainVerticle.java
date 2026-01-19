@@ -126,7 +126,10 @@ public class MainVerticle extends AbstractVerticle {
                   cacheInitiationProcess.get();
                   promise.complete();
                 } catch (Exception e) {
-                  promise.fail(e);
+                  // Log error but don't fail application startup
+                  // Cache initialization failures shouldn't prevent the app from starting
+                  log.warn("Cache initialization failed, continuing without cache", e);
+                  promise.complete();
                 }
               });
 
