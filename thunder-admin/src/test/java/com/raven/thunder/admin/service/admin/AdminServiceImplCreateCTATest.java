@@ -68,7 +68,7 @@ class AdminServiceImplCreateCTATest {
     Frequency frequency = new Frequency();
     frequency.setSession(session);
     frequency.setWindow(window);
-    frequency.setLifeSpan(lifespan);
+    frequency.setLifespan(lifespan);
 
     RuleRequest rule =
         new RuleRequest(
