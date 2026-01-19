@@ -2,6 +2,7 @@ package com.raven.thunder.admin.service;
 
 import com.raven.thunder.admin.io.request.CTARequest;
 import com.raven.thunder.admin.io.request.CTAUpdateRequest;
+import com.raven.thunder.admin.io.request.TestCTARequest;
 import com.raven.thunder.admin.io.response.CTAListResponse;
 import com.raven.thunder.admin.model.FilterProps;
 import com.raven.thunder.core.io.response.FilterResponse;
@@ -90,4 +91,24 @@ public interface AdminService {
 
   /** Concludes CTAs whose end time has passed. */
   void terminateExpiredCTA();
+
+  /**
+   * Creates a new test CTA for specific users.
+   *
+   * @param tenantId tenant identifier
+   * @param testCta validated test CTA create request
+   * @param user user performing the operation
+   * @return generated test CTA id
+   */
+  Single<Long> createTestCTA(
+      String tenantId, @NotNull @Valid TestCTARequest testCta, @NotNull String user);
+
+  /**
+   * Removes a test CTA.
+   *
+   * @param tenantId tenant identifier
+   * @param ctaId test CTA identifier
+   * @return completes when deletion succeeds
+   */
+  Completable removeTestCTA(String tenantId, Long ctaId);
 }

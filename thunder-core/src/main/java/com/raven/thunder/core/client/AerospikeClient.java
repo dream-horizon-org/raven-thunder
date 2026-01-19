@@ -30,6 +30,8 @@ public interface AerospikeClient {
 
   Single<Key> rxPut(WritePolicy writePolicy, Key key, Bin... bins);
 
+  Single<Boolean> rxDelete(WritePolicy writePolicy, Key key);
+
   Single<Record> rxOperate(WritePolicy writePolicy, Key key, Operation... operations);
 
   Single<List<KeyRecord>> rxQuery(QueryPolicy queryPolicy, Statement statement);

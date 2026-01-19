@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.raven.thunder.api.dao.StateMachineRepository;
 import com.raven.thunder.api.io.request.CTASnapshotRequest;
 import com.raven.thunder.api.io.response.CTAResponse;
+import com.raven.thunder.api.model.UserDataSnapshot;
 import com.raven.thunder.api.service.SdkService;
 import com.raven.thunder.api.service.StaticDataCache;
 import com.raven.thunder.api.service.UserCohortsClient;
@@ -13,13 +14,19 @@ import com.raven.thunder.api.util.StateMachineUtil;
 import com.raven.thunder.core.dao.NudgePreviewRepository;
 import com.raven.thunder.core.model.BehaviourTag;
 import com.raven.thunder.core.model.CTA;
+import com.raven.thunder.core.model.CTAStatus;
 import com.raven.thunder.core.model.NudgePreview;
+import com.raven.thunder.core.model.TestCTA;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * SDK service implementation responsible for resolving eligible CTAs for a user, merging client
@@ -59,14 +66,16 @@ public class SdkServiceImpl implements SdkService {
   @Override
   public Maybe<CTAResponse> appLaunch(
       String tenantId, Long userId, CTASnapshotRequest deltaSnapshot) {
+    Map<Long, CTA> tenantActiveCTAs =
+        CTAFilterUtil.filterByTenant(cache.findAllActiveCTA(), tenantId);
+
     return userCohortsClient
         .findAllCohorts(userId)
         .map(
             cohorts ->
-                CTAFilterUtil.filterEligibleCTAs(
-                    tenantId,
-                    cohorts,
-                    CTAFilterUtil.filterByTenant(cache.findAllActiveCTA(), tenantId)))
+                eligibleCTA(
+                    tenantId, cohorts != null ? Set.copyOf(cohorts) : Set.of(), tenantActiveCTAs))
+        .map(eligibleCTAs -> addTestCTAsToResponse(eligibleCTAs, tenantId, userId))
         .filter(activeCTAs -> !activeCTAs.isEmpty())
         .flatMapSingle(
             activeCTAs ->
@@ -87,6 +96,45 @@ public class SdkServiceImpl implements SdkService {
                     .map(snapshot -> buildCTAResponse(tenantId, activeCTAs, snapshot)));
   }
 
+  private Map<Long, CTA> eligibleCTA(
+      String tenantId, Set<String> cohorts, Map<Long, CTA> activeCTAs) {
+    return CTAFilterUtil.filterEligibleCTAs(tenantId, cohorts, activeCTAs);
+  }
+
+  private Map<Long, CTA> addTestCTAsToResponse(
+      Map<Long, CTA> activeCtas, String tenantId, Long userId) {
+    String cacheKey = tenantId + ":" + userId;
+    List<TestCTA> testCTAs = cache.fetchUserTestCtaMap().get(cacheKey);
+
+    if (ObjectUtils.isNotEmpty(testCTAs)) {
+      for (TestCTA testCTA : testCTAs) {
+        activeCtas.put(testCTA.getId(), testCtaToCTA(testCTA));
+      }
+    }
+
+    return activeCtas;
+  }
+
+  private CTA testCtaToCTA(TestCTA testCTA) {
+    return CTA.builder()
+        .id(testCTA.getId())
+        .rule(testCTA.getRule())
+        .tenantId(testCTA.getTenantId())
+        .createdAt(testCTA.getCreatedAt())
+        .createdBy(testCTA.getCreatedBy())
+        .endTime(testCTA.getExpiresAt())
+        .startTime(testCTA.getCreatedAt())
+        .lastUpdatedAt(testCTA.getCreatedAt())
+        .lastUpdatedBy(testCTA.getCreatedBy())
+        .ctaStatus(CTAStatus.LIVE)
+        .name("")
+        .description("")
+        .tags(Collections.emptyList())
+        .team("")
+        .behaviourTags(Collections.emptyList())
+        .build();
+  }
+
   @Override
   public Single<Boolean> merge(String tenantId, Long userId, CTASnapshotRequest deltaSnapshot) {
     return loadOrCreateSnapshot(tenantId, userId)
@@ -103,28 +151,22 @@ public class SdkServiceImpl implements SdkService {
     return nudgePreviewRepository.find(tenantId, id);
   }
 
-  private Single<com.raven.thunder.api.model.UserDataSnapshot> loadOrCreateSnapshot(
-      String tenantId, Long userId) {
+  private Single<UserDataSnapshot> loadOrCreateSnapshot(String tenantId, Long userId) {
     return stateMachineRepository
         .find(tenantId, userId)
         .switchIfEmpty(
             Single.defer(
-                () ->
-                    Single.just(
-                        new com.raven.thunder.api.model.UserDataSnapshot(
-                            new HashMap<>(), new HashMap<>()))));
+                () -> Single.just(new UserDataSnapshot(new HashMap<>(), new HashMap<>()))));
   }
 
   private boolean updateSnapshotWithStaleData(
-      String tenantId,
-      Map<Long, CTA> activeCTAs,
-      com.raven.thunder.api.model.UserDataSnapshot snapshot) {
+      String tenantId, Map<Long, CTA> activeCTAs, UserDataSnapshot snapshot) {
     Map<Long, CTA> pausedCTAs = CTAFilterUtil.filterByTenant(cache.findAllPausedCTA(), tenantId);
     return StateMachineUtil.archiveStaleData(activeCTAs, pausedCTAs, snapshot);
   }
 
   private boolean mergeDeltaSnapshotIfPresent(
-      com.raven.thunder.api.model.UserDataSnapshot snapshot, CTASnapshotRequest deltaSnapshot) {
+      UserDataSnapshot snapshot, CTASnapshotRequest deltaSnapshot) {
     if (deltaSnapshot != null
         && deltaSnapshot.getCtas() != null
         && !deltaSnapshot.getCtas().isEmpty()) {
@@ -135,9 +177,7 @@ public class SdkServiceImpl implements SdkService {
   }
 
   private CTAResponse buildCTAResponse(
-      String tenantId,
-      Map<Long, CTA> activeCTAs,
-      com.raven.thunder.api.model.UserDataSnapshot snapshot) {
+      String tenantId, Map<Long, CTA> activeCTAs, UserDataSnapshot snapshot) {
     Map<String, BehaviourTag> tenantBehaviourTags =
         cache.findAllBehaviourTags().entrySet().stream()
             .filter(e -> tenantId.equals(e.getValue().getTenantId()))

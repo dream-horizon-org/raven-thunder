@@ -1,6 +1,8 @@
 package com.raven.thunder.core.client;
 
+import com.aerospike.client.AerospikeClient;
 import com.aerospike.client.Bin;
+import com.aerospike.client.Host;
 import com.aerospike.client.Key;
 import com.aerospike.client.Operation;
 import com.aerospike.client.Record;
@@ -24,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
-public class AerospikeClientImpl implements AerospikeClient {
+public class AerospikeClientImpl implements com.raven.thunder.core.client.AerospikeClient {
 
   private com.aerospike.client.AerospikeClient client;
   private final AerospikeConfig config;
@@ -39,20 +41,18 @@ public class AerospikeClientImpl implements AerospikeClient {
                 policy.maxConnsPerNode = config.getMaxConnections();
 
                 String[] hostPorts = config.getHost().split(",");
-                com.aerospike.client.Host[] hosts =
+                Host[] hosts =
                     Arrays.stream(hostPorts)
                         .map(
                             hp -> {
                               String[] parts = hp.trim().split(":");
                               if (parts.length == 2) {
-                                return new com.aerospike.client.Host(
-                                    parts[0].trim(), Integer.parseInt(parts[1].trim()));
+                                return new Host(parts[0].trim(), Integer.parseInt(parts[1].trim()));
                               } else {
-                                return new com.aerospike.client.Host(
-                                    parts[0].trim(), config.getPort());
+                                return new Host(parts[0].trim(), config.getPort());
                               }
                             })
-                        .toArray(com.aerospike.client.Host[]::new);
+                        .toArray(Host[]::new);
 
                 this.client = new com.aerospike.client.AerospikeClient(policy, hosts);
                 log.info("Aerospike client connected successfully to host: {}", config.getHost());
@@ -76,7 +76,7 @@ public class AerospikeClientImpl implements AerospikeClient {
   }
 
   @Override
-  public com.aerospike.client.AerospikeClient getClient() {
+  public AerospikeClient getClient() {
     if (client == null) {
       throw new IllegalStateException("Aerospike client is not initialized");
     }
@@ -105,6 +105,11 @@ public class AerospikeClientImpl implements AerospikeClient {
           getClient().put(writePolicy, key, bins);
           return key;
         });
+  }
+
+  @Override
+  public Single<Boolean> rxDelete(WritePolicy writePolicy, Key key) {
+    return Single.fromCallable(() -> getClient().delete(writePolicy, key));
   }
 
   @Override

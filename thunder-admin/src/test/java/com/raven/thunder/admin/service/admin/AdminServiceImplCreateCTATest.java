@@ -11,6 +11,7 @@ import com.raven.thunder.admin.io.request.RuleRequest;
 import com.raven.thunder.admin.service.AdminService;
 import com.raven.thunder.core.dao.CTARepository;
 import com.raven.thunder.core.dao.NudgePreviewRepository;
+import com.raven.thunder.core.dao.TestCTARepository;
 import com.raven.thunder.core.io.response.FilterResponse;
 import com.raven.thunder.core.model.CohortEligibility;
 import com.raven.thunder.core.model.Frequency;
@@ -36,6 +37,7 @@ class AdminServiceImplCreateCTATest {
 
   @Mock private CTARepository ctaRepository;
   @Mock private NudgePreviewRepository nudgePreviewRepository;
+  @Mock private TestCTARepository testCTARepository;
 
   @InjectMocks private AdminServiceImpl adminService;
 
@@ -110,7 +112,8 @@ class AdminServiceImplCreateCTATest {
             eq(tenantId), anyList(), anyString(), anyString(), anyString()))
         .thenReturn(Completable.complete());
 
-    AdminService service = new AdminServiceImpl(ctaRepository, nudgePreviewRepository);
+    AdminService service =
+        new AdminServiceImpl(ctaRepository, nudgePreviewRepository, testCTARepository);
     Long id = service.createCTA(tenantId, req, user).blockingGet();
 
     assertThat(id).isEqualTo(123L);
@@ -132,7 +135,8 @@ class AdminServiceImplCreateCTATest {
         .thenReturn(
             Maybe.just(new FilterResponse(List.of("Duplicate"), List.of(), List.of(), List.of())));
 
-    AdminService service = new AdminServiceImpl(ctaRepository, nudgePreviewRepository);
+    AdminService service =
+        new AdminServiceImpl(ctaRepository, nudgePreviewRepository, testCTARepository);
 
     assertThrows(
         DefinedException.class, () -> service.createCTA(tenantId, req, user).blockingGet());

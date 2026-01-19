@@ -2,6 +2,8 @@ package com.raven.thunder.api.service;
 
 import com.raven.thunder.core.model.BehaviourTag;
 import com.raven.thunder.core.model.CTA;
+import com.raven.thunder.core.model.TestCTA;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -23,4 +25,7 @@ public interface StaticDataCache {
 
   /** Returns a snapshot of behaviour tags keyed by tag name. */
   Map<String, BehaviourTag> findAllBehaviourTags();
+
+  /** Returns a map of test CTAs keyed by tenantId:userId. */
+  Map<String, List<TestCTA>> fetchUserTestCtaMap();
 }

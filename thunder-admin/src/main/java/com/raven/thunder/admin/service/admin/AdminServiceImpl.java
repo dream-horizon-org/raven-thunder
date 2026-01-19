@@ -5,6 +5,7 @@ import com.raven.thunder.admin.exception.DefinedException;
 import com.raven.thunder.admin.exception.ErrorEntity;
 import com.raven.thunder.admin.io.request.CTARequest;
 import com.raven.thunder.admin.io.request.CTAUpdateRequest;
+import com.raven.thunder.admin.io.request.TestCTARequest;
 import com.raven.thunder.admin.io.response.CTAListResponse;
 import com.raven.thunder.admin.model.FilterProps;
 import com.raven.thunder.admin.service.AdminService;
@@ -14,6 +15,7 @@ import com.raven.thunder.admin.util.CTAStatusValidator;
 import com.raven.thunder.admin.util.Constants;
 import com.raven.thunder.core.dao.CTARepository;
 import com.raven.thunder.core.dao.NudgePreviewRepository;
+import com.raven.thunder.core.dao.TestCTARepository;
 import com.raven.thunder.core.dao.cta.ActiveCTA;
 import com.raven.thunder.core.dao.cta.ScheduledCTA;
 import com.raven.thunder.core.error.ServiceError;
@@ -32,20 +34,26 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 
 @Slf4j
 public class AdminServiceImpl implements AdminService {
 
   private final CTARepository ctaRepository;
   private final NudgePreviewRepository nudgePreviewRepository;
+  private final TestCTARepository testCTARepository;
   private final CreateCTAMapper createCtaMapper = new CreateCTAMapper();
+  private final CreateTestCTAMapper createTestCTAMapper = new CreateTestCTAMapper();
   private final CTAUpdateValidator ctaUpdateValidator = new CTAUpdateValidator();
 
   @Inject
   public AdminServiceImpl(
-      CTARepository ctaRepository, NudgePreviewRepository nudgePreviewRepository) {
+      CTARepository ctaRepository,
+      NudgePreviewRepository nudgePreviewRepository,
+      TestCTARepository testCTARepository) {
     this.ctaRepository = ctaRepository;
     this.nudgePreviewRepository = nudgePreviewRepository;
+    this.testCTARepository = testCTARepository;
   }
 
   @Override
@@ -333,5 +341,42 @@ public class AdminServiceImpl implements AdminService {
         .subscribe(
             () -> log.info("CTA terminated: {}", ctaId),
             error -> log.error("Error terminating CTA: {}", ctaId, error));
+  }
+
+  @Override
+  public Single<Long> createTestCTA(
+      String tenantId, @NotNull @Valid TestCTARequest testCta, @NotNull String user) {
+
+    // If previousCtaId is present, delete it first (idempotent: ignore errors on delete).
+    Completable preDelete =
+        ObjectUtils.isNotEmpty(testCta.getPreviousCtaId())
+            ? removeTestCTA(tenantId, testCta.getPreviousCtaId())
+                .onErrorComplete() // don't fail the whole op if the old one is already gone
+            : Completable.complete();
+
+    return preDelete
+        .andThen(
+            ctaRepository
+                .generatedIncrementId(tenantId)
+                .flatMap(
+                    id ->
+                        testCTARepository
+                            .create(
+                                tenantId, createTestCTAMapper.apply(tenantId, testCta, user, id))
+                            .toSingleDefault(Long.parseLong(id.toString()))))
+        .doOnError(
+            error ->
+                log.error("Error creating TestCTA for tenant: {}, user: {}", tenantId, user, error))
+        .onErrorResumeNext(
+            throwable -> Single.error(new DefinedException(ErrorEntity.CTA_CREATION_ERROR)));
+  }
+
+  @Override
+  public Completable removeTestCTA(String tenantId, Long ctaId) {
+    return testCTARepository
+        .find(tenantId, ctaId)
+        .switchIfEmpty(
+            Single.defer(() -> Single.error(new DefinedException(ErrorEntity.NO_SUCH_CTA))))
+        .flatMapCompletable(cta -> testCTARepository.delete(ctaId).ignoreElement());
   }
 }

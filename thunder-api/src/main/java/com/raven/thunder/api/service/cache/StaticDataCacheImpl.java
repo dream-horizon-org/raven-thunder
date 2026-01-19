@@ -6,20 +6,24 @@ import com.raven.thunder.api.service.StaticDataCache;
 import com.raven.thunder.core.config.Config;
 import com.raven.thunder.core.dao.BehaviourTagsRepository;
 import com.raven.thunder.core.dao.CTARepository;
+import com.raven.thunder.core.dao.TestCTARepository;
 import com.raven.thunder.core.model.BehaviourTag;
 import com.raven.thunder.core.model.CTA;
+import com.raven.thunder.core.model.TestCTA;
+import com.raven.thunder.core.util.SharedDataUtils;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
 import io.vertx.rxjava3.core.Vertx;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Cache implementation for static data (CTAs and BehaviourTags). Loads data from
- * repositories on initialization and refreshes periodically based on configuration.
+ * Cache implementation for static data (CTAs and BehaviourTags). Loads data from repositories on
+ * initialization and refreshes periodically based on configuration.
  */
 @Slf4j
 @Singleton
@@ -27,8 +31,9 @@ public class StaticDataCacheImpl implements StaticDataCache {
 
   private final CTARepository ctaRepository;
   private final BehaviourTagsRepository behaviourTagsRepository;
-  private final Config config;
+  private final TestCTARepository testCTARepository;
   private final Vertx vertx;
+  private static final long DEFAULT_CACHE_REFRESH_INTERVAL_MS = 30000L; // 30 seconds default
   private MasterData masterDataCache;
   private final AtomicBoolean isCacheInitiationProcessTriggered = new AtomicBoolean(false);
   private final CompletableFuture<Void> cacheInitiationProcess = new CompletableFuture<>();
@@ -37,17 +42,18 @@ public class StaticDataCacheImpl implements StaticDataCache {
   public StaticDataCacheImpl(
       CTARepository ctaRepository,
       BehaviourTagsRepository behaviourTagsRepository,
-      Config config,
+      TestCTARepository testCTARepository,
       Vertx vertx) {
     this.ctaRepository = ctaRepository;
     this.behaviourTagsRepository = behaviourTagsRepository;
-    this.config = config;
+    this.testCTARepository = testCTARepository;
     this.vertx = vertx;
     // Initialize with empty data to avoid NPE
     this.masterDataCache = new MasterData();
     this.masterDataCache.setActiveCTACache(Collections.emptyMap());
     this.masterDataCache.setPausedCTACache(Collections.emptyMap());
     this.masterDataCache.setBehaviourTagCache(Collections.emptyMap());
+    this.masterDataCache.setTestCTACache(Collections.emptyMap());
   }
 
   @Override
@@ -66,7 +72,8 @@ public class StaticDataCacheImpl implements StaticDataCache {
               if (refreshInterval != null && refreshInterval > 0) {
                 scheduleCacheRefresh(refreshInterval);
               } else {
-                log.warn("Cache refresh interval not configured or invalid, cache will not refresh periodically");
+                log.warn(
+                    "Cache refresh interval not configured or invalid, cache will not refresh periodically");
               }
               cacheInitiationProcess.complete(null);
             },
@@ -81,11 +88,13 @@ public class StaticDataCacheImpl implements StaticDataCache {
             ctaRepository.findAllWithStatusActive(),
             ctaRepository.findAllWithStatusPaused(),
             behaviourTagsRepository.findAll(),
-            (activeCTAs, pausedCTAs, behaviourTags) -> {
+            testCTARepository.fetchAllTestCTAs(),
+            (activeCTAs, pausedCTAs, behaviourTags, testCTAs) -> {
               MasterData masterData = new MasterData();
               masterData.setActiveCTACache(activeCTAs);
               masterData.setPausedCTACache(pausedCTAs);
               masterData.setBehaviourTagCache(behaviourTags);
+              masterData.setTestCTACache(testCTAs);
               return masterData;
             })
         .doOnSuccess(
@@ -112,19 +121,20 @@ public class StaticDataCacheImpl implements StaticDataCache {
   }
 
   private Long getCacheRefreshInterval() {
-    if (config == null) {
-      log.warn("Config is null");
-      return null;
+    // Try to get from Config if available, otherwise use default
+    try {
+      Config config = SharedDataUtils.get(vertx.getDelegate(), Config.class);
+      if (config != null
+          && config.getCacheRefresh() != null
+          && config.getCacheRefresh().getMs() != null) {
+        return config.getCacheRefresh().getMs();
+      }
+    } catch (Exception e) {
+      log.debug(
+          "Could not retrieve Config from SharedData, using default cache refresh interval", e);
     }
-    if (config.getCacheRefresh() == null) {
-      log.warn("Config.cacheRefresh is null");
-      return null;
-    }
-    if (config.getCacheRefresh().getMs() == null) {
-      log.warn("Config.cacheRefresh.ms is null");
-      return null;
-    }
-    return config.getCacheRefresh().getMs();
+    log.info("Using default cache refresh interval: {} ms", DEFAULT_CACHE_REFRESH_INTERVAL_MS);
+    return DEFAULT_CACHE_REFRESH_INTERVAL_MS;
   }
 
   @Override
@@ -149,5 +159,13 @@ public class StaticDataCacheImpl implements StaticDataCache {
       return Collections.emptyMap();
     }
     return masterDataCache.getBehaviourTagCache();
+  }
+
+  @Override
+  public Map<String, List<TestCTA>> fetchUserTestCtaMap() {
+    if (masterDataCache == null || masterDataCache.getTestCTACache() == null) {
+      return Collections.emptyMap();
+    }
+    return masterDataCache.getTestCTACache();
   }
 }

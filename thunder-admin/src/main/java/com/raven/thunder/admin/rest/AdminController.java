@@ -5,6 +5,7 @@ import static com.raven.thunder.admin.constant.Constants.USER_ID_NULL_ERROR_MESS
 import com.google.inject.Inject;
 import com.raven.thunder.admin.io.request.CTARequest;
 import com.raven.thunder.admin.io.request.CTAUpdateRequest;
+import com.raven.thunder.admin.io.request.TestCTARequest;
 import com.raven.thunder.admin.io.response.CTAListResponse;
 import com.raven.thunder.admin.model.FilterProps;
 import com.raven.thunder.admin.service.AdminService;
@@ -15,7 +16,17 @@ import com.raven.thunder.core.model.CTA;
 import com.raven.thunder.core.model.NudgePreview;
 import com.raven.thunder.core.util.FormatUtil;
 import com.raven.thunder.core.util.ResponseWrapper;
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import java.util.concurrent.CompletionStage;
 import javax.validation.Valid;
@@ -842,5 +853,26 @@ public class AdminController {
           Long id) {
     return ResponseWrapper.fromCompletable(
         service.updateStatusToTerminated(tenantId, id), null, 200);
+  }
+
+  @POST
+  @Path("/ctas/test/create")
+  @Consumes(MediaType.WILDCARD)
+  @Produces(MediaType.APPLICATION_JSON)
+  public CompletionStage<Response<Long>> createTestCta(
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
+      @NotNull @Valid TestCTARequest testCta,
+      @NotNull(message = USER_ID_NULL_ERROR_MESSAGE) @HeaderParam("user") String user) {
+    return ResponseWrapper.fromSingle(service.createTestCTA(tenantId, testCta, user), 200);
+  }
+
+  @DELETE
+  @Path("/ctas/test/{ctaId}")
+  @Consumes(MediaType.WILDCARD)
+  @Produces(MediaType.APPLICATION_JSON)
+  public CompletionStage<Response<Object>> removeTestCta(
+      @DefaultValue("default") @HeaderParam("x-tenant-id") String tenantId,
+      @NotNull @PathParam("ctaId") Long ctaId) {
+    return ResponseWrapper.fromCompletable(service.removeTestCTA(tenantId, ctaId), null, 200);
   }
 }

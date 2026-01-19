@@ -9,6 +9,7 @@ import com.raven.thunder.admin.exception.DefinedException;
 import com.raven.thunder.admin.service.AdminService;
 import com.raven.thunder.core.dao.CTARepository;
 import com.raven.thunder.core.dao.NudgePreviewRepository;
+import com.raven.thunder.core.dao.TestCTARepository;
 import com.raven.thunder.core.dao.cta.CTADetails;
 import com.raven.thunder.core.model.CTA;
 import com.raven.thunder.core.model.CTAStatus;
@@ -26,6 +27,7 @@ class AdminServiceImplStatusTest {
 
   @Mock private CTARepository ctaRepository;
   @Mock private NudgePreviewRepository nudgePreviewRepository;
+  @Mock private TestCTARepository testCTARepository;
   @InjectMocks private AdminServiceImpl adminService;
 
   @Test
@@ -44,7 +46,8 @@ class AdminServiceImplStatusTest {
             eq(id), eq(CTAStatus.LIVE), startCaptor.capture(), endCaptor.capture()))
         .thenReturn(Completable.complete());
 
-    AdminService svc = new AdminServiceImpl(ctaRepository, nudgePreviewRepository);
+    AdminService svc =
+        new AdminServiceImpl(ctaRepository, nudgePreviewRepository, testCTARepository);
     svc.updateStatusToLive(tenantId, id).test().assertComplete();
 
     verify(ctaRepository, times(1)).find(tenantId, id);
@@ -65,7 +68,8 @@ class AdminServiceImplStatusTest {
 
     when(ctaRepository.find(tenantId, id)).thenReturn(Maybe.just(live));
 
-    AdminService svc = new AdminServiceImpl(ctaRepository, nudgePreviewRepository);
+    AdminService svc =
+        new AdminServiceImpl(ctaRepository, nudgePreviewRepository, testCTARepository);
     assertThrows(
         DefinedException.class, () -> svc.updateStatusToLive(tenantId, id).blockingAwait());
     verify(ctaRepository, never()).update(eq(id), eq(CTAStatus.LIVE), anyLong(), anyLong());
@@ -86,7 +90,8 @@ class AdminServiceImplStatusTest {
     when(ctaRepository.update(id, generation, CTAStatus.SCHEDULED))
         .thenReturn(Completable.complete());
 
-    AdminService svc = new AdminServiceImpl(ctaRepository, nudgePreviewRepository);
+    AdminService svc =
+        new AdminServiceImpl(ctaRepository, nudgePreviewRepository, testCTARepository);
     svc.updateStatusToScheduled(tenantId, id).test().assertComplete();
 
     verify(ctaRepository, times(1)).findWithGeneration(tenantId, id);
@@ -105,7 +110,8 @@ class AdminServiceImplStatusTest {
 
     when(ctaRepository.findWithGeneration(tenantId, id)).thenReturn(Maybe.just(details));
 
-    AdminService svc = new AdminServiceImpl(ctaRepository, nudgePreviewRepository);
+    AdminService svc =
+        new AdminServiceImpl(ctaRepository, nudgePreviewRepository, testCTARepository);
     assertThrows(
         DefinedException.class, () -> svc.updateStatusToScheduled(tenantId, id).blockingAwait());
     verify(ctaRepository, never()).update(eq(id), anyInt(), eq(CTAStatus.SCHEDULED));
@@ -122,7 +128,8 @@ class AdminServiceImplStatusTest {
     when(ctaRepository.find(tenantId, id)).thenReturn(Maybe.just(live));
     when(ctaRepository.update(id, CTAStatus.PAUSED)).thenReturn(Completable.complete());
 
-    AdminService svc = new AdminServiceImpl(ctaRepository, nudgePreviewRepository);
+    AdminService svc =
+        new AdminServiceImpl(ctaRepository, nudgePreviewRepository, testCTARepository);
     svc.updateStatusToPaused(tenantId, id).test().assertComplete();
 
     verify(ctaRepository, times(1)).update(id, CTAStatus.PAUSED);
