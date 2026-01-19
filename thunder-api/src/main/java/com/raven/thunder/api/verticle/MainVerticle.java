@@ -1,13 +1,13 @@
 package com.raven.thunder.api.verticle;
 
+import com.raven.thunder.api.injection.GuiceInjector;
+import com.raven.thunder.api.service.StaticDataCache;
 import com.raven.thunder.core.client.AerospikeClient;
 import com.raven.thunder.core.client.AerospikeClientHolder;
 import com.raven.thunder.core.client.AerospikeClientImpl;
 import com.raven.thunder.core.config.AerospikeConfig;
 import com.raven.thunder.core.config.Config;
 import com.raven.thunder.core.config.ServerConfig;
-import com.raven.thunder.api.injection.GuiceInjector;
-import com.raven.thunder.api.service.StaticDataCache;
 import com.raven.thunder.core.util.ConfigUtil;
 import com.raven.thunder.core.util.SharedDataUtils;
 import io.reactivex.rxjava3.core.Completable;
