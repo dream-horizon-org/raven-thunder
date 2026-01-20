@@ -1,7 +1,12 @@
 package com.raven.thunder.admin.it;
 
+import com.raven.thunder.admin.injection.GuiceInjector;
+import com.raven.thunder.admin.injection.MainModule;
 import io.restassured.RestAssured;
 import io.vertx.rxjava3.core.Vertx;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.util.List;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestInstancePostProcessor;
@@ -65,8 +70,7 @@ public class Setup
 
   private void initializeGuiceInjector() {
     try {
-      com.raven.thunder.admin.injection.GuiceInjector.initialize(
-          java.util.List.of(new com.raven.thunder.admin.injection.MainModule(vertx.getDelegate())));
+      GuiceInjector.initialize(List.of(new MainModule(vertx.getDelegate())));
     } catch (IllegalStateException ignored) {
       // Already initialized - safe to continue
     }
@@ -97,10 +101,10 @@ public class Setup
   }
 
   private static int findFreePort() {
-    try (java.net.ServerSocket socket = new java.net.ServerSocket(0)) {
+    try (ServerSocket socket = new ServerSocket(0)) {
       socket.setReuseAddress(true);
       return socket.getLocalPort();
-    } catch (java.io.IOException e) {
+    } catch (IOException e) {
       return 8081;
     }
   }

@@ -6,6 +6,8 @@ import com.raven.thunder.api.io.response.RuleResponse;
 import com.raven.thunder.api.model.BehaviourExposureRule;
 import com.raven.thunder.api.model.CTARelationSnapshot;
 import com.raven.thunder.core.model.CTARelation;
+import com.raven.thunder.core.model.CtaRelationRule;
+import com.raven.thunder.core.model.CtaRelationRuleTypes;
 import com.raven.thunder.core.model.ExposureRule;
 import com.raven.thunder.core.model.Frequency;
 import com.raven.thunder.core.model.rule.LifespanFrequency;
@@ -15,6 +17,7 @@ import com.raven.thunder.core.model.rule.WindowFrequency;
 import com.raven.thunder.core.model.rule.WindowFrequencyUnit;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class MappersTest {
@@ -32,7 +35,7 @@ class MappersTest {
     Frequency frequency = new Frequency();
     frequency.setSession(session);
     frequency.setWindow(window);
-    frequency.setLifeSpan(lifespan);
+    frequency.setLifespan(lifespan);
 
     Rule rule =
         new Rule(
@@ -81,12 +84,8 @@ class MappersTest {
   @Test
   void ctaRelationMapper_mapsShownAndHideLists() {
     CTARelation relation = new CTARelation();
-    relation.setShownCta(
-        new com.raven.thunder.core.model.CtaRelationRule(
-            com.raven.thunder.core.model.CtaRelationRuleTypes.LIST, java.util.Set.of("a")));
-    relation.setHideCta(
-        new com.raven.thunder.core.model.CtaRelationRule(
-            com.raven.thunder.core.model.CtaRelationRuleTypes.LIST, java.util.Set.of("b")));
+    relation.setShownCta(new CtaRelationRule(CtaRelationRuleTypes.LIST, Set.of("a")));
+    relation.setHideCta(new CtaRelationRule(CtaRelationRuleTypes.LIST, Set.of("b")));
 
     CTARelationMapper mapper = new CTARelationMapper();
     CTARelationSnapshot snap = mapper.apply(relation);

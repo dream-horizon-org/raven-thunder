@@ -1,5 +1,7 @@
 package com.raven.thunder.api.verticle;
 
+import com.raven.thunder.api.injection.GuiceInjector;
+import com.raven.thunder.api.service.StaticDataCache;
 import com.raven.thunder.core.client.AerospikeClient;
 import com.raven.thunder.core.client.AerospikeClientHolder;
 import com.raven.thunder.core.client.AerospikeClientImpl;
@@ -9,10 +11,13 @@ import com.raven.thunder.core.config.ServerConfig;
 import com.raven.thunder.core.util.ConfigUtil;
 import com.raven.thunder.core.util.SharedDataUtils;
 import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Maybe;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.impl.cpu.CpuCoreSensor;
 import io.vertx.rxjava3.core.AbstractVerticle;
+import io.vertx.rxjava3.core.Promise;
+import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -102,7 +107,40 @@ public class MainVerticle extends AbstractVerticle {
         .rxDeployVerticle(
             () -> new RestVerticle(httpServerOptions),
             new DeploymentOptions().setInstances(instances))
-        .ignoreElement();
+        .flatMapCompletable(
+            deploymentId -> {
+              log.info("RestVerticle deployed successfully, initializing cache...");
+              return initializeStaticDataCache();
+            });
+  }
+
+  private Completable initializeStaticDataCache() {
+    try {
+      StaticDataCache cache = GuiceInjector.getGuiceInjector().getInstance(StaticDataCache.class);
+      CompletableFuture<?> cacheInitiationProcess = cache.initiateCache();
+
+      Maybe<Void> cacheInitiationProcessResult =
+          vertx.rxExecuteBlocking(
+              (Promise<Void> promise) -> {
+                try {
+                  cacheInitiationProcess.get();
+                  promise.complete();
+                } catch (Exception e) {
+                  // Log error but don't fail application startup
+                  // Cache initialization failures shouldn't prevent the app from starting
+                  log.warn("Cache initialization failed, continuing without cache", e);
+                  promise.complete();
+                }
+              });
+
+      return cacheInitiationProcessResult
+          .ignoreElement()
+          .doOnComplete(() -> log.info("Static data cache initialized successfully"))
+          .doOnError(error -> log.error("Failed to initialize static data cache", error));
+    } catch (Exception e) {
+      log.error("Failed to get StaticDataCache instance", e);
+      return Completable.error(e);
+    }
   }
 
   private Integer getNumOfCores() {

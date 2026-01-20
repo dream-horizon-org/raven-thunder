@@ -1,5 +1,6 @@
 package com.raven.thunder.admin.io.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.raven.thunder.core.model.CohortEligibility;
 import com.raven.thunder.core.model.Frequency;
 import com.raven.thunder.core.model.GroupByConfig;
@@ -17,6 +18,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Schema(
     description =
         "Rule configuration for CTA including cohort eligibility, state transitions, actions, and frequency. "

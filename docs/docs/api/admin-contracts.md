@@ -508,6 +508,95 @@ or
 }
 ```
 
+### Create Test CTA
+- **Path**: `/thunder/ctas/test/create`
+- **Method**: POST
+- **Headers**:
+  - `Content-Type: application/json`
+  - `x-tenant-id: <string>` (optional, defaults to "default")
+  - `user: <string>` (required) - User identifier performing the operation
+- **Request Body**:
+```json
+{
+  "userIds": "array<long> (required) - List of user IDs to target with this test CTA",
+  "expiresInMinutes": "long (required) - Expiration time in minutes from creation",
+  "previousCtaId": "long (optional) - ID of previous test CTA to delete (for idempotency)",
+  "rule": {
+    "cohortEligibility": {
+      "includes": "array<string> (required, non-empty) - List of cohorts to include",
+      "excludes": "array<string> (required) - List of cohorts to exclude"
+    },
+    "stateToAction": "map<string, string> (required, non-empty) - Mapping of state names to action names",
+    "resetStates": "array<string> (optional) - List of state names that trigger reset",
+    "resetCTAonFirstLaunch": "boolean (optional) - Whether to reset CTA state on first app launch",
+    "contextParams": "array<string> (optional) - List of context parameter names",
+    "stateTransition": "map<string, map<string, array<StateTransitionCondition>>> (required) - State transition rules",
+    "groupByConfig": {
+      "maxActiveStateMachineCount": "integer (optional) - Maximum number of active state machines per group",
+      "groupByKeys": "array<string> (optional) - Keys to group state machines by"
+    },
+    "priority": "integer (required) - CTA priority (higher number = higher priority)",
+    "stateMachineTTL": "long (required) - State machine time-to-live in milliseconds",
+    "actions": "array<map<string, object>> (required) - List of action definitions",
+    "frequency": {
+      "session": {
+        "limit": "integer (required) - Maximum number of exposures per session"
+      },
+      "window": {
+        "limit": "integer (required) - Maximum number of exposures in the time window",
+        "unit": "enum (required) - One of: days, hours, minutes, seconds",
+        "value": "integer (required) - Window duration value"
+      },
+      "lifeSpan": {
+        "limit": "integer (required) - Maximum number of exposures in user's lifetime"
+      }
+    }
+  }
+}
+```
+- **Responses**:
+  - **200**: Success response with created Test CTA ID
+```json
+{
+  "data": "long - Generated Test CTA ID"
+}
+```
+  - **400**: Error response
+```json
+{
+  "error": {
+    "message": "Error while creating CTA",
+    "code": "CTA_CREATION_ERROR"
+  }
+}
+```
+
+### Remove Test CTA
+- **Path**: `/thunder/ctas/test/{ctaId}`
+- **Method**: DELETE
+- **Path Parameters**:
+  - `ctaId` (required) - Test CTA identifier to remove
+- **Headers**:
+  - `Content-Type: application/json`
+  - `x-tenant-id: <string>` (optional, defaults to "default")
+- **Request**: None (empty body)
+- **Responses**:
+  - **200**: Success response with empty object
+```json
+{
+  "data": null
+}
+```
+  - **400**: Error response
+```json
+{
+  "error": {
+    "message": "Invalid cta id",
+    "code": "CTA_ID_INVALID"
+  }
+}
+```
+
 ## Event APIs
 
 Events define the structure and properties of user actions that can trigger CTAs. Each event includes a name and a list of properties with types, expected values, and mandatory flags.

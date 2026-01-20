@@ -9,6 +9,7 @@ import com.raven.thunder.admin.io.request.RuleRequest;
 import com.raven.thunder.admin.service.AdminService;
 import com.raven.thunder.core.dao.CTARepository;
 import com.raven.thunder.core.dao.NudgePreviewRepository;
+import com.raven.thunder.core.dao.TestCTARepository;
 import com.raven.thunder.core.dao.cta.CTADetails;
 import com.raven.thunder.core.model.CTAStatus;
 import com.raven.thunder.core.model.CohortEligibility;
@@ -34,6 +35,7 @@ class AdminServiceImplUpdateCTATest {
 
   @Mock private CTARepository ctaRepository;
   @Mock private NudgePreviewRepository nudgePreviewRepository;
+  @Mock private TestCTARepository testCTARepository;
   @InjectMocks private AdminServiceImpl adminService;
 
   private CTAUpdateRequest buildUpdateRequest() {
@@ -60,7 +62,7 @@ class AdminServiceImplUpdateCTATest {
     Frequency frequency = new Frequency();
     frequency.setSession(session);
     frequency.setWindow(window);
-    frequency.setLifeSpan(lifespan);
+    frequency.setLifespan(lifespan);
     RuleRequest rule =
         new RuleRequest(
             eligibility,
@@ -111,7 +113,8 @@ class AdminServiceImplUpdateCTATest {
             eq(tenantId), anyList(), anyString(), anyString(), anyString()))
         .thenReturn(Completable.complete());
 
-    AdminService svc = new AdminServiceImpl(ctaRepository, nudgePreviewRepository);
+    AdminService svc =
+        new AdminServiceImpl(ctaRepository, nudgePreviewRepository, testCTARepository);
     svc.updateCTA(tenantId, req, ctaId, "user@x").test().assertComplete();
 
     verify(ctaRepository, times(1)).findWithGeneration(tenantId, ctaId);
@@ -133,7 +136,8 @@ class AdminServiceImplUpdateCTATest {
     when(ctaRepository.update(any(), eq(gen)))
         .thenReturn(Completable.error(new RuntimeException("db")));
 
-    AdminService svc = new AdminServiceImpl(ctaRepository, nudgePreviewRepository);
+    AdminService svc =
+        new AdminServiceImpl(ctaRepository, nudgePreviewRepository, testCTARepository);
     // blockingAwait throws on error; ensure it's our domain exception
     org.junit.jupiter.api.Assertions.assertThrows(
         DefinedException.class,

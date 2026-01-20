@@ -15,6 +15,7 @@ import com.raven.thunder.api.service.UserCohortsClient;
 import com.raven.thunder.core.dao.NudgePreviewRepository;
 import com.raven.thunder.core.model.CTA;
 import com.raven.thunder.core.model.CohortEligibility;
+import com.raven.thunder.core.model.Frequency;
 import com.raven.thunder.core.model.rule.Rule;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
@@ -51,7 +52,7 @@ class SdkServiceImplAppLaunchTest {
             null,
             null,
             List.of(Map.of()),
-            new com.raven.thunder.core.model.Frequency());
+            new Frequency());
     CTA cta = new CTA();
     cta.setId(id);
     cta.setRule(rule);
